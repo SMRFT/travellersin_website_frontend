@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaCalendarAlt, FaUsers, FaInfoCircle, FaMapMarkerAlt, FaClock, FaUser, FaPhone } from 'react-icons/fa';
+import {
+    FaSearch, FaCalendarAlt, FaUsers, FaInfoCircle,
+    FaMapMarkerAlt, FaClock, FaUser, FaPhone,
+    FaDownload, FaShareAlt, FaHotel, FaCheckCircle
+} from 'react-icons/fa';
 import { trackEventBooking } from '../services/eventService';
+import html2pdf from 'html2pdf.js';
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  background: #FAFAFA;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
-  color: #fff;
+  color: #333;
 `;
 
 const Container = styled.div`
@@ -25,17 +30,15 @@ const Title = styled.h1`
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, #d4af37, #f5d76e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0F1E2E;
 `;
 
 const SearchCard = styled.div`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 24px;
   padding: 2.5rem;
-  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.05);
   margin-bottom: 3rem;
 `;
 
@@ -52,31 +55,31 @@ const InputGroup = styled.div`
 `;
 
 const Label = styled.label`
-  color: rgba(255, 255, 255, 0.5);
+  color: #666;
   font-size: 0.85rem;
   margin-left: 0.5rem;
 `;
 
 const Input = styled.input`
   padding: 1rem 1.2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #FAFAFA;
+  border: 1px solid #ddd;
   border-radius: 12px;
-  color: #fff;
+  color: #333;
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
-    background: rgba(255, 255, 255, 0.08);
+    border-color: #C9A24D;
+    background: #fff;
   }
 `;
 
 const SubmitBtn = styled(motion.button)`
   padding: 1.2rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   font-weight: 700;
@@ -90,11 +93,11 @@ const SubmitBtn = styled(motion.button)`
 `;
 
 const ResultCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 24px;
   padding: 2.5rem;
-  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 `;
 
 const StatusBadge = styled.div`
@@ -110,14 +113,14 @@ const StatusBadge = styled.div`
         switch (props.$status) {
             case 'confirmed': return 'rgba(16, 185, 129, 0.1)';
             case 'cancelled': return 'rgba(239, 68, 68, 0.1)';
-            default: return 'rgba(212, 175, 55, 0.1)';
+            default: return 'rgba(201, 162, 77, 0.1)';
         }
     }};
   color: ${props => {
         switch (props.$status) {
             case 'confirmed': return '#10b981';
             case 'cancelled': return '#ef4444';
-            default: return '#d4af37';
+            default: return '#C9A24D';
         }
     }};
 `;
@@ -139,7 +142,7 @@ const DetailItem = styled.div`
 `;
 
 const DetailIcon = styled.div`
-  color: #d4af37;
+  color: #C9A24D;
   font-size: 1.2rem;
   margin-top: 0.2rem;
 `;
@@ -150,7 +153,7 @@ const DetailContent = styled.div`
 `;
 
 const DetailLabel = styled.span`
-  color: rgba(255, 255, 255, 0.4);
+  color: #666;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -159,11 +162,86 @@ const DetailLabel = styled.span`
 const DetailValue = styled.span`
   font-size: 1.1rem;
   font-weight: 600;
-  color: #fff;
+  color: #0F1E2E;
+`;
+
+const ConfirmationCard = styled.div`
+  background: white;
+  color: #333;
+  width: 100%;
+  padding: 2.5rem;
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  margin-bottom: 2rem;
+  display: block; /* Shown by default inside ResultCard, but can be hidden for normal view if preferred */
+`;
+
+const CardHeader = styled.div`
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+`;
+
+const CardBrand = styled.div`
+  color: #d4af37;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+`;
+
+const PrintableDetail = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 0.5rem;
+
+  span:first-child { color: #666; font-weight: 500; }
+  span:last-child { color: #000; font-weight: 600; }
+`;
+
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+`;
+
+const ActionButton = styled(motion.button)`
+  flex: 1;
+  padding: 0.8rem 1.5rem;
+  background: ${props => props.$primary ? '#1E6F5C' : '#ffffff'};
+  color: ${props => props.$primary ? '#ffffff' : '#1E6F5C'};
+  border: ${props => props.$primary ? 'none' : '1px solid #1E6F5C'};
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    ${props => !props.$primary && 'background: rgba(201, 162, 77, 0.1);'}
+  }
 `;
 
 const TrackEvent = () => {
-    const [bookingId, setBookingId] = useState('');
+    const cardRef = useRef();
+    const [bookingIdInput, setBookingIdInput] = useState('');
     const [phone, setPhone] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
@@ -176,7 +254,7 @@ const TrackEvent = () => {
         setResult(null);
 
         try {
-            const data = await trackEventBooking(bookingId, phone);
+            const data = await trackEventBooking(bookingIdInput, phone);
             setResult(data);
         } catch (err) {
             setError(err.response?.data?.error || 'Could not find your event booking.');
@@ -185,12 +263,43 @@ const TrackEvent = () => {
         }
     };
 
+    const handleDownloadPDF = () => {
+        const element = cardRef.current;
+        const opt = {
+            margin: 10,
+            filename: `EventConfirmation_${result.booking_id}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().from(element).set(opt).save();
+    };
+
+    const handleShare = async () => {
+        const shareData = {
+            title: 'TravellersInn Event Booking',
+            text: `My event booking at TravellersInn (ID: ${result.booking_id}) is ${result.status}.`,
+            url: window.location.href
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(shareData.text);
+                alert('Details copied to clipboard!');
+            }
+        } catch (err) {
+            console.error('Share failed:', err);
+        }
+    };
+
     return (
         <PageWrapper>
             <Container>
                 <Header>
                     <Title>Track Your Event</Title>
-                    <p style={{ color: 'rgba(255,255,255,0.5)' }}>Check the status of your event inquiry or booking at TravellersInn</p>
+                    <p style={{ color: '#666' }}>Check the status of your event inquiry or booking at TravellersInn</p>
                 </Header>
 
                 <SearchCard>
@@ -201,8 +310,8 @@ const TrackEvent = () => {
                                 <Input
                                     required
                                     placeholder="e.g. EVT-XXXX"
-                                    value={bookingId}
-                                    onChange={e => setBookingId(e.target.value.toUpperCase())}
+                                    value={bookingIdInput}
+                                    onChange={e => setBookingIdInput(e.target.value.toUpperCase())}
                                 />
                             </InputGroup>
                             <InputGroup>
@@ -240,15 +349,32 @@ const TrackEvent = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                         >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
                                 <div>
-                                    <h2 style={{ fontFamily: 'Playfair Display', fontSize: '1.8rem', marginBottom: '0.5rem' }}>{result.event_type} Inquiry</h2>
-                                    <p style={{ color: 'rgba(255,255,255,0.4)', marginBottom: '1rem' }}>ID: {result.booking_id}</p>
+                                    <h2 style={{ fontFamily: 'Playfair Display', fontSize: '1.8rem', marginBottom: '0.5rem', color: '#0F1E2E' }}>{result.event_type} Inquiry</h2>
+                                    <p style={{ color: '#666' }}>ID: {result.booking_id}</p>
                                 </div>
                                 <StatusBadge $status={result.status}>{result.status}</StatusBadge>
                             </div>
 
-                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '2rem 0' }} />
+                            <div style={{ display: 'none' }}>
+                                <ConfirmationCard ref={cardRef}>
+                                    <CardHeader>
+                                        <CardBrand><FaHotel /> TravellersInn</CardBrand>
+                                        <h3 style={{ margin: 0, color: '#333', fontSize: '1rem' }}>EVENT BOOKING STATUS</h3>
+                                    </CardHeader>
+                                    <PrintableDetail><span>Booking ID</span><span>{result.booking_id}</span></PrintableDetail>
+                                    <PrintableDetail><span>Event Type</span><span>{result.event_type}</span></PrintableDetail>
+                                    <PrintableDetail><span>Status</span><span style={{ color: '#d4af37' }}>{result.status.toUpperCase()}</span></PrintableDetail>
+                                    <PrintableDetail><span>Event Date</span><span>{new Date(result.event_date).toLocaleDateString()}</span></PrintableDetail>
+                                    <PrintableDetail><span>Expected Guests</span><span>{result.number_of_guests}</span></PrintableDetail>
+                                    <PrintableDetail><span>Guest Name</span><span>{result.name}</span></PrintableDetail>
+                                    <PrintableDetail><span>Contact</span><span>{result.phone}</span></PrintableDetail>
+                                    <div style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#666', textAlign: 'center' }}>
+                                        Thank you for choosing TravellersInn.
+                                    </div>
+                                </ConfirmationCard>
+                            </div>
 
                             <DetailGrid>
                                 <DetailItem>
@@ -290,16 +416,25 @@ const TrackEvent = () => {
                             </DetailGrid>
 
                             {result.message && (
-                                <div style={{ marginTop: '2.5rem', padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div style={{ marginTop: '2.5rem', padding: '1.5rem', background: '#FAFAFA', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.05)' }}>
                                     <DetailLabel>Your message</DetailLabel>
-                                    <p style={{ marginTop: '0.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', fontStyle: 'italic' }}>
+                                    <p style={{ marginTop: '0.5rem', color: '#333', fontSize: '0.95rem', fontStyle: 'italic' }}>
                                         "{result.message}"
                                     </p>
                                 </div>
                             )}
 
+                            <ActionButtons>
+                                <ActionButton $primary onClick={handleDownloadPDF}>
+                                    <FaDownload /> Download Receipt
+                                </ActionButton>
+                                <ActionButton onClick={handleShare}>
+                                    <FaShareAlt /> Share Status
+                                </ActionButton>
+                            </ActionButtons>
+
                             <div style={{ marginTop: '3rem', textAlign: 'center' }}>
-                                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>
+                                <p style={{ color: '#666', fontSize: '0.85rem' }}>
                                     Submitted on {new Date(result.created_at).toLocaleString()}
                                 </p>
                             </div>

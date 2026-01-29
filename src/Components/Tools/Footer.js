@@ -23,7 +23,7 @@ const shimmer = keyframes`
 /* ================= STYLED COMPONENTS ================= */
 
 const FooterWrapper = styled.footer`
-  background: linear-gradient(180deg, #0a0a14 0%, #0f0f1a 100%);
+  background: #0F1E2E;
   position: relative;
   overflow: hidden;
 
@@ -34,7 +34,7 @@ const FooterWrapper = styled.footer`
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    background: linear-gradient(90deg, transparent, #C9A24D, transparent);
   }
 `;
 
@@ -69,7 +69,7 @@ const Logo = styled(Link)`
   text-decoration: none;
   font-family: 'Playfair Display', Georgia, serif;
   letter-spacing: 1px;
-  background: linear-gradient(135deg, #fff 0%, #d4af37 50%, #fff 100%);
+  background: linear-gradient(135deg, #fff 0%, #C9A24D 50%, #fff 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -83,7 +83,7 @@ const Logo = styled(Link)`
 `;
 
 const LogoAccent = styled.span`
-  -webkit-text-fill-color: #d4af37;
+  -webkit-text-fill-color: #C9A24D;
 `;
 
 const BrandDescription = styled.p`
@@ -121,9 +121,9 @@ const SocialIcon = styled.a`
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.15);
-    border-color: rgba(212, 175, 55, 0.4);
-    color: #d4af37;
+    background: rgba(201, 162, 77, 0.15);
+    border-color: rgba(201, 162, 77, 0.4);
+    color: #C9A24D;
     transform: translateY(-3px);
   }
 `;
@@ -144,7 +144,7 @@ const ColumnTitle = styled.h4`
     left: 0;
     width: 30px;
     height: 2px;
-    background: linear-gradient(90deg, #d4af37, transparent);
+    background: linear-gradient(90deg, #C9A24D, transparent);
 
     @media (max-width: 600px) {
       left: 50%;
@@ -172,7 +172,7 @@ const FooterLink = styled.li`
     gap: 0.5rem;
 
     &:hover {
-      color: #d4af37;
+      color: #C9A24D;
       transform: translateX(5px);
 
       @media (max-width: 600px) {
@@ -196,7 +196,7 @@ const ContactItem = styled.div`
   }
 
   svg {
-    color: #d4af37;
+    color: #C9A24D;
     font-size: 1rem;
     margin-top: 4px;
     flex-shrink: 0;
@@ -243,14 +243,14 @@ const NewsletterInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: rgba(212, 175, 55, 0.5);
+    border-color: rgba(201, 162, 77, 0.5);
     background: rgba(255, 255, 255, 0.08);
   }
 `;
 
 const NewsletterButton = styled(motion.button)`
   padding: 0.9rem 1.5rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  background: #1E6F5C;
   border: none;
   border-radius: 10px;
   color: #0f0f1a;
@@ -261,7 +261,7 @@ const NewsletterButton = styled(motion.button)`
   white-space: nowrap;
 
   &:hover {
-    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 5px 20px rgba(30, 111, 92, 0.3);
   }
 `;
 
@@ -308,12 +308,12 @@ const AwardBadge = styled.div`
 const AwardIcon = styled.div`
   width: 35px;
   height: 35px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  background: linear-gradient(135deg, rgba(201, 162, 77, 0.2), rgba(201, 162, 77, 0.05));
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d4af37;
+  color: #C9A24D;
   font-size: 1rem;
 `;
 
@@ -323,7 +323,7 @@ const AwardText = styled.div`
 
   span {
     display: block;
-    color: #d4af37;
+    color: #C9A24D;
     font-weight: 600;
     font-size: 0.9rem;
   }
@@ -362,18 +362,17 @@ const LegalLinks = styled.div`
     transition: color 0.3s ease;
 
     &:hover {
-      color: #d4af37;
+      color: #C9A24D;
     }
   }
 `;
 
 const BackToTop = styled(motion.button)`
-  position: fixed;
   bottom: 2rem;
   right: 2rem;
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  background: #1E6F5C;
   border: none;
   border-radius: 12px;
   color: #0f0f1a;
@@ -382,7 +381,7 @@ const BackToTop = styled(motion.button)`
   justify-content: center;
   cursor: pointer;
   font-size: 1.2rem;
-  box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 5px 25px rgba(30, 111, 92, 0.3);
   z-index: 100;
 
   @media (max-width: 768px) {

@@ -17,7 +17,7 @@ const formatImageUrl = (url) => {
 /* ================= STYLED COMPONENTS ================= */
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  background: #FAFAFA;
   min-height: 100vh;
   padding-top: 90px;
 `;
@@ -27,17 +27,18 @@ const HeroSection = styled.section`
   position: relative;
   padding: 4rem 2rem;
   text-align: center;
-  background: linear-gradient(to bottom, rgba(15, 15, 26, 0.5), rgba(15, 15, 26, 1));
+  background: #0F1E2E;
+
+  @media (max-width: 768px) {
+    padding: 3rem 1.5rem;
+  }
 `;
 
 const PageLabel = styled(motion.span)`
-  display: inline-block;
-  padding: 0.5rem 1.5rem;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 50px;
-  color: #d4af37;
-  font-size: 0.8rem;
+  display: block;
+  color: #C9A24D;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
   margin-bottom: 1.5rem;
@@ -51,10 +52,10 @@ const PageTitle = styled(motion.h1)`
   margin-bottom: 1rem;
   
   span {
-    background: linear-gradient(135deg, #d4af37, #f5d76e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #C9A24D;
+    background: none;
+    -webkit-text-fill-color: initial;
+    background-clip: border-box;
   }
 `;
 
@@ -77,9 +78,9 @@ const FilterSection = styled.div`
 
 const FilterButton = styled.button`
   padding: 0.8rem 1.5rem;
-  background: ${props => props.$active ? 'linear-gradient(135deg, #d4af37, #b8860b)' : 'rgba(255, 255, 255, 0.05)'};
-  border: 1px solid ${props => props.$active ? 'transparent' : 'rgba(255, 255, 255, 0.1)'};
-  color: ${props => props.$active ? '#0f0f1a' : 'rgba(255, 255, 255, 0.7)'};
+  background: ${props => props.$active ? '#C9A24D' : 'rgba(255, 255, 255, 0.1)'};
+  border: 1px solid ${props => props.$active ? 'transparent' : 'rgba(255, 255, 255, 0.2)'};
+  color: ${props => props.$active ? '#0f0f1a' : 'rgba(255, 255, 255, 0.8)'};
   border-radius: 50px;
   font-size: 0.9rem;
   font-weight: 500;
@@ -87,7 +88,7 @@ const FilterButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background: ${props => props.$active ? 'linear-gradient(135deg, #d4af37, #b8860b)' : 'rgba(255, 255, 255, 0.1)'};
+    background: ${props => props.$active ? '#C9A24D' : 'rgba(255, 255, 255, 0.2)'};
     color: ${props => props.$active ? '#0f0f1a' : '#fff'};
   }
 `;
@@ -98,9 +99,9 @@ const StatsBar = styled.div`
   justify-content: center;
   gap: 3rem;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  background: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   margin-bottom: 3rem;
   flex-wrap: wrap;
 
@@ -116,12 +117,12 @@ const StatItem = styled.div`
 const StatValue = styled.div`
   font-size: 1.8rem;
   font-weight: 700;
-  color: #d4af37;
+  color: #C9A24D;
   font-family: 'Playfair Display', Georgia, serif;
 `;
 
 const StatLabel = styled.div`
-  color: rgba(255, 255, 255, 0.5);
+  color: #333333;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -136,7 +137,7 @@ const RoomsSection = styled.section`
 
 const RoomsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
 
   @media (max-width: 480px) {
@@ -145,17 +146,17 @@ const RoomsGrid = styled.div`
 `;
 
 const RoomCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0F1E2E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
   overflow: hidden;
   transition: all 0.4s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(212, 175, 55, 0.2);
+    border-color: rgba(201, 162, 77, 0.2);
     transform: translateY(-8px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -181,7 +182,7 @@ const RoomBadge = styled.div`
   top: 1rem;
   left: 1rem;
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #d4af37, #b8860b);
+  background: #C9A24D;
   color: #0f0f1a;
   font-size: 0.75rem;
   font-weight: 600;
@@ -213,7 +214,7 @@ const RoomRating = styled.div`
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  color: #d4af37;
+  color: #C9A24D;
   font-size: 0.9rem;
   font-weight: 600;
 `;
@@ -229,11 +230,12 @@ const SpecItem = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.6);
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.85rem;
 
   svg {
-    color: #d4af37;
+    color: #C9A24D;
   }
 `;
 
@@ -246,10 +248,11 @@ const RoomAmenities = styled.div`
 
 const AmenityTag = styled.span`
   padding: 0.4rem 0.8rem;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(201, 162, 77, 0.1);
+  border: 1px solid rgba(201, 162, 77, 0.2);
   border-radius: 20px;
-  color: rgba(255, 255, 255, 0.7);
+  border-radius: 20px;
+  color: #ddd;
   font-size: 0.75rem;
 `;
 
@@ -258,7 +261,7 @@ const RoomFooter = styled.div`
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const RoomPrice = styled.div`
@@ -273,14 +276,14 @@ const PriceAmount = styled.span`
 `;
 
 const PriceLabel = styled.span`
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 0.85rem;
 `;
 
 const ViewButton = styled(Link)`
   padding: 0.9rem 2rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   text-decoration: none;
   border-radius: 50px;
   font-size: 0.9rem;
@@ -288,11 +291,11 @@ const ViewButton = styled(Link)`
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
-
+  box-shadow: 0 4px 20px rgba(30, 111, 92, 0.3);
+  
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 8px 30px rgba(30, 111, 92, 0.4);
   }
 `;
 
@@ -427,11 +430,11 @@ const Rooms = () => {
 
       <RoomsSection>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: '#d4af37' }}>
+          <div style={{ textAlign: 'center', padding: '4rem', color: '#1E6F5C' }}>
             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
               <FaSnowflake style={{ fontSize: '3rem' }} />
             </motion.div>
-            <p style={{ marginTop: '1rem', color: 'rgba(255,255,255,0.5)' }}>Searching for luxury...</p>
+            <p style={{ marginTop: '1rem', color: '#666' }}>Searching for luxury...</p>
           </div>
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '4rem', color: '#ff4d4d' }}>
@@ -440,7 +443,7 @@ const Rooms = () => {
             <FilterButton onClick={() => window.location.reload()} style={{ marginTop: '1rem' }}>Try Again</FilterButton>
           </div>
         ) : filteredRooms.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,0.5)' }}>
+          <div style={{ textAlign: 'center', padding: '4rem', color: '#666' }}>
             <h3>No rooms found matching your criteria.</h3>
             <FilterButton onClick={() => setFilter('all')} style={{ marginTop: '1rem' }}>Show All Rooms</FilterButton>
           </div>

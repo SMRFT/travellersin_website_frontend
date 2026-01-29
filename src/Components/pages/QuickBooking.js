@@ -7,23 +7,31 @@ import { useAuth } from '../auth/AuthContext';
 import { getRooms, checkRoomAvailability } from '../services/roomService';
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  background: #d0d0d0;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 768px) {
+    padding: 100px 1rem 2rem;
+  }
 `;
 
 const MultiStepCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 32px;
   width: 100%;
   max-width: 1000px;
   padding: 3rem;
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
 `;
 
 const Title = styled.h2`
@@ -111,14 +119,18 @@ const Select = styled.select`
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
   gap: 1.5rem;
   margin-bottom: 2rem;
 `;
 
 const RoomCard = styled(motion.div)`
   padding: 1.5rem;
-  background: ${props => props.$selected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.02)'};
-  border: 1px solid ${props => props.$selected ? '#d4af37' : 'rgba(255, 255, 255, 0.05)'};
+  background: ${props => props.$selected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.05)'};
+  border: 1px solid ${props => props.$selected ? '#d4af37' : 'rgba(255, 255, 255, 0.1)'};
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -134,8 +146,8 @@ const AddonCard = styled(motion.div)`
   align-items: center;
   gap: 1rem;
   padding: 1.2rem;
-  background: ${props => props.$selected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.02)'};
-  border: 1px solid ${props => props.$selected ? '#d4af37' : 'rgba(255, 255, 255, 0.05)'};
+  background: ${props => props.$selected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.05)'};
+  border: 1px solid ${props => props.$selected ? '#d4af37' : 'rgba(255, 255, 255, 0.1)'};
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -166,10 +178,16 @@ const Button = styled(motion.button)`
   gap: 0.8rem;
 
   ${props => props.$primary ? `
-    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-    color: #0f0f1a;
+    background: #1E6F5C;
+    color: #ffffff;
     border: none;
-    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
+
+    &:hover {
+      background: #165e4d;
+      box-shadow: 0 15px 40px rgba(30, 111, 92, 0.4);
+      transform: translateY(-2px);
+    }
   ` : `
     background: transparent;
     color: #fff;

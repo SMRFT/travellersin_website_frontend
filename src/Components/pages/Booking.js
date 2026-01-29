@@ -7,7 +7,7 @@ import { useAuth } from '../auth/AuthContext';
 import { getRoomById, checkRoomAvailability } from '../services/roomService';
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  background: #d0d0d0;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
   display: flex;
@@ -16,9 +16,9 @@ const PageWrapper = styled.div`
 `;
 
 const BookingCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 32px;
   width: 100%;
   max-width: 900px;
@@ -41,10 +41,18 @@ const InfoSection = styled.div`
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
+
+  @media (max-width: 600px) {
+    padding: 2rem;
+  }
 `;
 
 const FormSection = styled.div`
   padding: 3rem;
+
+  @media (max-width: 600px) {
+    padding: 2rem;
+  }
 `;
 
 const Badge = styled.span`
@@ -158,13 +166,18 @@ const Grid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 `;
 
 const SubmitButton = styled(motion.button)`
   margin-top: 1rem;
   padding: 1.2rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   border: none;
   border-radius: 16px;
   font-size: 1rem;
@@ -174,7 +187,12 @@ const SubmitButton = styled(motion.button)`
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
+
+  &:hover {
+    background: #165e4d;
+    box-shadow: 0 15px 40px rgba(30, 111, 92, 0.4);
+  }
 `;
 
 const AddonsSection = styled.div`
@@ -188,6 +206,10 @@ const AddonGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-top: 1rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const AddonCard = styled.div`

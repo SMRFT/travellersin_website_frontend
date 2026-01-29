@@ -120,8 +120,8 @@ const MethodCard = styled.div`
 const PayButton = styled(motion.button)`
   width: 100%;
   padding: 1.2rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   border: none;
   border-radius: 16px;
   font-size: 1.1rem;
@@ -131,8 +131,13 @@ const PayButton = styled(motion.button)`
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 30px rgba(30, 111, 92, 0.3);
   margin-bottom: 1.5rem;
+
+  &:hover {
+    background: #165e4d;
+    box-shadow: 0 20px 40px rgba(30, 111, 92, 0.4);
+  }
 
   &:disabled {
     opacity: 0.6;

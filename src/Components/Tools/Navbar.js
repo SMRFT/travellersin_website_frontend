@@ -26,17 +26,9 @@ const Nav = styled(motion.nav)`
   padding: 0 4rem;
   z-index: 1000;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  ${({ $scrolled }) => $scrolled ? css`
-    background: rgba(15, 15, 26, 0.95);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-    height: 75px;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-  ` : css`
-    background: transparent;
-    backdrop-filter: none;
-  `}
+  background: #0F1E2E;
+  border-bottom: 1px solid rgba(201, 162, 77, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 
   @media (max-width: 1024px) {
     padding: 0 2rem;
@@ -55,7 +47,7 @@ const Logo = styled(Link)`
   z-index: 1001;
   font-family: 'Playfair Display', Georgia, serif;
   letter-spacing: 1px;
-  background: linear-gradient(135deg, #fff 0%, #d4af37 50%, #fff 100%);
+  background: linear-gradient(135deg, #fff 0%, #C9A24D 50%, #fff 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -72,8 +64,8 @@ const Logo = styled(Link)`
 `;
 
 const LogoAccent = styled.span`
-  color: #d4af37;
-  -webkit-text-fill-color: #d4af37;
+  color: #C9A24D;
+  -webkit-text-fill-color: #C9A24D;
 `;
 
 /* --- DESKTOP MENU --- */
@@ -103,7 +95,7 @@ const UserMenu = styled.div`
 const LoginBtn = styled(motion.button)`
   background: transparent;
   color: #fff;
-  border: 1px solid rgba(212, 175, 55, 0.5);
+  border: 1px solid rgba(201, 162, 77, 0.5);
   padding: 0.7rem 1.8rem;
   border-radius: 50px;
   cursor: pointer;
@@ -113,8 +105,8 @@ const LoginBtn = styled(motion.button)`
   margin-right: 1rem;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.1);
-    border-color: #d4af37;
+    background: rgba(201, 162, 77, 0.1);
+    border-color: #C9A24D;
   }
 `;
 
@@ -122,18 +114,18 @@ const UserAvatar = styled(Link)`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(212, 175, 55, 0.2);
+  background: rgba(201, 162, 77, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d4af37;
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #C9A24D;
+  border: 1px solid rgba(201, 162, 77, 0.3);
   text-decoration: none;
   transition: all 0.3s ease;
   margin-right: 0.5rem;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.3);
+    background: rgba(201, 162, 77, 0.3);
     transform: scale(1.05);
   }
 `;
@@ -159,7 +151,7 @@ const LinkItem = styled.div`
 `;
 
 const StyledLink = styled(Link)`
-  color: ${({ $isActive }) => $isActive ? '#d4af37' : 'rgba(255, 255, 255, 0.8)'};
+  color: ${({ $isActive }) => $isActive ? '#C9A24D' : 'rgba(255, 255, 255, 0.8)'};
   font-weight: 500;
   text-decoration: none;
   font-size: 0.95rem;
@@ -178,7 +170,7 @@ const StyledLink = styled(Link)`
     transform: translateX(-50%) scaleX(0);
     width: 20px;
     height: 2px;
-    background: linear-gradient(90deg, #d4af37, #f5d76e);
+    background: linear-gradient(90deg, #C9A24D, #f5d76e);
     border-radius: 2px;
     transition: transform 0.3s ease;
   }
@@ -193,7 +185,7 @@ const StyledLink = styled(Link)`
   }
 
   ${({ $isActive }) => $isActive && css`
-    color: #d4af37;
+    color: #C9A24D;
     
     &::before {
       transform: translateX(-50%) scaleX(1);
@@ -208,13 +200,13 @@ const Underline = styled(motion.div)`
   transform: translateX(-50%);
   width: 20px;
   height: 2px;
-  background: linear-gradient(90deg, #d4af37, #f5d76e);
+  background: linear-gradient(90deg, #C9A24D, #f5d76e);
   border-radius: 2px;
 `;
 
 const BookButton = styled(motion.button)`
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   padding: 0.85rem 2rem;
   border: none;
   border-radius: 50px;
@@ -223,7 +215,7 @@ const BookButton = styled(motion.button)`
   font-size: 0.9rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 20px rgba(30, 111, 92, 0.3);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   overflow: hidden;
@@ -241,7 +233,7 @@ const BookButton = styled(motion.button)`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 8px 30px rgba(30, 111, 92, 0.4);
 
     &::before {
       left: 100%;
@@ -297,13 +289,13 @@ const MobileMenuContainer = styled(motion.div)`
   width: 320px;
   max-width: 85%;
   height: 100vh;
-  background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 100%);
+  background: #0F1E2E;
   display: flex;
   flex-direction: column;
   padding: 100px 2rem 2rem;
   z-index: 999;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
-  border-left: 1px solid rgba(212, 175, 55, 0.1);
+  border-left: 1px solid rgba(201, 162, 77, 0.1);
 `;
 
 const MobileMenuHeader = styled.div`
@@ -329,7 +321,7 @@ const MobileNavLinks = styled.div`
 const MobileLink = styled(motion(Link))`
   font-size: 1.3rem;
   font-weight: 600;
-  color: ${({ $isActive }) => $isActive ? '#d4af37' : 'rgba(255, 255, 255, 0.8)'};
+  color: ${({ $isActive }) => $isActive ? '#C9A24D' : 'rgba(255, 255, 255, 0.8)'};
   text-decoration: none;
   padding: 1rem 1.5rem;
   border-radius: 12px;
@@ -347,7 +339,7 @@ const MobileLink = styled(motion(Link))`
     top: 0;
     height: 100%;
     width: 3px;
-    background: linear-gradient(180deg, #d4af37, #f5d76e);
+    background: linear-gradient(180deg, #C9A24D, #f5d76e);
     transform: scaleY(0);
     transition: transform 0.3s ease;
   }
@@ -363,7 +355,7 @@ const MobileLink = styled(motion(Link))`
   }
 
   ${({ $isActive }) => $isActive && css`
-    background: rgba(212, 175, 55, 0.1);
+    background: rgba(201, 162, 77, 0.1);
     
     &::before {
       transform: scaleY(1);
@@ -373,7 +365,7 @@ const MobileLink = styled(motion(Link))`
 
 const MobileLinkNumber = styled.span`
   font-size: 0.8rem;
-  color: rgba(212, 175, 55, 0.6);
+  color: rgba(201, 162, 77, 0.6);
   font-weight: 400;
 `;
 
@@ -385,7 +377,7 @@ const MobileMenuFooter = styled.div`
 
 const MobileBookButton = styled(motion.button)`
   width: 100%;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  background: #1E6F5C;
   color: #0f0f1a;
   padding: 1.2rem 2rem;
   border: none;
@@ -395,11 +387,11 @@ const MobileBookButton = styled(motion.button)`
   font-size: 1rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 20px rgba(30, 111, 92, 0.3);
   transition: all 0.3s ease;
-
+  
   &:hover {
-    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 8px 30px rgba(30, 111, 92, 0.4);
   }
 `;
 
@@ -434,20 +426,10 @@ const linkVariants = {
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  // Removed transparency specific state since header is now solid #0F1E2E
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, toggleLoginModal } = useAuth();
-
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -477,7 +459,6 @@ const Navbar = () => {
   return (
     <>
       <Nav
-        $scrolled={scrolled}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}

@@ -206,10 +206,16 @@ const Button = styled(motion.button)`
   transition: all 0.3s ease;
   
   ${props => props.$primary ? `
-    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-    color: #0f0f1a;
+    background: #1E6F5C;
+    color: #ffffff;
     border: none;
-    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+    box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
+
+    &:hover {
+      background: #165e4d;
+      box-shadow: 0 15px 40px rgba(30, 111, 92, 0.4);
+      transform: translateY(-2px);
+    }
   ` : `
     background: rgba(255, 255, 255, 0.05);
     color: #fff;
@@ -257,223 +263,223 @@ const PolicySection = styled.div`
 `;
 
 const Confirmation = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const receiptRef = useRef();
-    const { bookingId, method, success } = location.state || {};
+  const location = useLocation();
+  const navigate = useNavigate();
+  const receiptRef = useRef();
+  const { bookingId, method, success } = location.state || {};
 
-    const handlePrint = () => {
-        window.print();
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownloadPDF = () => {
+    const element = receiptRef.current;
+    const opt = {
+      margin: [0.5, 0.5],
+      filename: `Booking_Receipt_${bookingId}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    // Temporarily add a class for clean export
+    element.classList.add('exporting-pdf');
+    html2pdf().from(element).set(opt).save().then(() => {
+      element.classList.remove('exporting-pdf');
+    });
+  };
+
+  const handleSharePDF = async () => {
+    const element = receiptRef.current;
+    const opt = {
+      margin: [0.5, 0.5],
+      filename: `Receipt_${bookingId}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    const handleDownloadPDF = () => {
-        const element = receiptRef.current;
-        const opt = {
-            margin: [0.5, 0.5],
-            filename: `Booking_Receipt_${bookingId}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff'
-            },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        // Temporarily add a class for clean export
-        element.classList.add('exporting-pdf');
-        html2pdf().from(element).set(opt).save().then(() => {
-            element.classList.remove('exporting-pdf');
+    try {
+      element.classList.add('exporting-pdf');
+      const pdfBlob = await html2pdf().from(element).set(opt).output('blob');
+      element.classList.remove('exporting-pdf');
+
+      const file = new File([pdfBlob], `Receipt_${bookingId}.pdf`, { type: 'application/pdf' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Booking Receipt',
+          text: 'My TravellersInn Booking Receipt'
         });
-    };
-
-    const handleSharePDF = async () => {
-        const element = receiptRef.current;
-        const opt = {
-            margin: [0.5, 0.5],
-            filename: `Receipt_${bookingId}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: {
-                scale: 2,
-                backgroundColor: '#ffffff'
-            },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-
-        try {
-            element.classList.add('exporting-pdf');
-            const pdfBlob = await html2pdf().from(element).set(opt).output('blob');
-            element.classList.remove('exporting-pdf');
-
-            const file = new File([pdfBlob], `Receipt_${bookingId}.pdf`, { type: 'application/pdf' });
-
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: 'Booking Receipt',
-                    text: 'My TravellersInn Booking Receipt'
-                });
-            } else {
-                // Fallback to link share + download
-                const shareText = `My TravellersInn Booking ID: ${bookingId}`;
-                if (navigator.share) {
-                    await navigator.share({ title: 'Booking Receipt', text: shareText, url: window.location.href });
-                } else {
-                    navigator.clipboard.writeText(shareText);
-                    alert('Booking ID copied. Downloading PDF...');
-                }
-                html2pdf().from(element).set(opt).save();
-            }
-        } catch (err) {
-            console.error('Error sharing PDF:', err);
-            html2pdf().from(element).set(opt).save(); // Fallback to download
+      } else {
+        // Fallback to link share + download
+        const shareText = `My TravellersInn Booking ID: ${bookingId}`;
+        if (navigator.share) {
+          await navigator.share({ title: 'Booking Receipt', text: shareText, url: window.location.href });
+        } else {
+          navigator.clipboard.writeText(shareText);
+          alert('Booking ID copied. Downloading PDF...');
         }
-    };
-
-    // If accessed directly without booking state
-    if (!success) {
-        return (
-            <PageWrapper>
-                <ConfirmationCard>
-                    <Title>Oops!</Title>
-                    <Subtitle>Something went wrong or the session expired.</Subtitle>
-                    <Button $primary onClick={() => navigate('/rooms')}>Return to Rooms</Button>
-                </ConfirmationCard>
-            </PageWrapper>
-        );
+        html2pdf().from(element).set(opt).save();
+      }
+    } catch (err) {
+      console.error('Error sharing PDF:', err);
+      html2pdf().from(element).set(opt).save(); // Fallback to download
     }
+  };
 
+  // If accessed directly without booking state
+  if (!success) {
     return (
-        <PageWrapper>
-            <GlobalPrintStyle />
-            <ConfirmationCard
-                ref={receiptRef}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-            >
-                <PrintHeader>
-                    <h1>TravellersInn</h1>
-                    <p>Booking Receipt & Confirmation</p>
-                </PrintHeader>
-
-                <div className="no-print">
-                    <SuccessIcon
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 12, delay: 0.2 }}
-                    >
-                        <FaCheckCircle />
-                    </SuccessIcon>
-                </div>
-
-                <Title>Reservation Confirmed!</Title>
-                <Subtitle>
-                    {method === 'cash'
-                        ? "Your request has been received. Please pay at the front desk upon arrival."
-                        : "Your payment was successful. We've sent the confirmation to your email."
-                    }
-                </Subtitle>
-
-                <BookingDetails>
-                    <DetailLine>
-                        <span className="label"><FaHotel /> Booking ID</span>
-                        <span className="value">{bookingId}</span>
-                    </DetailLine>
-                    <DetailLine>
-                        <span className="label"><FaCalendarAlt /> Status</span>
-                        <span className="value" style={{ color: '#10b981' }}>Confirmed</span>
-                    </DetailLine>
-                    {location.state?.check_in && (
-                        <DetailLine>
-                            <span className="label"><FaCalendarAlt /> Check-in</span>
-                            <span className="value">
-                                {new Date(location.state.check_in).toLocaleDateString(undefined, {
-                                    weekday: 'short',
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric'
-                                })}
-                                <span style={{ color: 'rgba(255,255,255,0.4)', marginLeft: '0.5rem' }}>
-                                    ({location.state?.checkInTime || '12:00 PM'})
-                                </span>
-                            </span>
-                        </DetailLine>
-                    )}
-                    {location.state?.check_out && (
-                        <DetailLine>
-                            <span className="label"><FaCalendarAlt /> Check-out</span>
-                            <span className="value">
-                                {new Date(location.state.check_out).toLocaleDateString(undefined, {
-                                    weekday: 'short',
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric'
-                                })}
-                                <span style={{ color: 'rgba(255,255,255,0.4)', marginLeft: '0.5rem' }}>
-                                    ({location.state?.checkOutTime || '10:00 AM'})
-                                </span>
-                            </span>
-                        </DetailLine>
-                    )}
-                    <DetailLine>
-                        <span className="label"><FaArrowRight /> Payment Method</span>
-                        <span className="value">{method === 'cash' ? 'Pay at Hotel' : 'Razorpay Online'}</span>
-                    </DetailLine>
-                    {location.state?.room_numbers && (
-                        <DetailLine>
-                            <span className="label"><FaHotel /> Rooms Booked</span>
-                            <span className="value">
-                                {typeof location.state.room_numbers === 'string'
-                                    ? location.state.room_numbers.replace(/^,|,$/g, '').replace(/,/g, ', ')
-                                    : (Array.isArray(location.state.room_numbers) ? location.state.room_numbers.join(', ') : location.state.room_numbers)}
-                            </span>
-                        </DetailLine>
-                    )}
-                </BookingDetails>
-
-                <PolicySection className="no-print">
-                    <h4><FaExclamationTriangle /> Cancellation Policy</h4>
-                    <p>
-                        Free cancellation is available for <strong>24 hours</strong> from the time of booking.
-                        You can cancel your reservation through your profile or by using the <strong>Track Stay</strong> feature
-                        with your Booking ID: <strong>{bookingId}</strong>.
-                    </p>
-                </PolicySection>
-
-                <ActionGrid className="no-print">
-                    <Button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleDownloadPDF}
-                    >
-                        <FaDownload /> Download PDF
-                    </Button>
-                    <Button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleSharePDF}
-                    >
-                        <FaShareAlt /> Share PDF
-                    </Button>
-                </ActionGrid>
-
-                <Button
-                    $primary
-                    className="no-print"
-                    style={{ width: '100%', marginBottom: '1.5rem' }}
-                    onClick={() => navigate('/profile')}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                >
-                    Go to My Bookings
-                </Button>
-
-                <HomeLink to="/" className="no-print">
-                    Back to Homepage
-                </HomeLink>
-            </ConfirmationCard>
-        </PageWrapper>
+      <PageWrapper>
+        <ConfirmationCard>
+          <Title>Oops!</Title>
+          <Subtitle>Something went wrong or the session expired.</Subtitle>
+          <Button $primary onClick={() => navigate('/rooms')}>Return to Rooms</Button>
+        </ConfirmationCard>
+      </PageWrapper>
     );
+  }
+
+  return (
+    <PageWrapper>
+      <GlobalPrintStyle />
+      <ConfirmationCard
+        ref={receiptRef}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <PrintHeader>
+          <h1>TravellersInn</h1>
+          <p>Booking Receipt & Confirmation</p>
+        </PrintHeader>
+
+        <div className="no-print">
+          <SuccessIcon
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 12, delay: 0.2 }}
+          >
+            <FaCheckCircle />
+          </SuccessIcon>
+        </div>
+
+        <Title>Reservation Confirmed!</Title>
+        <Subtitle>
+          {method === 'cash'
+            ? "Your request has been received. Please pay at the front desk upon arrival."
+            : "Your payment was successful. We've sent the confirmation to your email."
+          }
+        </Subtitle>
+
+        <BookingDetails>
+          <DetailLine>
+            <span className="label"><FaHotel /> Booking ID</span>
+            <span className="value">{bookingId}</span>
+          </DetailLine>
+          <DetailLine>
+            <span className="label"><FaCalendarAlt /> Status</span>
+            <span className="value" style={{ color: '#10b981' }}>Confirmed</span>
+          </DetailLine>
+          {location.state?.check_in && (
+            <DetailLine>
+              <span className="label"><FaCalendarAlt /> Check-in</span>
+              <span className="value">
+                {new Date(location.state.check_in).toLocaleDateString(undefined, {
+                  weekday: 'short',
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                })}
+                <span style={{ color: 'rgba(255,255,255,0.4)', marginLeft: '0.5rem' }}>
+                  ({location.state?.checkInTime || '12:00 PM'})
+                </span>
+              </span>
+            </DetailLine>
+          )}
+          {location.state?.check_out && (
+            <DetailLine>
+              <span className="label"><FaCalendarAlt /> Check-out</span>
+              <span className="value">
+                {new Date(location.state.check_out).toLocaleDateString(undefined, {
+                  weekday: 'short',
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                })}
+                <span style={{ color: 'rgba(255,255,255,0.4)', marginLeft: '0.5rem' }}>
+                  ({location.state?.checkOutTime || '10:00 AM'})
+                </span>
+              </span>
+            </DetailLine>
+          )}
+          <DetailLine>
+            <span className="label"><FaArrowRight /> Payment Method</span>
+            <span className="value">{method === 'cash' ? 'Pay at Hotel' : 'Razorpay Online'}</span>
+          </DetailLine>
+          {location.state?.room_numbers && (
+            <DetailLine>
+              <span className="label"><FaHotel /> Rooms Booked</span>
+              <span className="value">
+                {typeof location.state.room_numbers === 'string'
+                  ? location.state.room_numbers.replace(/^,|,$/g, '').replace(/,/g, ', ')
+                  : (Array.isArray(location.state.room_numbers) ? location.state.room_numbers.join(', ') : location.state.room_numbers)}
+              </span>
+            </DetailLine>
+          )}
+        </BookingDetails>
+
+        <PolicySection className="no-print">
+          <h4><FaExclamationTriangle /> Cancellation Policy</h4>
+          <p>
+            Free cancellation is available for <strong>24 hours</strong> from the time of booking.
+            You can cancel your reservation through your profile or by using the <strong>Track Stay</strong> feature
+            with your Booking ID: <strong>{bookingId}</strong>.
+          </p>
+        </PolicySection>
+
+        <ActionGrid className="no-print">
+          <Button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleDownloadPDF}
+          >
+            <FaDownload /> Download PDF
+          </Button>
+          <Button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleSharePDF}
+          >
+            <FaShareAlt /> Share PDF
+          </Button>
+        </ActionGrid>
+
+        <Button
+          $primary
+          className="no-print"
+          style={{ width: '100%', marginBottom: '1.5rem' }}
+          onClick={() => navigate('/profile')}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          Go to My Bookings
+        </Button>
+
+        <HomeLink to="/" className="no-print">
+          Back to Homepage
+        </HomeLink>
+      </ConfirmationCard>
+    </PageWrapper>
+  );
 };
 
 export default Confirmation;

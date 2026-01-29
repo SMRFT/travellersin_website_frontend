@@ -14,9 +14,11 @@ const formatImageUrl = (url) => {
 };
 
 const Container = styled.div`
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #0F1E2E;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 `;
 
 const TableWrapper = styled.div`
@@ -34,8 +36,8 @@ const Controls = styled.div`
 
 const ActionButton = styled(motion.button)`
   padding: 0.8rem 1.5rem;
-  background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.1)' : 'linear-gradient(135deg, #d4af37 0%, #b8860b 100%)'};
-  color: ${props => props.$variant === 'danger' ? '#ff4d4d' : '#0f0f1a'};
+  background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.1)' : '#1E6F5C'};
+  color: ${props => props.$variant === 'danger' ? '#ff4d4d' : '#ffffff'};
   border: ${props => props.$variant === 'danger' ? '1px solid rgba(255, 77, 77, 0.2)' : 'none'};
   border-radius: 12px;
   font-weight: 600;
@@ -57,14 +59,16 @@ const RoomsTable = styled.table`
   }
 
   th {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.85rem;
+    background: #15202b; // Slightly lighter/different blue for header
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
 
   tr:hover {
-    background: rgba(255, 255, 255, 0.01);
+    background: rgba(212, 175, 55, 0.05);
   }
 `;
 

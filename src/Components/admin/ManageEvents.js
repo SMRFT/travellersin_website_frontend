@@ -6,9 +6,10 @@ import api from '../services/api';
 import { getAllEventBookings, updateEventBookingStatus } from '../services/eventService';
 
 const Container = styled.div`
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
+  background: #0F1E2E;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 `;
 
 const TabGroup = styled.div`
@@ -58,9 +59,9 @@ const ActionButton = styled(motion.button)`
 
 const TableWrapper = styled.div`
   overflow-x: auto;
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: none;
 `;
 
 const Table = styled.table`
@@ -74,8 +75,10 @@ const Table = styled.table`
   }
 
   th {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.85rem;
+    background: #15202b;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
@@ -110,8 +113,8 @@ const EventsGrid = styled.div`
 `;
 
 const EventCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #0f151a; // Very dark blue/black for cards
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 1.5rem;
   position: relative;
@@ -155,6 +158,14 @@ const ManageEvents = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState(null);
     const [formData, setFormData] = useState({ event_name: '', about: '', size: '', price: '' });
+
+    // Date Filter State (Default 3 days)
+    const [startDate, setStartDate] = useState(() => {
+        const d = new Date();
+        d.setDate(d.getDate() - 3);
+        return d.toISOString().split('T')[0];
+    });
+    const [endDate, setEndDate] = useState(() => new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
         fetchEvents();
@@ -234,6 +245,26 @@ const ManageEvents = () => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
                         >
+                            <div style={{ display: 'flex', gap: '1rem', paddingBottom: '1.5rem', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>From:</span>
+                                    <input
+                                        type="date"
+                                        value={startDate}
+                                        onChange={e => setStartDate(e.target.value)}
+                                        style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px' }}
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>To:</span>
+                                    <input
+                                        type="date"
+                                        value={endDate}
+                                        onChange={e => setEndDate(e.target.value)}
+                                        style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px' }}
+                                    />
+                                </div>
+                            </div>
                             <TableWrapper>
                                 <Table>
                                     <thead>

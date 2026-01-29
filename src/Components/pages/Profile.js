@@ -14,7 +14,7 @@ import { trackBooking, getUserBookings, cancelBooking, initiateBookingPayment, v
 /* ================= STYLED COMPONENTS ================= */
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  background: #f9fafb;
   min-height: 100vh;
   padding-top: 90px;
 `;
@@ -29,17 +29,30 @@ const Container = styled.div`
   }
 `;
 
+const TopSection = styled.div`
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  align-items: stretch;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+`;
+
 /* --- Profile Header --- */
 const ProfileHeader = styled.section`
   display: flex;
   align-items: flex-start;
   gap: 2rem;
   padding: 3rem;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
+  background: #0F1E2E;
+  backdrop-filter: none;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   border-radius: 24px;
-  margin-bottom: 2rem;
+  flex: 2;
+  margin-bottom: 0;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -156,12 +169,12 @@ const ProfileActions = styled.div`
 const ActionButton = styled(motion.button)`
   padding: 0.9rem 2rem;
   background: ${props => props.$primary
-    ? 'linear-gradient(135deg, #d4af37, #b8860b)'
+    ? '#1E6F5C'
     : 'rgba(255, 255, 255, 0.05)'};
   border: 1px solid ${props => props.$primary
     ? 'transparent'
     : 'rgba(255, 255, 255, 0.1)'};
-  color: ${props => props.$primary ? '#0f0f1a' : 'rgba(255, 255, 255, 0.8)'};
+  color: ${props => props.$primary ? '#ffffff' : 'rgba(255, 255, 255, 0.8)'};
   border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -174,7 +187,7 @@ const ActionButton = styled(motion.button)`
   &:hover {
     transform: translateY(-2px);
     ${props => props.$primary
-    ? 'box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);'
+    ? 'background: #165e4d; box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);'
     : 'background: rgba(255, 255, 255, 0.08);'}
   }
 `;
@@ -182,30 +195,23 @@ const ActionButton = styled(motion.button)`
 /* --- Stats Grid --- */
 const StatsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 500px) {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: 1fr; // Vertical stack
+  gap: 1rem;
+  flex: 1;
+  min-width: 250px;
 `;
 
 const StatCard = styled(motion.div)`
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   text-align: center;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
     border-color: rgba(212, 175, 55, 0.2);
+    transform: translateY(-5px);
   }
 `;
 
@@ -248,8 +254,9 @@ const ContentGrid = styled.div`
 
 /* --- Sidebar Navigation --- */
 const Sidebar = styled.div`
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   border-radius: 20px;
   padding: 1.5rem;
   height: fit-content;
@@ -335,8 +342,9 @@ const NavLogoutButton = styled(LogoutButton)`
 const MainContent = styled.div``;
 
 const ContentCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   border-radius: 20px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -570,8 +578,8 @@ const EmptyButton = styled(Link)`
   align-items: center;
   gap: 0.5rem;
   padding: 0.9rem 2rem;
-  background: linear-gradient(135deg, #d4af37, #b8860b);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   text-decoration: none;
   border-radius: 50px;
   font-weight: 600;
@@ -579,7 +587,8 @@ const EmptyButton = styled(Link)`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+    background: #165e4d;
+    box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
   }
 `;
 
@@ -1019,63 +1028,53 @@ const Profile = () => {
   return (
     <PageWrapper>
       <Container>
-        {/* Profile Header */}
-        <ProfileHeader>
-          <AvatarSection>
-            <Avatar>
-              <FaUser />
-            </Avatar>
-            <AvatarEdit>
-              <FaCamera />
-            </AvatarEdit>
-          </AvatarSection>
+        <TopSection>
+          {/* Profile Header */}
+          <ProfileHeader>
+            <AvatarSection>
+              <Avatar>
+                <FaUser />
+              </Avatar>
+              <AvatarEdit>
+                <FaCamera />
+              </AvatarEdit>
+            </AvatarSection>
 
-          <ProfileInfo>
-            <ProfileName>{userData.name}</ProfileName>
-            <ProfileEmail>{userData.email}</ProfileEmail>
-            <ProfileBadges>
-              <Badge $gold><FaStar /> Gold Member</Badge>
-              <Badge><FaCheck /> Verified</Badge>
-              <Badge>Since 2023</Badge>
-            </ProfileBadges>
-          </ProfileInfo>
+            <ProfileInfo>
+              <ProfileName>{userData.name}</ProfileName>
+              <ProfileEmail>{userData.email}</ProfileEmail>
+              <ProfileBadges>
+                <Badge><FaCheck /> Verified</Badge>
+              </ProfileBadges>
+            </ProfileInfo>
 
-          <ProfileActions>
-            <ActionButton
-              $primary
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              as={Link}
-              to="/rooms"
-            >
-              <FaHotel /> Book a Room
-            </ActionButton>
-          </ProfileActions>
-        </ProfileHeader>
+            <ProfileActions>
+              <ActionButton
+                $primary
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                as={Link}
+                to="/rooms"
+              >
+                <FaHotel /> Book a Room
+              </ActionButton>
+            </ProfileActions>
+          </ProfileHeader>
 
-        {/* Stats Grid */}
-        <StatsGrid>
-          <StatCard whileHover={{ scale: 1.02 }}>
-            <StatIcon><FaHotel /></StatIcon>
-            <StatValue>12</StatValue>
-            <StatLabel>Total Stays</StatLabel>
-          </StatCard>
-          <StatCard whileHover={{ scale: 1.02 }}>
-            <StatIcon><FaClock /></StatIcon>
-            <StatValue>24</StatValue>
-            <StatLabel>Nights Stayed</StatLabel>
-          </StatCard>
-          <StatCard whileHover={{ scale: 1.02 }}>
-            <StatIcon><FaGift /></StatIcon>
-            <StatValue>1,250</StatValue>
-            <StatLabel>Reward Points</StatLabel>
-          </StatCard>
-          <StatCard whileHover={{ scale: 1.02 }}>
-            <StatIcon><FaStar /></StatIcon>
-            <StatValue>4.8</StatValue>
-            <StatLabel>Avg Rating Given</StatLabel>
-          </StatCard>
-        </StatsGrid>
+          {/* Stats Grid */}
+          <StatsGrid>
+            <StatCard whileHover={{ scale: 1.02 }}>
+              <StatIcon><FaHotel /></StatIcon>
+              <StatValue>12</StatValue>
+              <StatLabel>Total Stays</StatLabel>
+            </StatCard>
+            <StatCard whileHover={{ scale: 1.02 }}>
+              <StatIcon><FaClock /></StatIcon>
+              <StatValue>24</StatValue>
+              <StatLabel>Nights Stayed</StatLabel>
+            </StatCard>
+          </StatsGrid>
+        </TopSection>
 
         {/* Content Grid */}
         <ContentGrid>

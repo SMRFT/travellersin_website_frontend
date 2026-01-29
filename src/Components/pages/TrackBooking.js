@@ -6,7 +6,7 @@ import { trackBooking, cancelBooking, initiateBookingPayment, verifyPayment } fr
 import { useNavigate } from 'react-router-dom';
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  background: #FAFAFA;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
   display: flex;
@@ -15,14 +15,13 @@ const PageWrapper = styled.div`
 `;
 
 const TrackingCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0F1E2E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 32px;
   width: 100%;
   max-width: 600px;
   padding: 3rem;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 
   @media (max-width: 600px) {
     padding: 2rem;
@@ -38,7 +37,7 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   text-align: center;
   margin-bottom: 2.5rem;
 `;
@@ -56,7 +55,7 @@ const FormGroup = styled.div`
 `;
 
 const Label = styled.label`
-  color: rgba(212, 175, 55, 0.9);
+  color: #C9A24D;
   font-size: 0.9rem;
   font-weight: 600;
   margin-left: 0.5rem;
@@ -73,16 +72,16 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+    border-color: #C9A24D;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(201, 162, 77, 0.1);
   }
 `;
 
 const SubmitButton = styled(motion.button)`
   padding: 1rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   font-weight: 700;
@@ -111,7 +110,7 @@ const DetailItem = styled.div`
   }
 
   .label {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.5);
     display: flex;
     align-items: center;
     gap: 0.8rem;
@@ -278,7 +277,7 @@ const TrackBooking = () => {
                     <motion.button
                         whileHover={{ x: -2 }}
                         onClick={() => navigate(-1)}
-                        style={{ background: 'none', border: 'none', color: '#d4af37', cursor: 'pointer', fontSize: '1.2rem' }}
+                        style={{ background: 'none', border: 'none', color: '#C9A24D', cursor: 'pointer', fontSize: '1.2rem' }}
                     >
                         <FaArrowLeft />
                     </motion.button>

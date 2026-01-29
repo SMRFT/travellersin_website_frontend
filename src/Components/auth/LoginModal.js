@@ -115,14 +115,20 @@ const Input = styled.input`
 const SubmitButton = styled(motion.button)`
   margin-top: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #d4af37, #b8860b);
+  background: #1E6F5C;
   border: none;
   border-radius: 12px;
-  color: #0f0f1a;
+  color: #ffffff;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   letter-spacing: 1px;
+  box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
+
+  &:hover {
+    background: #165e4d;
+    box-shadow: 0 15px 40px rgba(30, 111, 92, 0.4);
+  }
 `;
 
 const ToggleText = styled.p`

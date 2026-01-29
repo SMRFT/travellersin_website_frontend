@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getRoomImage } from '../../assets/imageMap';
-import { FaCalendarAlt, FaUsers, FaGlassCheers, FaBriefcase, FaHeart, FaMusic, FaTimes, FaUser, FaEnvelope, FaPhone, FaPaperPlane, FaClock, FaCheckCircle } from 'react-icons/fa';
+import {
+  FaCalendarAlt, FaUsers, FaGlassCheers, FaBriefcase,
+  FaHeart, FaMusic, FaTimes, FaUser, FaEnvelope,
+  FaPhone, FaPaperPlane, FaClock, FaCheckCircle,
+  FaDownload, FaShareAlt, FaHotel
+} from 'react-icons/fa';
 import { submitEventInquiry } from '../services/eventService';
+import html2pdf from 'html2pdf.js';
 
 /* ================= KEYFRAME ANIMATIONS ================= */
 
@@ -20,7 +26,7 @@ const shimmer = keyframes`
 /* ================= STYLED COMPONENTS ================= */
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  background: #FAFAFA;
   min-height: 100vh;
   padding-top: 90px;
 `;
@@ -70,13 +76,10 @@ const HeroContent = styled(motion.div)`
 `;
 
 const PageLabel = styled(motion.span)`
-  display: inline-block;
-  padding: 0.5rem 1.5rem;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 50px;
-  color: #d4af37;
-  font-size: 0.8rem;
+  display: block;
+  color: #C9A24D;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
   margin-bottom: 1.5rem;
@@ -90,10 +93,10 @@ const PageTitle = styled(motion.h1)`
   margin-bottom: 1.5rem;
   
   span {
-    background: linear-gradient(135deg, #d4af37, #f5d76e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #C9A24D;
+    background: none;
+    -webkit-text-fill-color: initial;
+    background-clip: border-box;
   }
 `;
 
@@ -122,35 +125,32 @@ const SectionHeader = styled(motion.div)`
 `;
 
 const SectionLabel = styled.span`
-  display: inline-block;
-  padding: 0.5rem 1.5rem;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 50px;
-  color: #d4af37;
-  font-size: 0.75rem;
+  display: block;
+  color: #C9A24D;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
   margin-bottom: 1rem;
 `;
 
 const SectionTitle = styled.h2`
-  color: #fff;
+  color: #0F1E2E;
   font-size: clamp(2rem, 4vw, 2.8rem);
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 600;
   margin-bottom: 1rem;
   
   span {
-    background: linear-gradient(135deg, #d4af37, #f5d76e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #C9A24D;
+    background: none;
+    -webkit-text-fill-color: initial;
+    background-clip: border-box;
   }
 `;
 
 const SectionDescription = styled.p`
-  color: rgba(255, 255, 255, 0.6);
+  color: #333333;
   font-size: 1.1rem;
   max-width: 600px;
   margin: 0 auto;
@@ -168,14 +168,13 @@ const EventTypesGrid = styled.div`
 const EventTypeCard = styled(motion.div)`
   position: relative;
   padding: 2.5rem;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0F1E2E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
   border-radius: 24px;
   text-align: center;
   overflow: hidden;
   transition: all 0.4s ease;
-  cursor: pointer;
 
   &::before {
     content: '';
@@ -185,42 +184,26 @@ const EventTypeCard = styled(motion.div)`
     right: 0;
     height: 3px;
     background: linear-gradient(90deg, transparent, #d4af37, transparent);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(212, 175, 55, 0.3);
-    transform: translateY(-8px);
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
-
-    &::before {
-      opacity: 1;
-    }
+    opacity: 0.5;
   }
 `;
 
 const EventIcon = styled.div`
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  background: linear-gradient(135deg, rgba(201, 162, 77, 0.2), rgba(201, 162, 77, 0.05));
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
   font-size: 2rem;
-  color: #d4af37;
-  transition: all 0.3s ease;
-
-  ${EventTypeCard}:hover & {
-    transform: scale(1.1);
-  }
+  color: #C9A24D;
+  margin: 0 auto 1.5rem;
 `;
 
 const EventTypeTitle = styled.h3`
-  color: #fff;
+  color: #C9A24D;
   font-size: 1.4rem;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -228,7 +211,7 @@ const EventTypeTitle = styled.h3`
 `;
 
 const EventTypeText = styled.p`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.7;
   font-size: 0.95rem;
 `;
@@ -320,7 +303,7 @@ const VenueTitle = styled.h4`
 `;
 
 const VenueCapacity = styled.p`
-  color: #d4af37;
+  color: #C9A24D;
   font-size: 0.85rem;
   letter-spacing: 1px;
 `;
@@ -337,14 +320,15 @@ const FeatureItem = styled(motion.div)`
   align-items: flex-start;
   gap: 1.5rem;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #0F1E2E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.02);
   border-radius: 16px;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(212, 175, 55, 0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border-color: rgba(201, 162, 77, 0.2);
   }
 `;
 
@@ -352,12 +336,12 @@ const FeatureIcon = styled.div`
   width: 50px;
   height: 50px;
   min-width: 50px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  background: linear-gradient(135deg, rgba(201, 162, 77, 0.2), rgba(201, 162, 77, 0.05));
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d4af37;
+  color: #C9A24D;
   font-size: 1.2rem;
 `;
 
@@ -371,7 +355,7 @@ const FeatureTitle = styled.h4`
 `;
 
 const FeatureText = styled.p`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
   line-height: 1.6;
 `;
@@ -379,12 +363,8 @@ const FeatureText = styled.p`
 /* --- CTA Section --- */
 const CTASection = styled(motion.div)`
   padding: 5rem 3rem;
-  background: linear-gradient(
-    135deg,
-    rgba(212, 175, 55, 0.15) 0%,
-    rgba(212, 175, 55, 0.05) 100%
-  );
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: #0F1E2E;
+  border: 1px solid rgba(201, 162, 77, 0.2);
   border-radius: 30px;
   text-align: center;
   position: relative;
@@ -410,8 +390,8 @@ const CTAText = styled.p`
 
 const CTAButton = styled(motion.button)`
   padding: 1.2rem 3rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   border: none;
   border-radius: 50px;
   font-size: 1rem;
@@ -419,12 +399,12 @@ const CTAButton = styled(motion.button)`
   letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 10px 40px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 10px 40px rgba(30, 111, 92, 0.3);
   transition: all 0.4s ease;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 50px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 15px 50px rgba(30, 111, 92, 0.4);
   }
 
   &:disabled {
@@ -453,7 +433,7 @@ const FormGroup = styled.div`
 `;
 
 const Label = styled.label`
-  color: rgba(255, 255, 255, 0.6);
+  color: #333333;
   font-size: 0.85rem;
   font-weight: 500;
   margin-left: 0.5rem;
@@ -461,48 +441,48 @@ const Label = styled.label`
 
 const Input = styled.input`
   padding: 1rem 1.2rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 14px;
-  color: #fff;
+  color: #333;
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+    border-color: #C9A24D;
+    background: #fff;
+    box-shadow: 0 0 15px rgba(201, 162, 77, 0.1);
   }
 `;
 
 const Select = styled.select`
   padding: 1rem 1.2rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 14px;
-  color: #fff;
+  color: #333;
   font-size: 1rem;
   appearance: none;
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
+    border-color: #C9A24D;
   }
 
   option {
-    background-color: #1a1a2e;
-    color: #fff;
+    background-color: #fff;
+    color: #333;
   }
 `;
 
 const TextArea = styled.textarea`
   padding: 1rem 1.2rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 14px;
-  color: #fff;
+  color: #333;
   font-size: 1rem;
   min-height: 120px;
   resize: vertical;
@@ -516,13 +496,101 @@ const TextArea = styled.textarea`
 const SuccessOverlay = styled(motion.div)`
   position: absolute;
   inset: 0;
-  background: rgba(15, 15, 26, 0.95);
+  background: rgba(15, 15, 26, 0.98);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 100;
   padding: 2rem;
+  overflow-y: auto;
+`;
+
+const ConfirmationCard = styled.div`
+  background: white;
+  color: #333;
+  width: 100%;
+  max-width: 500px;
+  padding: 3rem;
+  border-radius: 4px;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+
+  @media (max-width: 480px) {
+    padding: 1.5rem;
+  }
+`;
+
+const CardHeader = styled.div`
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+`;
+
+const CardBrand = styled.div`
+  color: #C9A24D;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+`;
+
+const DetailRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 0.5rem;
+
+  span:first-child {
+    color: #333333;
+    font-weight: 500;
+  }
+  span:last-child {
+    color: #000;
+    font-weight: 600;
+  }
+`;
+
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  justify-content: center;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+`;
+
+const CompactButton = styled(motion.button)`
+  flex: 1;
+  padding: 0.8rem 1.5rem;
+  background: ${props => props.$outline ? 'transparent' : '#1E6F5C'};
+  color: ${props => props.$outline ? '#C9A24D' : '#fff'};
+  border: ${props => props.$outline ? '2px solid #C9A24D' : 'none'};
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+  }
 `;
 
 /* --- Lightbox --- */
@@ -601,6 +669,7 @@ const itemVariants = {
 /* ================= COMPONENT ================= */
 
 const Events = () => {
+  const cardRef = useRef();
   const [lightboxImage, setLightboxImage] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -664,6 +733,37 @@ const Events = () => {
       alert('Failed to submit inquiry. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    const element = cardRef.current;
+    const opt = {
+      margin: 10,
+      filename: `EventInquiry_${bookingId}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().from(element).set(opt).save();
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'TravellersInn Event Inquiry',
+      text: `My event inquiry at TravellersInn is confirmed. ID: ${bookingId}`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.text);
+        alert('Confirmation details copied to clipboard!');
+      }
+    } catch (err) {
+      console.error('Share failed:', err);
     }
   };
 
@@ -819,13 +919,61 @@ const Events = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <FaCheckCircle size={60} color="#d4af37" style={{ marginBottom: '1.5rem' }} />
-                <h3 style={{ fontSize: '1.8rem', marginBottom: '1rem', color: '#fff' }}>Inquiry Submitted!</h3>
-                <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '1.5rem', textAlign: 'center' }}>
-                  Thank you for choosing TravellersInn. Your inquiry has been received. <br />
-                  Booking ID: <strong style={{ color: '#d4af37' }}>{bookingId}</strong>
-                </p>
-                <CTAButton onClick={() => { setSubmitted(false); setShowForm(false); }}>Close</CTAButton>
+                <div style={{ transform: 'scale(0.9)', originY: 0 }}>
+                  <ConfirmationCard ref={cardRef}>
+                    <CardHeader>
+                      <CardBrand>
+                        <FaHotel /> TravellersInn
+                      </CardBrand>
+                      <h3 style={{ margin: 0, color: '#333', fontSize: '1.2rem' }}>EVENT INQUIRY CONFIRMATION</h3>
+                    </CardHeader>
+
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+                      <FaCheckCircle size={40} color="#10b981" />
+                    </div>
+
+                    <DetailRow>
+                      <span>Booking ID</span>
+                      <span style={{ color: '#d4af37' }}>{bookingId}</span>
+                    </DetailRow>
+                    <DetailRow>
+                      <span>Full Name</span>
+                      <span>{formData.name}</span>
+                    </DetailRow>
+                    <DetailRow>
+                      <span>Event Type</span>
+                      <span>{formData.event_type}</span>
+                    </DetailRow>
+                    <DetailRow>
+                      <span>Event Date</span>
+                      <span>{formData.event_date}</span>
+                    </DetailRow>
+                    <DetailRow>
+                      <span>Guests</span>
+                      <span>{formData.number_of_guests}</span>
+                    </DetailRow>
+                    <DetailRow>
+                      <span>Phone</span>
+                      <span>{formData.phone}</span>
+                    </DetailRow>
+
+                    <div style={{ marginTop: '2rem', fontSize: '0.8rem', color: '#666', borderTop: '1px solid #eee', paddingTop: '1rem', textAlign: 'center' }}>
+                      Our events team will contact you shortly to finalize the details.
+                    </div>
+                  </ConfirmationCard>
+
+                  <ActionButtons>
+                    <CompactButton onClick={handleDownloadPDF}>
+                      <FaDownload /> Download PDF
+                    </CompactButton>
+                    <CompactButton $outline onClick={handleShare}>
+                      <FaShareAlt /> Share
+                    </CompactButton>
+                    <CompactButton $outline onClick={() => { setSubmitted(false); setShowForm(false); }}>
+                      Close
+                    </CompactButton>
+                  </ActionButtons>
+                </div>
               </SuccessOverlay>
             )}
           </AnimatePresence>
