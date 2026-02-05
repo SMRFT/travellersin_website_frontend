@@ -64,9 +64,10 @@ const ConfirmationCard = styled(motion.div)`
     box-shadow: none;
     backdrop-filter: none;
     max-width: 100%;
-    padding: 0;
+    padding: 2rem; /* Add padding for print */
     text-align: left;
     display: block;
+    color: #000;
   }
 
   &.exporting-pdf {
@@ -142,12 +143,19 @@ const Title = styled.h2`
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
   margin-bottom: 1rem;
+
+  @media print {
+    color: #000 !important;
+  }
 `;
 
 const Subtitle = styled.p`
   color: rgba(255, 255, 255, 0.6);
   font-size: 1.1rem;
   margin-bottom: 2.5rem;
+  @media print {
+    color: #333 !important;
+  }
 `;
 
 const BookingDetails = styled.div`
@@ -157,6 +165,12 @@ const BookingDetails = styled.div`
   padding: 2rem;
   margin-bottom: 2.5rem;
   text-align: left;
+
+  @media print {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #000;
+  }
 `;
 
 const DetailLine = styled.div`
@@ -165,6 +179,10 @@ const DetailLine = styled.div`
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+  @media print {
+    border-bottom: 1px solid #eee;
+  }
 
   &:last-child {
     margin-bottom: 0;
@@ -178,17 +196,24 @@ const DetailLine = styled.div`
     display: flex;
     align-items: center;
     gap: 0.6rem;
+
+    @media print {
+      color: #555;
+    }
   }
 
   .value {
     color: #fff;
     font-weight: 600;
+    @media print {
+      color: #000;
+    }
   }
 `;
 
 const ActionGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr; /* Added column for Print */
   gap: 1rem;
   margin-bottom: 2rem;
 `;
@@ -450,16 +475,23 @@ const Confirmation = () => {
           <Button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handlePrint}
+          >
+            <FaPrint /> Print Bill
+          </Button>
+          <Button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleDownloadPDF}
           >
-            <FaDownload /> Download PDF
+            <FaDownload /> PDF
           </Button>
           <Button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSharePDF}
           >
-            <FaShareAlt /> Share PDF
+            <FaShareAlt /> Share
           </Button>
         </ActionGrid>
 
