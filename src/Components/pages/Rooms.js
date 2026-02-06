@@ -6,12 +6,14 @@ import { getRoomImage } from '../../assets/imageMap';
 import { FaWifi, FaSnowflake, FaTv, FaConciergeBell, FaCoffee, FaParking, FaUsers, FaBed, FaRulerCombined, FaStar, FaCheck } from 'react-icons/fa';
 import { getRooms } from '../services/roomService';
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL.replace('/_b_a_c_k_e_n_d/travellerinwebsite/', '');
+const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 
 const formatImageUrl = (url) => {
   if (!url) return '';
   if (url.startsWith('http')) return url;
-  return `${API_BASE_URL}${url}`;
+  const baseUrl = (API_BASE_URL || '').replace(/\/$/, '');
+  const path = url.startsWith('/') ? url : `/${url}`;
+  return `${baseUrl}${path}`;
 };
 
 /* ================= STYLED COMPONENTS ================= */

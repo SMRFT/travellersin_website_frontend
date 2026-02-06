@@ -26,12 +26,14 @@ const Nav = styled(motion.nav)`
   padding: 0 4rem;
   z-index: 1000;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #0F1E2E;
-  border-bottom: 1px solid rgba(201, 162, 77, 0.1);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  background: ${({ $scrolled }) => $scrolled ? '#0F1E2E' : 'rgba(15, 30, 46, 0.85)'};
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid ${({ $scrolled }) => $scrolled ? 'rgba(201, 162, 77, 0.1)' : 'transparent'};
+  box-shadow: ${({ $scrolled }) => $scrolled ? '0 4px 30px rgba(0, 0, 0, 0.3)' : 'none'};
+  padding: ${({ $scrolled }) => $scrolled ? '0 4rem' : '1.5rem 4rem'};
 
   @media (max-width: 1024px) {
-    padding: 0 2rem;
+    padding: ${({ $scrolled }) => $scrolled ? '0 2rem' : '1.5rem 2rem'};
   }
 
   @media (max-width: 768px) {
@@ -296,6 +298,22 @@ const MobileMenuContainer = styled(motion.div)`
   z-index: 999;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
   border-left: 1px solid rgba(201, 162, 77, 0.1);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 162, 77, 0.3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(201, 162, 77, 0.3);
+    border-radius: 20px;
+  }
 `;
 
 const MobileMenuHeader = styled.div`
@@ -430,6 +448,21 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, toggleLoginModal } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 50;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [scrolled]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -451,14 +484,16 @@ const Navbar = () => {
     { title: 'Home', path: '/' },
     { title: 'Rooms', path: '/rooms' },
     { title: 'Gallery', path: '/gallery' },
-    { title: 'Track Stay', path: '/track-booking' },
     { title: 'Events', path: '/events' },
+    { title: 'Track Stay', path: '/track-booking' },
+    { title: 'Track Event', path: '/trackevent' },
     { title: 'Contact', path: '/contact' }
   ];
 
   return (
     <>
       <Nav
+        $scrolled={scrolled}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -578,6 +613,20 @@ const Navbar = () => {
                     {item.title}
                   </MobileLink>
                 ))}
+                {user && (
+                  <MobileLink
+                    to="/profile"
+                    onClick={closeMenu}
+                    $isActive={isActive('/profile')}
+                    custom={navLinks.length}
+                    variants={linkVariants}
+                    initial="closed"
+                    animate="open"
+                  >
+                    <MobileLinkNumber>0{navLinks.length + 1}</MobileLinkNumber>
+                    Profile
+                  </MobileLink>
+                )}
               </MobileNavLinks>
 
               <MobileMenuFooter>

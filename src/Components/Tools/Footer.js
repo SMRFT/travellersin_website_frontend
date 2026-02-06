@@ -404,7 +404,7 @@ const Footer = () => {
     { name: 'Rooms', path: '/rooms' },
     { name: 'Events', path: '/events' },
     { name: 'Track Booking', path: '/track-booking' },
-    { name: 'Track Event', path: '/track-event' },
+    { name: 'Track Event', path: '/trackevent' },
     { name: 'Contact', path: '/contact' }
   ];
 
@@ -467,8 +467,10 @@ const Footer = () => {
           <ContactItem>
             <FaMapMarkerAlt />
             <ContactText>
-              123 Hotel Street, Salem<br />
-              Tamil Nadu, India - 636001
+              60/37 Saradha College,<br/>
+Near Shanmugam Hospital,<br/>
+L R N Colony, Hasthampatti,<br/>
+Salem, India - 636007
             </ContactText>
           </ContactItem>
           <ContactItem>
@@ -477,7 +479,7 @@ const Footer = () => {
           </ContactItem>
           <ContactItem>
             <FaEnvelope />
-            <ContactText>info@travellersinn.com</ContactText>
+            <ContactText>hoteltravellersinnslm@gmail.com</ContactText>
           </ContactItem>
           <ContactItem>
             <FaClock />

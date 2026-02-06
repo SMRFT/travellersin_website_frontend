@@ -191,7 +191,9 @@ const Payment = () => {
 
     try {
       const bookingData = {
-        room_numbers: bookingDetails.room_numbers || [roomId],
+        room_numbers: Array.isArray(bookingDetails.room_numbers) && bookingDetails.room_numbers.length > 0
+          ? bookingDetails.room_numbers.map(String).filter(r => r && r !== "undefined" && r !== "null")
+          : [String(bookingDetails.roomId || roomId)],
         customer_id: bookingDetails.customerId,
         guest_name: bookingDetails.fullName,
         guest_phone: bookingDetails.phone,
@@ -205,7 +207,8 @@ const Payment = () => {
           status: method === 'online' ? 'paid' : 'pending' // if online, we only create if paid
         },
         id_proof_type: bookingDetails.idProofType,
-        id_proof_file: "uploaded_id_placeholder",
+        id_proof_number: bookingDetails.idProofNumber,
+        id_proof_file: bookingDetails.idProofFile || "uploaded_id_placeholder",
         extra_addons: bookingDetails.extra_addons || []
       };
 

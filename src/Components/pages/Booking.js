@@ -366,9 +366,16 @@ const Booking = () => {
       email: user ? user.email : formData.guestEmail,
       phone: user ? user.phone : formData.guestPhone,
       customerId: user ? user.customer_id : null,
-      room_numbers: [room.room_number],
-      idProofFile: formData.idProofNumber // Using number as representative for now
+      room_numbers: [room.room_number || roomId],
+      idProofFile: formData.idProofNumber, // Using number as representative for now
+      idProofNumber: formData.idProofNumber,
+      idProofType: formData.idProofType,
     };
+
+    if (!room.room_number && !roomId) {
+      alert("Error: Room Number is missing. Please try refreshing the page.");
+      return;
+    }
 
     // Pass data to Payment page
     navigate('/payment', {
@@ -599,7 +606,7 @@ const Booking = () => {
                   placeholder="Enter your ID number"
                   value={formData.idProofNumber}
                   onChange={handleChange}
-                  required
+                  // required
                   style={{ width: '100%' }}
                 />
                 <FaIdCard style={{

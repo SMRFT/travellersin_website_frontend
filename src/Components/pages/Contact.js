@@ -589,12 +589,12 @@ const Contact = () => {
               <ContactDetails>
                 <ContactLabel>Email</ContactLabel>
                 <ContactText>
-                  <ContactLink href="mailto:info@travellersinn.com">
-                    info@travellersinn.com
+                  <ContactLink href="mailto:hoteltravellersinnslm@gmail.com">
+                    hoteltravellersinnslm@gmail.com
                   </ContactLink><br />
-                  <ContactLink href="mailto:bookings@travellersinn.com">
+                  {/* <ContactLink href="mailto:bookings@travellersinn.com">
                     bookings@travellersinn.com
-                  </ContactLink>
+                  </ContactLink> */}
                 </ContactText>
               </ContactDetails>
             </ContactItem>

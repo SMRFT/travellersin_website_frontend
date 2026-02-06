@@ -5,12 +5,14 @@ import { getRooms } from '../services/roomService';
 import api from '../services/api';
 import { FaPlus, FaTrash, FaEdit, FaSave, FaTimes, FaImage, FaUpload, FaSpinner } from 'react-icons/fa';
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL.replace('/_b_a_c_k_e_n_d/travellerinwebsite/', '');
+const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 
 const formatImageUrl = (url) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
-    return `${API_BASE_URL}${url}`;
+    const baseUrl = (API_BASE_URL || '').replace(/\/$/, '');
+    const path = url.startsWith('/') ? url : `/${url}`;
+    return `${baseUrl}${path}`;
 };
 
 const Container = styled.div`

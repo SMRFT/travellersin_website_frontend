@@ -6,6 +6,7 @@ import { GlobalStyle, theme } from "./GlobalStyles";
 /* ===== Layout ===== */
 import Navbar from "./Components/Tools/Navbar";
 import Footer from "./Components/Tools/Footer";
+import ScrollToTop from "./Components/Tools/ScrollToTop";
 
 /* ===== Auth ===== */
 import { AuthProvider } from "./Components/auth/AuthContext";
@@ -35,6 +36,7 @@ function App() {
       <GlobalStyle />
       <AuthProvider>
         <Router>
+          <ScrollToTop />
           <Navbar />
 
           {/* Optional Global Login Modal */}
@@ -57,7 +59,7 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/quick-booking" element={<QuickBooking />} />
             <Route path="/gallery" element={<Gallery />} />
-            <Route path="/track-event" element={<TrackEvent />} />
+            <Route path="/trackevent" element={<TrackEvent />} />
           </Routes>
 
           <Footer />

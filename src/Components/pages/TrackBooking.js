@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaCalendarAlt, FaHotel, FaPhone, FaCheckCircle, FaExclamationTriangle, FaArrowLeft, FaBed, FaFileInvoiceDollar } from 'react-icons/fa';
 import { trackBooking, cancelBooking, initiateBookingPayment, verifyPayment } from '../services/bookingService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const PageWrapper = styled.div`
   background: #FAFAFA;
@@ -172,6 +172,35 @@ const TrackBooking = () => {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const location = useLocation();
+
+    // Auto-fill and search from URL params
+    React.useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const urlId = params.get('id');
+        const urlPhone = params.get('phone');
+
+        if (urlId && urlPhone) {
+            setBookingId(urlId);
+            setPhone(urlPhone);
+            // We need to call trackBooking directly here or trigger search
+            fetchBookingAuto(urlId, urlPhone);
+        }
+    }, [location]);
+
+    const fetchBookingAuto = async (bid, bphone) => {
+        setLoading(true);
+        setError('');
+        setBooking(null);
+        try {
+            const data = await trackBooking(bid, bphone);
+            setBooking(data);
+        } catch (err) {
+            setError(err.response?.data?.error || "Unable to find booking. Please check your details.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSearch = async (e) => {
         e.preventDefault();

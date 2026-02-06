@@ -11,7 +11,7 @@ export const getAllEventBookings = async () => {
 };
 
 export const trackEventBooking = async (bookingId, phone) => {
-    const response = await api.post('/events/track/', {
+    const response = await api.post('/events/status/', {
         booking_id: bookingId,
         phone: phone
     });

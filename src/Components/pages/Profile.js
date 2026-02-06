@@ -714,10 +714,14 @@ const Profile = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
 
   const fetchBookings = async () => {
-    if (!userData.customer_id) return;
+    if (!user || (!user.customer_id && !user.id)) return;
+
+    // Fallback: create ID if missing? No, user must be valid.
+    const customerId = user.customer_id || user.id;
+
     setBookingsLoading(true);
     try {
-      const data = await getUserBookings(userData.customer_id);
+      const data = await getUserBookings(customerId);
       setBookings(data);
     } catch (err) {
       console.error('Error fetching bookings:', err);
@@ -727,8 +731,10 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    fetchBookings();
-  }, [userData.customer_id]);
+    if (user) {
+      fetchBookings();
+    }
+  }, [user]);
 
   const handleCancelBooking = async (bookingId) => {
     const reason = window.prompt("Please enter the reason for cancellation:");
@@ -745,47 +751,15 @@ const Profile = () => {
   };
 
   const handlePayNow = async (booking) => {
-    try {
-      const { order } = await initiateBookingPayment(booking.booking_id);
-      const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_placeholder",
-        amount: order.amount,
-        currency: "INR",
-        name: "TravellersInn",
-        description: `Payment for Booking ${booking.booking_id}`,
-        order_id: order.id,
-        handler: async function (response) {
-          try {
-            await verifyPayment({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              booking_id: booking.booking_id
-            });
-            await fetchBookings();
-            alert("Payment successful!");
-          } catch (err) {
-            alert("Payment verification failed.");
-          }
-        },
-        prefill: {
-          name: userData.name,
-          email: userData.email,
-          contact: userData.phone,
-        },
-        theme: { color: "#d4af37" }
-      };
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (err) {
-      alert("Failed to initiate payment.");
-    }
+    // Redirect to Track Booking page for payment
+    navigate(`/track-booking?id=${booking.booking_id}&phone=${booking.guest_phone}`);
   };
 
   const canCancel = (booking) => {
     if (!booking || ['cancelled', 'cancellation_requested'].includes(booking.booking_status)) return false;
     const createdAt = new Date(booking.created_at);
     const now = new Date();
+    // Allow cancellation if within 24 hours of booking creation
     return (now - createdAt) / (1000 * 60 * 60) <= 24;
   };
 
@@ -905,11 +879,30 @@ const Profile = () => {
                       <FaHotel />
                     </BookingImage>
                     <BookingInfo>
-                      <BookingTitle>Room {booking.room_number}</BookingTitle>
+                      <BookingTitle>
+                        Room(s): {
+                          booking.room_numbers
+                            ? (Array.isArray(booking.room_numbers)
+                              ? booking.room_numbers.join(', ')
+                              : booking.room_numbers.replace(/^,|,$/g, '').replace(/,/g, ', '))
+                            : 'N/A'
+                        }
+                      </BookingTitle>
                       <BookingMeta>
                         <span><FaCalendarAlt /> {new Date(booking.check_in).toLocaleDateString()} - {new Date(booking.check_out).toLocaleDateString()}</span>
                         <span><FaUser /> {booking.number_of_guests} Guests</span>
-                        <span><FaCreditCard /> ₹{booking.payment_details?.amount?.toLocaleString()} ({booking.payment_details?.method})</span>
+                        <span>
+                          <FaCreditCard />
+                          {booking.discount_amount > 0 ? (
+                            <>
+                              <span style={{ textDecoration: 'line-through', opacity: 0.7, marginRight: '5px' }}>₹{booking.payment_details?.amount}</span>
+                              <span style={{ color: '#10b981' }}>₹{(booking.payment_details?.amount - booking.discount_amount).toLocaleString()}</span>
+                            </>
+                          ) : (
+                            `₹${booking.payment_details?.amount?.toLocaleString()}`
+                          )}
+                          ({booking.payment_details?.method})
+                        </span>
                       </BookingMeta>
                       <BookingStatus $status={booking.booking_status}>
                         {booking.booking_status === 'confirmed' && <FaCheck />}

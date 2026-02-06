@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -8,6 +8,8 @@ import {
 } from 'react-icons/fa';
 import { trackEventBooking } from '../services/eventService';
 import html2pdf from 'html2pdf.js';
+
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const PageWrapper = styled.div`
   background: #FAFAFA;
@@ -245,7 +247,37 @@ const TrackEvent = () => {
     const [phone, setPhone] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
+
     const [error, setError] = useState('');
+    const location = useLocation();
+
+    // Auto-fill and search from URL params
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const urlId = params.get('id');
+        const urlPhone = params.get('phone');
+
+        if (urlId && urlPhone) {
+            setBookingIdInput(urlId);
+            setPhone(urlPhone);
+            fetchEventAuto(urlId, urlPhone);
+        }
+    }, [location]);
+
+    const fetchEventAuto = async (bid, bphone) => {
+        setLoading(true);
+        setError('');
+        setResult(null);
+
+        try {
+            const data = await trackEventBooking(bid, bphone);
+            setResult(data);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Could not find your event booking.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSearch = async (e) => {
         e.preventDefault();

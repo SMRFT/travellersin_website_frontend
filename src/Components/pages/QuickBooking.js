@@ -324,7 +324,7 @@ const QuickBooking = () => {
             email: user ? user.email : formData.guestEmail,
             phone: user ? user.phone : formData.guestPhone,
             customerId: user ? user.customer_id : null,
-            roomNumbers: formData.selectedRooms,
+            room_numbers: formData.selectedRooms,
             extra_addons: formData.selectedAddons.map(id => {
                 const addon = addonsList.find(a => a.id === id);
                 return { id: addon.id, name: addon.name, price: addon.price };

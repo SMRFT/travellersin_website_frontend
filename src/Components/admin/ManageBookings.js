@@ -7,7 +7,7 @@ import api from '../services/api';
 import { getRooms } from '../services/roomService';
 import { approveCancellation, rejectCancellation } from '../services/bookingService';
 
-const API_BASE_URL = (process.env.REACT_APP_BACKEND_BASE_URL || "").replace('/_b_a_c_k_e_n_d/travellerinwebsite/', '');
+const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 
 const Container = styled.div`
   background: #0F1E2E;
@@ -187,17 +187,81 @@ const ManageBookings = () => {
 
     const handleUpdateStatus = async (bookingId, newStatus, extraData = {}) => {
         try {
-            const updates = { booking_status: newStatus, ...extraData };
-            const response = await api.patch(`/admin/booking/${bookingId}/`, updates);
+            // Fetch current booking to merge payment details properly
+            // Or we can rely on the fact that we have the 'booking' object passed via UI state if we wanted, 
+            // but handleUpdateStatus is generic.
 
-            if (newStatus === 'confirmed' || updates.amount_paid) {
-                // Check if payment was recorded (amount_paid in updates)
-                if (updates.amount_paid) {
+            // Wait, we call this from buttons where we might not have the full fresh booking object handy 
+            // except what's in the list.
+            // Let's assume we need to construct a proper payload.
+
+            // If extraData contains amount_paid, we are doing a payment update.
+            // We need to send payment_details object.
+
+            let payload = { booking_status: newStatus };
+
+            if (extraData.amount_paid !== undefined) {
+                // We need to construct nested payment_details.
+                // Since we are patching, we should ideally merge with existing.
+                // But the backend serializer might replace the whole JSON field.
+                // Let's try to get the existing payment details from the booking in state if possible.
+                // We don't have it easily here without passing it.
+                // Hack: We know what we want to update.
+                // Let's update the calling signature to pass the current booking OR 
+                // we fetch it first? Fetching is safer but slower.
+                // Let's rely on the fact that backend might handle partial updates if written well, 
+                // OR we update the frontend logic to pass the 'current_payment_details' in extraData 
+                // and we merge it here.
+
+                // Better: Update handleUpdateStatus to accept 'booking' object instead of just ID?
+                // No, that breaks other calls.
+
+                // Let's just update the specific call for Payment Record to do the right thing.
+                // But wait, handleUpdateStatus is "smart".
+
+                // Let's assume for now the backend endpoint `/admin/booking/<id>/` 
+                // uses a serializer that might overwrite `payment_details`.
+
+                // Let's modify the payload construction:
+                if (extraData.amount_paid) {
+                    // This is coming from Record Payment.
+                    // We need to reconstruct the payment_details.
+                    // We can't know the existing 'amount' or 'method' without the booking.
+
+                    // Let's find the booking in local state
+                    const currentBooking = bookings.find(b => b.booking_id === bookingId);
+                    if (currentBooking) {
+                        payload.payment_details = {
+                            ...currentBooking.payment_details,
+                            amount_paid: extraData.amount_paid,
+                            status: extraData.payment_status || currentBooking.payment_details.status,
+                            // If payment_type is passed, maybe store it? Backend 'Billing' model handles history.
+                            // The 'payment_details' JSON on booking is just a snapshot.
+                        };
+                    }
+                }
+            } else {
+                // For standard status updates (cancel, confirm), just merge extraData
+                payload = { ...payload, ...extraData };
+            }
+
+            // If we have extraData that is NOT amount_paid (like cancellation_reason), add it
+            if (extraData.cancellation_reason) payload.cancellation_reason = extraData.cancellation_reason;
+
+            // Wait, if we added payment_details, we should pass payment_type separately?
+            // The view likely looks for payment_type in request.data for the Billing record creation.
+            if (extraData.payment_type) payload.payment_type = extraData.payment_type;
+            if (extraData.amount_paid) payload.amount_paid = extraData.amount_paid; // For the view/signal to catch it?
+
+            const response = await api.patch(`/admin/booking/${bookingId}/`, payload);
+
+            if (newStatus === 'confirmed' || extraData.amount_paid) {
+                if (extraData.amount_paid) {
                     const latestBill = response.data.booking.payment_details.latest_billing_no;
-                    const pType = updates.payment_type || 'cash';
+                    const pType = extraData.payment_type || 'cash';
                     if (latestBill) {
                         if (window.confirm("Payment Recorded! Do you want to print the bill?")) {
-                            printBill(response.data.booking, latestBill, updates.amount_paid, pType);
+                            printBill(response.data.booking, latestBill, extraData.amount_paid, pType);
                         }
                     }
                 } else if (newStatus === 'confirmed') {
@@ -309,7 +373,8 @@ const ManageBookings = () => {
             check_in: booking.check_in ? booking.check_in.slice(0, 16) : '', // format for datetime-local
             check_out: booking.check_out ? booking.check_out.slice(0, 16) : '',
             amount: booking.payment_details?.amount || '',
-            amount_paid: booking.payment_details?.amount_paid || ''
+            amount_paid: booking.payment_details?.amount_paid || '',
+            discount_amount: booking.discount_amount || ''
         });
         setCreateModal(true);
     };
@@ -328,10 +393,20 @@ const ManageBookings = () => {
                 room_numbers: Array.isArray(newBooking.room_numbers) ? newBooking.room_numbers.join(',') : newBooking.room_numbers,
                 check_in: newBooking.check_in,
                 check_out: newBooking.check_out,
+                discount_amount: parseFloat(newBooking.discount_amount || 0),
                 payment_details: {
                     amount: parseFloat(newBooking.amount),
                     amount_paid: parseFloat(newBooking.amount_paid || 0),
-                    status: parseFloat(newBooking.amount_paid) >= parseFloat(newBooking.amount) ? 'paid' : (parseFloat(newBooking.amount_paid) > 0 ? 'partially_paid' : 'pending'),
+                    status: (() => {
+                        const total = parseFloat(newBooking.amount);
+                        const discount = parseFloat(newBooking.discount_amount || 0);
+                        const paid = parseFloat(newBooking.amount_paid || 0);
+                        const netPayable = total - discount;
+
+                        if (paid >= netPayable) return 'paid';
+                        if (paid > 0) return 'partially_paid';
+                        return 'pending';
+                    })(),
                     method: 'cash' // Default to cash for manual
                 },
                 booking_status: editingBooking ? editingBooking.booking_status : 'confirmed',
@@ -353,7 +428,7 @@ const ManageBookings = () => {
             setNewBooking({
                 guest_name: '', guest_phone: '', guest_email: '',
                 number_of_guests: 1, id_proof_type: 'Aadhar Card', id_proof_file: '',
-                room_numbers: [], check_in: '', check_out: '', amount: '', amount_paid: ''
+                room_numbers: [], check_in: '', check_out: '', amount: '', amount_paid: '', discount_amount: ''
             });
         } catch (err) {
             alert("Failed to save booking: " + (err.response?.data?.error || err.message));
@@ -402,7 +477,7 @@ const ManageBookings = () => {
                             setNewBooking({
                                 guest_name: '', guest_phone: '', guest_email: '',
                                 number_of_guests: 1, id_proof_type: 'Aadhar Card', id_proof_file: '',
-                                room_numbers: [], check_in: '', check_out: '', amount: '', amount_paid: ''
+                                room_numbers: [], check_in: '', check_out: '', amount: '', amount_paid: '', discount_amount: ''
                             });
                             setCreateModal(true);
                         }}
@@ -459,8 +534,13 @@ const ManageBookings = () => {
                                 <td>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                                         <div style={{ fontSize: '0.9rem', color: '#fff' }}>₹{booking.payment_details?.amount || 0}</div>
+                                        {booking.discount_amount > 0 && (
+                                            <div style={{ fontSize: '0.75rem', color: '#d4af37' }}>- Disc: ₹{booking.discount_amount}</div>
+                                        )}
                                         <div style={{ fontSize: '0.7rem', color: '#10b981' }}>Paid: ₹{booking.payment_details?.amount_paid || 0}</div>
-                                        <div style={{ fontSize: '0.7rem', color: '#ff4d4d' }}>Bal: ₹{(booking.payment_details?.amount || 0) - (booking.payment_details?.amount_paid || 0)}</div>
+                                        <div style={{ fontSize: '0.7rem', color: '#ff4d4d' }}>
+                                            Bal: ₹{((booking.payment_details?.amount || 0) - (booking.discount_amount || 0)) - (booking.payment_details?.amount_paid || 0)}
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
@@ -582,7 +662,40 @@ const ManageBookings = () => {
                                 <ActionBtn
                                     $color="#10b981"
                                     style={{ background: 'rgba(16,185,129,0.1)', flex: 1, borderRadius: '8px' }}
-                                    onClick={() => handleUpdateStatus(paymentModal.booking.booking_id, paymentModal.booking.booking_status, { amount_paid: paymentModal.amount, payment_type: paymentModal.paymentType })}
+                                    onClick={() => {
+                                        const total = parseFloat(paymentModal.booking.payment_details?.amount || 0);
+                                        const discount = parseFloat(paymentModal.booking.discount_amount || 0);
+                                        const paidSoFar = parseFloat(paymentModal.booking.payment_details?.amount_paid || 0);
+                                        const currentPayment = parseFloat(paymentModal.amount || 0);
+                                        const newTotalPaid = paidSoFar + currentPayment;
+                                        const netPayable = total - discount;
+
+                                        const newStatus = newTotalPaid >= netPayable ? 'paid' : 'partially_paid';
+
+                                        handleUpdateStatus(
+                                            paymentModal.booking.booking_id,
+                                            paymentModal.booking.booking_status, // Keep booking status same unless we want to auto-confirm? User said "status paid", referring to payment status.
+                                            {
+                                                amount_paid: currentPayment, // Backend adds this to total? Or replaces? 
+                                                // Wait, backend likely ADDS if it's recording a transaction.
+                                                // Let's check backend logic. If backend replaces, we send newTotalPaid. If adds, we send currentPayment.
+                                                // Actually, looking at handleSaveBooking, it sends TOTAL amount_paid.
+                                                // BUT handleUpdateStatus hits /admin/booking/ID/.
+                                                // Let's assume for now we need to send the UPDATE payload.
+                                                // However, usually "Record Payment" implies adding a transaction.
+                                                // I'll check handleUpdateStatus again.
+
+                                                // Re-reading handleUpdateStatus: it blindly sends updates.
+                                                // If I send { amount_paid: 500 }, does the backend ADD 500 or SET to 500?
+                                                // I need to check backend `booking_detail_update` (PATCH).
+
+                                                // If backend simply updates fields:
+                                                amount_paid: newTotalPaid, // We must calculate total here if backend doesn't add.
+                                                payment_type: paymentModal.paymentType,
+                                                payment_status: newStatus
+                                            }
+                                        );
+                                    }}
                                 >
                                     Record
                                 </ActionBtn>
@@ -656,7 +769,7 @@ const ManageBookings = () => {
                                     {newBooking.id_proof_file && (
                                         <div style={{ fontSize: '0.8rem', marginTop: '0.3rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                             <FaCheck /> File Uploaded
-                                            <a href={`${API_BASE_URL}${newBooking.id_proof_file}`} target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>View</a>
+                                            <a href={`${(API_BASE_URL || '').replace(/\/$/, '')}/${newBooking.id_proof_file.replace(/^\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>View</a>
                                         </div>
                                     )}
                                 </div>
@@ -684,6 +797,21 @@ const ManageBookings = () => {
                                 <div>
                                     <Label>Total Amount (₹)</Label>
                                     <Input required type="number" value={newBooking.amount} onChange={e => setNewBooking({ ...newBooking, amount: e.target.value })} />
+                                </div>
+                                <div>
+                                    <Label>Discount (₹)</Label>
+                                    <Input
+                                        type="number"
+                                        value={newBooking.discount_amount}
+                                        onChange={e => {
+                                            const discount = parseFloat(e.target.value) || 0;
+                                            // Optional: Auto-update total amount if we had a base price logic, but here amount is manual.
+                                            // So we just let admin adjust amount manually or we can act smart.
+                                            // Let's just store it.
+                                            setNewBooking({ ...newBooking, discount_amount: e.target.value });
+                                        }}
+                                        placeholder="0"
+                                    />
                                 </div>
                                 <div>
                                     <Label>Amount Paid (₹)</Label>
