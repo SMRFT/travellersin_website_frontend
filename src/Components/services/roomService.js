@@ -22,3 +22,8 @@ export const checkRoomAvailability = async (roomNumbers, checkIn, checkOut) => {
     });
     return response.data;
 };
+
+export const getRoomBookings = async (roomNumber) => {
+    const response = await api.get(`/rooms/${roomNumber}/bookings/`);
+    return response.data;
+};

@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCalendarAlt, FaHotel, FaArrowRight, FaCheckCircle, FaExclamationTriangle, FaUsers, FaBed, FaWifi, FaCoffee, FaPlus, FaClock, FaIdCard } from 'react-icons/fa';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import { addDays, isWithinInterval, parseISO, startOfToday, format } from 'date-fns';
 import { useAuth } from '../auth/AuthContext';
-import { getRooms, checkRoomAvailability } from '../services/roomService';
+import { getRooms, checkRoomAvailability, getRoomBookings } from '../services/roomService';
 
 const PageWrapper = styled.div`
   background: #d0d0d0;
@@ -200,6 +203,47 @@ const Button = styled(motion.button)`
   }
 `;
 
+const DatePickerStyles = styled.div`
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+  .react-datepicker__input-container {
+    width: 100%;
+  }
+  
+  .react-datepicker {
+    background-color: #0F1E2E;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: inherit;
+    color: #fff;
+  }
+
+  .react-datepicker__header {
+    background-color: #0F1E2E;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .react-datepicker__current-month, .react-datepicker__day-name {
+    color: #d4af37;
+  }
+
+  .react-datepicker__day {
+    color: #fff;
+    &:hover {
+      background-color: rgba(212, 175, 55, 0.2);
+    }
+  }
+
+  .react-datepicker__day--disabled {
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
+    background-color: #d4af37;
+    color: #0F1E2E;
+  }
+`;
+
 const addonsList = [
     { id: 'breakfast', name: 'Breakfast', price: 500, icon: <FaCoffee />, perGuest: true },
     { id: 'wifi', name: 'Premium WiFi', price: 200, icon: <FaWifi />, perGuest: false },
@@ -234,6 +278,8 @@ const QuickBooking = () => {
         checked: false
     });
 
+    const [bookedDates, setBookedDates] = useState([]);
+
     useEffect(() => {
         const fetchRooms = async () => {
             try {
@@ -250,20 +296,73 @@ const QuickBooking = () => {
 
     const handleNext = async () => {
         if (step === 1) {
+            // Room Selection Step
+            // Validate at least one room is selected
+            if (formData.selectedRooms.length === 0) {
+                alert("Please select at least one room.");
+                return;
+            }
+
             setAvailability(prev => ({ ...prev, loading: true }));
             try {
-                const roomNumbers = rooms.map(r => r.room_number).join(',');
+                // Fetch bookings for all selected rooms
+                const allBookedDates = new Set();
+
+                await Promise.all(formData.selectedRooms.map(async (roomNum) => {
+                    try {
+                        const bookings = await getRoomBookings(roomNum);
+                        bookings.forEach(booking => {
+                            let currentDate = parseISO(booking.start);
+                            const endDate = parseISO(booking.end);
+                            while (currentDate <= endDate) {
+                                allBookedDates.add(currentDate.toISOString().split('T')[0]);
+                                currentDate = addDays(currentDate, 1);
+                            }
+                        });
+                    } catch (e) {
+                        console.error(`Failed to fetch bookings for room ${roomNum}`, e);
+                    }
+                }));
+
+                setBookedDates(Array.from(allBookedDates).map(d => new Date(d)));
+                setStep(prev => prev + 1);
+            } catch (err) {
+                console.error("Error fetching room bookings:", err);
+                alert("Could not load room availability. Please try again.");
+            } finally {
+                setAvailability(prev => ({ ...prev, loading: false }));
+            }
+
+        } else if (step === 2) {
+            // Date Selection Step
+            if (!formData.checkIn || !formData.checkOut) {
+                alert("Please select check-in and check-out dates.");
+                return;
+            }
+
+            // Verify availability (double check)
+            setAvailability(prev => ({ ...prev, loading: true }));
+            try {
+                const roomNumbers = formData.selectedRooms.join(',');
                 const res = await checkRoomAvailability(
                     roomNumbers,
                     `${formData.checkIn}T${formData.checkInTime}:00Z`,
                     `${formData.checkOut}T${formData.checkOutTime}:00Z`
                 );
+
+                if (!res.is_available) {
+                    alert(`Selected dates are not available for the following rooms: ${res.conflicts.join(', ')}`);
+                    setAvailability({ loading: false, conflicts: res.conflicts || [], checked: true });
+                    return;
+                }
+
                 setAvailability({
                     loading: false,
-                    conflicts: res.conflicts || [],
+                    conflicts: [],
                     checked: true
                 });
                 setStep(prev => prev + 1);
+
             } catch (err) {
                 console.error("Availability check failed:", err);
                 setAvailability(prev => ({ ...prev, loading: false }));
@@ -368,59 +467,9 @@ const QuickBooking = () => {
                             animate={{ x: 0, opacity: 1 }}
                             exit={{ x: -20, opacity: 0 }}
                         >
-                            <Grid>
-                                <FormGroup>
-                                    <Label>Check-in Date</Label>
-                                    <Input
-                                        type="date"
-                                        value={formData.checkIn}
-                                        onChange={e => setFormData({ ...formData, checkIn: e.target.value })}
-                                    />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label>Check-in Time</Label>
-                                    <Input
-                                        type="time"
-                                        value={formData.checkInTime}
-                                        onChange={e => setFormData({ ...formData, checkInTime: e.target.value })}
-                                    />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label>Check-out Date</Label>
-                                    <Input
-                                        type="date"
-                                        value={formData.checkOut}
-                                        onChange={e => setFormData({ ...formData, checkOut: e.target.value })}
-                                    />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label>Check-out Time</Label>
-                                    <Input
-                                        type="time"
-                                        value={formData.checkOutTime}
-                                        onChange={e => setFormData({ ...formData, checkOutTime: e.target.value })}
-                                    />
-                                </FormGroup>
-                            </Grid>
-                            <ButtonGroup>
-                                <div />
-                                <Button $primary onClick={handleNext} disabled={!formData.checkIn || !formData.checkOut || availability.loading}>
-                                    {availability.loading ? 'Searching Rooms...' : 'Select Rooms'} <FaArrowRight />
-                                </Button>
-                            </ButtonGroup>
-                        </motion.div>
-                    )}
-
-                    {step === 2 && (
-                        <motion.div
-                            key="step2"
-                            initial={{ x: 20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: -20, opacity: 0 }}
-                        >
                             <Label>Select Your Rooms</Label>
                             <Grid>
-                                {rooms.filter(r => !availability.conflicts.includes(r.room_number)).map(room => (
+                                {rooms.map(room => (
                                     <RoomCard
                                         key={room.room_number}
                                         $selected={formData.selectedRooms.includes(room.room_number)}
@@ -439,9 +488,79 @@ const QuickBooking = () => {
                                 ))}
                             </Grid>
                             <ButtonGroup>
+                                <div />
+                                <Button $primary onClick={handleNext} disabled={formData.selectedRooms.length === 0 || availability.loading}>
+                                    {availability.loading ? 'Loading Availability...' : 'Select Dates'} <FaArrowRight />
+                                </Button>
+                            </ButtonGroup>
+                        </motion.div>
+                    )}
+
+                    {step === 2 && (
+                        <motion.div
+                            key="step2"
+                            initial={{ x: 20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: -20, opacity: 0 }}
+                        >
+                            <Grid>
+                                <FormGroup>
+                                    <Label>Check-in Date</Label>
+                                    <DatePickerStyles>
+                                        <DatePicker
+                                            selected={formData.checkIn ? new Date(formData.checkIn) : null}
+                                            onChange={(date) => setFormData(prev => ({ ...prev, checkIn: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                                            selectsStart
+                                            startDate={formData.checkIn ? new Date(formData.checkIn) : null}
+                                            endDate={formData.checkOut ? new Date(formData.checkOut) : null}
+                                            excludeDates={bookedDates}
+                                            minDate={startOfToday()}
+                                            placeholderText="Select Check-In Date"
+                                            customInput={<Input />}
+                                            dateFormat="yyyy-MM-dd"
+                                            required
+                                        />
+                                    </DatePickerStyles>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label>Check-in Time</Label>
+                                    <Input
+                                        type="time"
+                                        value={formData.checkInTime}
+                                        onChange={e => setFormData({ ...formData, checkInTime: e.target.value })}
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label>Check-out Date</Label>
+                                    <DatePickerStyles>
+                                        <DatePicker
+                                            selected={formData.checkOut ? new Date(formData.checkOut) : null}
+                                            onChange={(date) => setFormData(prev => ({ ...prev, checkOut: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                                            selectsEnd
+                                            startDate={formData.checkIn ? new Date(formData.checkIn) : null}
+                                            endDate={formData.checkOut ? new Date(formData.checkOut) : null}
+                                            minDate={formData.checkIn ? addDays(new Date(formData.checkIn), 1) : startOfToday()}
+                                            excludeDates={bookedDates}
+                                            placeholderText="Select Check-Out Date"
+                                            customInput={<Input />}
+                                            dateFormat="yyyy-MM-dd"
+                                            required
+                                        />
+                                    </DatePickerStyles>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label>Check-out Time</Label>
+                                    <Input
+                                        type="time"
+                                        value={formData.checkOutTime}
+                                        onChange={e => setFormData({ ...formData, checkOutTime: e.target.value })}
+                                    />
+                                </FormGroup>
+                            </Grid>
+                            <ButtonGroup>
                                 <Button onClick={handleBack}>Back</Button>
-                                <Button $primary onClick={handleNext} disabled={formData.selectedRooms.length === 0}>
-                                    Add-ons <FaArrowRight />
+                                <Button $primary onClick={handleNext} disabled={!formData.checkIn || !formData.checkOut || availability.loading}>
+                                    {availability.loading ? 'Verifying...' : 'Add-ons'} <FaArrowRight />
                                 </Button>
                             </ButtonGroup>
                         </motion.div>

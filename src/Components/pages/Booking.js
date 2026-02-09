@@ -3,8 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaCalendarAlt, FaUserFriends, FaHotel, FaArrowRight, FaCheckCircle, FaIdCard, FaCoffee, FaWifi, FaPlus, FaClock, FaExclamationTriangle } from 'react-icons/fa';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import { addDays, isWithinInterval, parseISO, startOfToday, format } from 'date-fns';
 import { useAuth } from '../auth/AuthContext';
-import { getRoomById, checkRoomAvailability } from '../services/roomService';
+import { getRoomById, checkRoomAvailability, getRoomBookings } from '../services/roomService';
 
 const PageWrapper = styled.div`
   background: #d0d0d0;
@@ -248,6 +251,47 @@ const AvailabilityBanner = styled(motion.div)`
   border: 1px solid ${props => props.$available ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
 `;
 
+const DatePickerStyles = styled.div`
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+  .react-datepicker__input-container {
+    width: 100%;
+  }
+  
+  .react-datepicker {
+    background-color: #0F1E2E;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: inherit;
+    color: #fff;
+  }
+
+  .react-datepicker__header {
+    background-color: #0F1E2E;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .react-datepicker__current-month, .react-datepicker__day-name {
+    color: #d4af37;
+  }
+
+  .react-datepicker__day {
+    color: #fff;
+    &:hover {
+      background-color: rgba(212, 175, 55, 0.2);
+    }
+  }
+
+  .react-datepicker__day--disabled {
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
+    background-color: #d4af37;
+    color: #0F1E2E;
+  }
+`;
+
 const addonsList = [
   { id: 'breakfast', name: 'Breakfast', price: 500, icon: <FaCoffee />, perGuest: true },
   { id: 'wifi', name: 'Premium WiFi', price: 200, icon: <FaWifi />, perGuest: false },
@@ -269,11 +313,22 @@ const Booking = () => {
     idProofType: 'Aadhar Card',
     idProofNumber: '',
     numberOfRooms: 1,
-    guestName: '',
-    guestPhone: '',
-    guestEmail: '',
+    guestName: user?.name || '',
+    guestPhone: user?.phone || '',
+    guestEmail: user?.email || '',
     selectedAddons: []
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        guestName: user.name || '',
+        guestPhone: user.phone || '',
+        guestEmail: user.email || ''
+      }));
+    }
+  }, [user]);
 
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -294,6 +349,32 @@ const Booking = () => {
     };
     fetchRoom();
   }, [roomId]);
+
+  const [bookedDates, setBookedDates] = useState([]);
+
+  useEffect(() => {
+    if (room?.room_number) {
+      const fetchBookings = async () => {
+        try {
+          const bookings = await getRoomBookings(room.room_number);
+          const dates = [];
+          bookings.forEach(booking => {
+            let currentDate = parseISO(booking.start);
+            const endDate = parseISO(booking.end);
+            // block the entire range
+            while (currentDate <= endDate) {
+              dates.push(new Date(currentDate));
+              currentDate = addDays(currentDate, 1);
+            }
+          });
+          setBookedDates(dates);
+        } catch (err) {
+          console.error("Failed to fetch bookings:", err);
+        }
+      };
+      fetchBookings();
+    }
+  }, [room]);
 
   useEffect(() => {
     if (!room) return;
@@ -362,9 +443,9 @@ const Booking = () => {
 
     const finalBookingDetails = {
       ...formData,
-      fullName: user ? user.name : formData.guestName,
-      email: user ? user.email : formData.guestEmail,
-      phone: user ? user.phone : formData.guestPhone,
+      fullName: formData.guestName,
+      email: formData.guestEmail,
+      phone: formData.guestPhone,
       customerId: user ? user.customer_id : null,
       room_numbers: [room.room_number || roomId],
       idProofFile: formData.idProofNumber, // Using number as representative for now
@@ -463,59 +544,66 @@ const Booking = () => {
                 )}
               </AvailabilityBanner>
             )}
-            {!user && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
-              >
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+            >
+              <FormGroup>
+                <Label>Full Name</Label>
+                <Input
+                  type="text"
+                  name="guestName"
+                  value={formData.guestName}
+                  onChange={handleChange}
+                  placeholder="Enter your full name"
+                  required
+                />
+              </FormGroup>
+              <Grid>
                 <FormGroup>
-                  <Label>Full Name</Label>
+                  <Label>Phone Number</Label>
                   <Input
-                    type="text"
-                    name="guestName"
-                    value={formData.guestName}
+                    type="tel"
+                    name="guestPhone"
+                    value={formData.guestPhone}
                     onChange={handleChange}
-                    placeholder="Enter your full name"
+                    placeholder="Phone number"
                     required
                   />
                 </FormGroup>
-                <Grid>
-                  <FormGroup>
-                    <Label>Phone Number</Label>
-                    <Input
-                      type="tel"
-                      name="guestPhone"
-                      value={formData.guestPhone}
-                      onChange={handleChange}
-                      placeholder="Phone number"
-                      required
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label>Email (Optional)</Label>
-                    <Input
-                      type="email"
-                      name="guestEmail"
-                      value={formData.guestEmail}
-                      onChange={handleChange}
-                      placeholder="Email address"
-                    />
-                  </FormGroup>
-                </Grid>
-                <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0.5rem 0' }} />
-              </motion.div>
-            )}
+                <FormGroup>
+                  <Label>Email (Optional)</Label>
+                  <Input
+                    type="email"
+                    name="guestEmail"
+                    value={formData.guestEmail}
+                    onChange={handleChange}
+                    placeholder="Email address"
+                  />
+                </FormGroup>
+              </Grid>
+              <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0.5rem 0' }} />
+            </motion.div>
+
             <Grid>
               <FormGroup>
                 <Label>Check-In Date</Label>
-                <Input
-                  type="date"
-                  name="checkIn"
-                  value={formData.checkIn}
-                  onChange={handleChange}
-                  required
-                />
+                <DatePickerStyles>
+                  <DatePicker
+                    selected={formData.checkIn ? new Date(formData.checkIn) : null}
+                    onChange={(date) => setFormData(prev => ({ ...prev, checkIn: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                    selectsStart
+                    startDate={formData.checkIn ? new Date(formData.checkIn) : null}
+                    endDate={formData.checkOut ? new Date(formData.checkOut) : null}
+                    excludeDates={bookedDates}
+                    minDate={startOfToday()}
+                    placeholderText="Select Check-In Date"
+                    customInput={<Input />}
+                    dateFormat="yyyy-MM-dd"
+                    required
+                  />
+                </DatePickerStyles>
               </FormGroup>
               <FormGroup>
                 <Label>Check-In Time</Label>
@@ -532,13 +620,21 @@ const Booking = () => {
             <Grid>
               <FormGroup>
                 <Label>Check-Out Date</Label>
-                <Input
-                  type="date"
-                  name="checkOut"
-                  value={formData.checkOut}
-                  onChange={handleChange}
-                  required
-                />
+                <DatePickerStyles>
+                  <DatePicker
+                    selected={formData.checkOut ? new Date(formData.checkOut) : null}
+                    onChange={(date) => setFormData(prev => ({ ...prev, checkOut: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                    selectsEnd
+                    startDate={formData.checkIn ? new Date(formData.checkIn) : null}
+                    endDate={formData.checkOut ? new Date(formData.checkOut) : null}
+                    minDate={formData.checkIn ? addDays(new Date(formData.checkIn), 1) : startOfToday()}
+                    excludeDates={bookedDates}
+                    placeholderText="Select Check-Out Date"
+                    customInput={<Input />}
+                    dateFormat="yyyy-MM-dd"
+                    required
+                  />
+                </DatePickerStyles>
               </FormGroup>
               <FormGroup>
                 <Label>Check-Out Time</Label>

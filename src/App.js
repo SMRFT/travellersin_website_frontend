@@ -11,6 +11,7 @@ import ScrollToTop from "./Components/Tools/ScrollToTop";
 /* ===== Auth ===== */
 import { AuthProvider } from "./Components/auth/AuthContext";
 import LoginModal from "./Components/auth/LoginModal";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 /* ===== Pages ===== */
 import Home from "./Components/pages/Home";
@@ -34,37 +35,39 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <AuthProvider>
-        <Router>
-          <ScrollToTop />
-          <Navbar />
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+        <AuthProvider>
+          <Router>
+            <ScrollToTop />
+            <Navbar />
 
-          {/* Optional Global Login Modal */}
-          <LoginModal />
+            {/* Optional Global Login Modal */}
+            <LoginModal />
 
-          <Routes>
-            {/* Client Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/rooms" element={<Rooms />} />
-            <Route path="/rooms/:roomId" element={<RoomDetails />} />
-            <Route path="/booking/:roomId" element={<Booking />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/confirmation" element={<Confirmation />} />
-            <Route path="/track-booking" element={<TrackBooking />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/signup" element={<AdminSignup />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/quick-booking" element={<QuickBooking />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/trackevent" element={<TrackEvent />} />
-          </Routes>
+            <Routes>
+              {/* Client Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/rooms" element={<Rooms />} />
+              <Route path="/rooms/:roomId" element={<RoomDetails />} />
+              <Route path="/booking/:roomId" element={<Booking />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/payment" element={<Payment />} />
+              <Route path="/confirmation" element={<Confirmation />} />
+              <Route path="/track-booking" element={<TrackBooking />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/signup" element={<AdminSignup />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/quick-booking" element={<QuickBooking />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/trackevent" element={<TrackEvent />} />
+            </Routes>
 
-          <Footer />
-        </Router>
-      </AuthProvider>
+            <Footer />
+          </Router>
+        </AuthProvider>
+      </GoogleOAuthProvider>
     </ThemeProvider>
   );
 }

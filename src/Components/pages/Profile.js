@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fa';
 import { useAuth } from '../auth/AuthContext';
 import { trackBooking, getUserBookings, cancelBooking, initiateBookingPayment, verifyPayment } from '../services/bookingService';
+import { updateUserProfile } from '../services/authService';
 
 /* ================= STYLED COMPONENTS ================= */
 
@@ -678,7 +679,7 @@ const DetailValue = styled.div`
 `;
 
 const Profile = () => {
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, updateUser } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('personal');
   const [isEditing, setIsEditing] = useState(false);
@@ -782,10 +783,33 @@ const Profile = () => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   };
 
+  const handleSaveChanges = async () => {
+    try {
+      // Basic validation
+      if (!userData.name || !userData.phone) {
+        alert("Name and Phone Number are required.");
+        return;
+      }
+
+      const res = await updateUserProfile(userData);
+      if (res && res.user) {
+        updateUser(res.user);
+        setIsEditing(false);
+        alert("Profile updated successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || "Failed to update profile.");
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'personal':
         return (
+          // ... rest of the component
+          // We need to inject handleSaveChanges into the button onClick
+          // Since we are replacing a chunk, we look for the CardHeader and ActionButton
           <ContentCard
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -795,7 +819,13 @@ const Profile = () => {
               <CardTitle><FaUser /> Personal Information</CardTitle>
               <ActionButton
                 $primary={isEditing}
-                onClick={() => setIsEditing(!isEditing)}
+                onClick={() => {
+                  if (isEditing) {
+                    handleSaveChanges();
+                  } else {
+                    setIsEditing(true);
+                  }
+                }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >

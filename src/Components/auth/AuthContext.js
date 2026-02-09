@@ -95,6 +95,40 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const googleLogin = useCallback(async (token, phone = null) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/google/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, phone }),
+      });
+      const data = await response.json();
+
+      if (response.status === 200 || response.status === 201) {
+        setUser(data.user);
+        setToken(data.tokens.access);
+        setUserType('customer');
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("token", data.tokens.access);
+        localStorage.setItem("refresh_token", data.tokens.refresh);
+        localStorage.setItem("userType", 'customer');
+        return { success: true, isNewUser: data.is_new_user };
+      } else if (response.status === 202) {
+        // User needs to provide phone number
+        return { success: false, requiresPhone: true, email: data.email, name: data.name };
+      }
+
+      return { success: false, error: data.error || "Google Login failed" };
+    } catch (err) {
+      return { success: false, error: "Network error" };
+    }
+  }, []);
+
+  const updateUser = useCallback((updatedUserData) => {
+    setUser(prev => ({ ...prev, ...updatedUserData }));
+    localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUserData }));
+  }, [user]);
+
   const logout = useCallback(() => {
     setUser(null);
     setToken(null);
@@ -127,6 +161,8 @@ export const AuthProvider = ({ children }) => {
       login,
       adminLogin,
       signup,
+      googleLogin,
+      updateUser,
       logout,
       isLoginModalOpen,
       toggleLoginModal,
