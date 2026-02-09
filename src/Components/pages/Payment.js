@@ -120,8 +120,8 @@ const MethodCard = styled.div`
 const PayButton = styled(motion.button)`
   width: 100%;
   padding: 1.2rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   border: none;
   border-radius: 16px;
   font-size: 1.1rem;
@@ -131,8 +131,13 @@ const PayButton = styled(motion.button)`
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 30px rgba(30, 111, 92, 0.3);
   margin-bottom: 1.5rem;
+
+  &:hover {
+    background: #165e4d;
+    box-shadow: 0 20px 40px rgba(30, 111, 92, 0.4);
+  }
 
   &:disabled {
     opacity: 0.6;
@@ -185,9 +190,10 @@ const Payment = () => {
     setError('');
 
     try {
-      // 1. Create the initial booking record on our backend
       const bookingData = {
-        room_numbers: bookingDetails.room_numbers || [roomId],
+        room_numbers: Array.isArray(bookingDetails.room_numbers) && bookingDetails.room_numbers.length > 0
+          ? bookingDetails.room_numbers.map(String).filter(r => r && r !== "undefined" && r !== "null")
+          : [String(bookingDetails.roomId || roomId)],
         customer_id: bookingDetails.customerId,
         guest_name: bookingDetails.fullName,
         guest_phone: bookingDetails.phone,
@@ -198,36 +204,38 @@ const Payment = () => {
         payment_details: {
           amount: totalAmount,
           method: method === 'online' ? 'razorpay' : 'cash',
-          status: 'pending'
+          status: method === 'online' ? 'paid' : 'pending' // if online, we only create if paid
         },
         id_proof_type: bookingDetails.idProofType,
-        id_proof_file: "uploaded_id_placeholder",
+        id_proof_number: bookingDetails.idProofNumber,
+        id_proof_file: bookingDetails.idProofFile || "uploaded_id_placeholder",
         extra_addons: bookingDetails.extra_addons || []
       };
 
-      const booking = await createBooking(bookingData);
-
       if (method === 'online') {
-        // 2. Create Razorpay Order
-        const orderData = await createRazorpayOrder(totalAmount);
-
-        // 3. Open Razorpay Checktout
+        // 1. Initialize Razorpay Options DIRECTLY (Frontend Approach)
         const options = {
-          key: process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_placeholder",
-          amount: orderData.amount,
+          key: "rzp_test_YooSlpOnNDsCoN",
+          amount: totalAmount * 100, // Amount in paise
           currency: "INR",
           name: "TravellersInn",
           description: `Booking for Room ${roomId}`,
-          order_id: orderData.id,
+          // order_id: null, // No Order ID created on backend
           handler: async function (response) {
-            // 4. Verify Payment Signature
+            console.log("Payment Success! Details:", response);
+
             try {
+              // 2. Create Booking NOW (after payment success)
+              const booking = await createBooking(bookingData);
+
+              // 3. Verify/Link Payment (Just record it)
               await verifyPayment({
-                razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
+                razorpay_order_id: response.razorpay_order_id || "N/A",
+                razorpay_signature: response.razorpay_signature || "SKIPPED",
                 booking_id: booking.booking_id
               });
+
               navigate('/confirmation', {
                 state: {
                   bookingId: booking.booking_id,
@@ -241,7 +249,8 @@ const Payment = () => {
                 }
               });
             } catch (err) {
-              setError("Payment verification failed. Please contact support.");
+              console.error(err);
+              setError("Payment successful but booking creation failed. Please contact support with Payment ID: " + response.razorpay_payment_id);
             }
           },
           prefill: {
@@ -252,14 +261,21 @@ const Payment = () => {
           theme: {
             color: "#d4af37",
           },
+          modal: {
+            ondismiss: function () {
+              setLoading(false);
+            }
+          }
         };
 
         const rzp = new window.Razorpay(options);
         rzp.open();
-        setLoading(false);
+        // Loading stays true until either success handler or ondismiss
       } else {
-        // Cash Flow
+        // Cash Flow - Create booking immediately
+        const booking = await createBooking(bookingData);
         await confirmCashBooking(booking.booking_id);
+
         navigate('/confirmation', {
           state: {
             bookingId: booking.booking_id,

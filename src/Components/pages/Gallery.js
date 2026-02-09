@@ -5,10 +5,10 @@ import { FaTimes, FaExpand } from 'react-icons/fa';
 import { getRoomImage } from '../../assets/imageMap';
 
 const GalleryContainer = styled.div`
-  background: #0a0a12;
+  background: #FAFAFA;
   min-height: 100vh;
   padding: 8rem 2rem 4rem;
-  color: #fff;
+  color: #333;
 `;
 
 const Header = styled.div`
@@ -20,9 +20,7 @@ const Title = styled.h1`
   font-family: 'Playfair Display', serif;
   font-size: clamp(2.5rem, 5vw, 4rem);
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, #d4af37, #f5d76e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0F1E2E;
 `;
 
 const FilterGroup = styled.div`
@@ -34,9 +32,9 @@ const FilterGroup = styled.div`
 `;
 
 const FilterBtn = styled.button`
-  background: ${props => props.$active ? 'rgba(212, 175, 55, 0.2)' : 'transparent'};
-  border: 1px solid ${props => props.$active ? '#d4af37' : 'rgba(255, 255, 255, 0.1)'};
-  color: ${props => props.$active ? '#d4af37' : 'rgba(255, 255, 255, 0.6)'};
+  background: ${props => props.$active ? '#C9A24D' : 'transparent'};
+  border: 1px solid ${props => props.$active ? '#C9A24D' : 'rgba(0, 0, 0, 0.1)'};
+  color: ${props => props.$active ? '#fff' : '#0F1E2E'};
   padding: 0.6rem 1.5rem;
   border-radius: 50px;
   cursor: pointer;
@@ -46,8 +44,8 @@ const FilterBtn = styled.button`
   text-transform: uppercase;
 
   &:hover {
-    border-color: #d4af37;
-    color: #d4af37;
+    border-color: #C9A24D;
+    color: #C9A24D;
   }
 `;
 

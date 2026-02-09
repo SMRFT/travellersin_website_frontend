@@ -10,11 +10,12 @@ import {
 } from 'react-icons/fa';
 import { useAuth } from '../auth/AuthContext';
 import { trackBooking, getUserBookings, cancelBooking, initiateBookingPayment, verifyPayment } from '../services/bookingService';
+import { updateUserProfile } from '../services/authService';
 
 /* ================= STYLED COMPONENTS ================= */
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  background: #f9fafb;
   min-height: 100vh;
   padding-top: 90px;
 `;
@@ -29,17 +30,30 @@ const Container = styled.div`
   }
 `;
 
+const TopSection = styled.div`
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  align-items: stretch;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+`;
+
 /* --- Profile Header --- */
 const ProfileHeader = styled.section`
   display: flex;
   align-items: flex-start;
   gap: 2rem;
   padding: 3rem;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
+  background: #0F1E2E;
+  backdrop-filter: none;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   border-radius: 24px;
-  margin-bottom: 2rem;
+  flex: 2;
+  margin-bottom: 0;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -156,12 +170,12 @@ const ProfileActions = styled.div`
 const ActionButton = styled(motion.button)`
   padding: 0.9rem 2rem;
   background: ${props => props.$primary
-    ? 'linear-gradient(135deg, #d4af37, #b8860b)'
+    ? '#1E6F5C'
     : 'rgba(255, 255, 255, 0.05)'};
   border: 1px solid ${props => props.$primary
     ? 'transparent'
     : 'rgba(255, 255, 255, 0.1)'};
-  color: ${props => props.$primary ? '#0f0f1a' : 'rgba(255, 255, 255, 0.8)'};
+  color: ${props => props.$primary ? '#ffffff' : 'rgba(255, 255, 255, 0.8)'};
   border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -174,7 +188,7 @@ const ActionButton = styled(motion.button)`
   &:hover {
     transform: translateY(-2px);
     ${props => props.$primary
-    ? 'box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);'
+    ? 'background: #165e4d; box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);'
     : 'background: rgba(255, 255, 255, 0.08);'}
   }
 `;
@@ -182,30 +196,23 @@ const ActionButton = styled(motion.button)`
 /* --- Stats Grid --- */
 const StatsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 500px) {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: 1fr; // Vertical stack
+  gap: 1rem;
+  flex: 1;
+  min-width: 250px;
 `;
 
 const StatCard = styled(motion.div)`
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   text-align: center;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
     border-color: rgba(212, 175, 55, 0.2);
+    transform: translateY(-5px);
   }
 `;
 
@@ -248,8 +255,9 @@ const ContentGrid = styled.div`
 
 /* --- Sidebar Navigation --- */
 const Sidebar = styled.div`
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   border-radius: 20px;
   padding: 1.5rem;
   height: fit-content;
@@ -335,8 +343,9 @@ const NavLogoutButton = styled(LogoutButton)`
 const MainContent = styled.div``;
 
 const ContentCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   border-radius: 20px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -570,8 +579,8 @@ const EmptyButton = styled(Link)`
   align-items: center;
   gap: 0.5rem;
   padding: 0.9rem 2rem;
-  background: linear-gradient(135deg, #d4af37, #b8860b);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   text-decoration: none;
   border-radius: 50px;
   font-weight: 600;
@@ -579,7 +588,8 @@ const EmptyButton = styled(Link)`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+    background: #165e4d;
+    box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
   }
 `;
 
@@ -669,7 +679,7 @@ const DetailValue = styled.div`
 `;
 
 const Profile = () => {
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, updateUser } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('personal');
   const [isEditing, setIsEditing] = useState(false);
@@ -705,10 +715,14 @@ const Profile = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
 
   const fetchBookings = async () => {
-    if (!userData.customer_id) return;
+    if (!user || (!user.customer_id && !user.id)) return;
+
+    // Fallback: create ID if missing? No, user must be valid.
+    const customerId = user.customer_id || user.id;
+
     setBookingsLoading(true);
     try {
-      const data = await getUserBookings(userData.customer_id);
+      const data = await getUserBookings(customerId);
       setBookings(data);
     } catch (err) {
       console.error('Error fetching bookings:', err);
@@ -718,8 +732,10 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    fetchBookings();
-  }, [userData.customer_id]);
+    if (user) {
+      fetchBookings();
+    }
+  }, [user]);
 
   const handleCancelBooking = async (bookingId) => {
     const reason = window.prompt("Please enter the reason for cancellation:");
@@ -736,47 +752,15 @@ const Profile = () => {
   };
 
   const handlePayNow = async (booking) => {
-    try {
-      const { order } = await initiateBookingPayment(booking.booking_id);
-      const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_placeholder",
-        amount: order.amount,
-        currency: "INR",
-        name: "TravellersInn",
-        description: `Payment for Booking ${booking.booking_id}`,
-        order_id: order.id,
-        handler: async function (response) {
-          try {
-            await verifyPayment({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              booking_id: booking.booking_id
-            });
-            await fetchBookings();
-            alert("Payment successful!");
-          } catch (err) {
-            alert("Payment verification failed.");
-          }
-        },
-        prefill: {
-          name: userData.name,
-          email: userData.email,
-          contact: userData.phone,
-        },
-        theme: { color: "#d4af37" }
-      };
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (err) {
-      alert("Failed to initiate payment.");
-    }
+    // Redirect to Track Booking page for payment
+    navigate(`/track-booking?id=${booking.booking_id}&phone=${booking.guest_phone}`);
   };
 
   const canCancel = (booking) => {
     if (!booking || ['cancelled', 'cancellation_requested'].includes(booking.booking_status)) return false;
     const createdAt = new Date(booking.created_at);
     const now = new Date();
+    // Allow cancellation if within 24 hours of booking creation
     return (now - createdAt) / (1000 * 60 * 60) <= 24;
   };
 
@@ -799,10 +783,33 @@ const Profile = () => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   };
 
+  const handleSaveChanges = async () => {
+    try {
+      // Basic validation
+      if (!userData.name || !userData.phone) {
+        alert("Name and Phone Number are required.");
+        return;
+      }
+
+      const res = await updateUserProfile(userData);
+      if (res && res.user) {
+        updateUser(res.user);
+        setIsEditing(false);
+        alert("Profile updated successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || "Failed to update profile.");
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'personal':
         return (
+          // ... rest of the component
+          // We need to inject handleSaveChanges into the button onClick
+          // Since we are replacing a chunk, we look for the CardHeader and ActionButton
           <ContentCard
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -812,7 +819,13 @@ const Profile = () => {
               <CardTitle><FaUser /> Personal Information</CardTitle>
               <ActionButton
                 $primary={isEditing}
-                onClick={() => setIsEditing(!isEditing)}
+                onClick={() => {
+                  if (isEditing) {
+                    handleSaveChanges();
+                  } else {
+                    setIsEditing(true);
+                  }
+                }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -896,11 +909,30 @@ const Profile = () => {
                       <FaHotel />
                     </BookingImage>
                     <BookingInfo>
-                      <BookingTitle>Room {booking.room_number}</BookingTitle>
+                      <BookingTitle>
+                        Room(s): {
+                          booking.room_numbers
+                            ? (Array.isArray(booking.room_numbers)
+                              ? booking.room_numbers.join(', ')
+                              : booking.room_numbers.replace(/^,|,$/g, '').replace(/,/g, ', '))
+                            : 'N/A'
+                        }
+                      </BookingTitle>
                       <BookingMeta>
                         <span><FaCalendarAlt /> {new Date(booking.check_in).toLocaleDateString()} - {new Date(booking.check_out).toLocaleDateString()}</span>
                         <span><FaUser /> {booking.number_of_guests} Guests</span>
-                        <span><FaCreditCard /> ₹{booking.payment_details?.amount?.toLocaleString()} ({booking.payment_details?.method})</span>
+                        <span>
+                          <FaCreditCard />
+                          {booking.discount_amount > 0 ? (
+                            <>
+                              <span style={{ textDecoration: 'line-through', opacity: 0.7, marginRight: '5px' }}>₹{booking.payment_details?.amount}</span>
+                              <span style={{ color: '#10b981' }}>₹{(booking.payment_details?.amount - booking.discount_amount).toLocaleString()}</span>
+                            </>
+                          ) : (
+                            `₹${booking.payment_details?.amount?.toLocaleString()}`
+                          )}
+                          ({booking.payment_details?.method})
+                        </span>
                       </BookingMeta>
                       <BookingStatus $status={booking.booking_status}>
                         {booking.booking_status === 'confirmed' && <FaCheck />}
@@ -1019,63 +1051,53 @@ const Profile = () => {
   return (
     <PageWrapper>
       <Container>
-        {/* Profile Header */}
-        <ProfileHeader>
-          <AvatarSection>
-            <Avatar>
-              <FaUser />
-            </Avatar>
-            <AvatarEdit>
-              <FaCamera />
-            </AvatarEdit>
-          </AvatarSection>
+        <TopSection>
+          {/* Profile Header */}
+          <ProfileHeader>
+            <AvatarSection>
+              <Avatar>
+                <FaUser />
+              </Avatar>
+              <AvatarEdit>
+                <FaCamera />
+              </AvatarEdit>
+            </AvatarSection>
 
-          <ProfileInfo>
-            <ProfileName>{userData.name}</ProfileName>
-            <ProfileEmail>{userData.email}</ProfileEmail>
-            <ProfileBadges>
-              <Badge $gold><FaStar /> Gold Member</Badge>
-              <Badge><FaCheck /> Verified</Badge>
-              <Badge>Since 2023</Badge>
-            </ProfileBadges>
-          </ProfileInfo>
+            <ProfileInfo>
+              <ProfileName>{userData.name}</ProfileName>
+              <ProfileEmail>{userData.email}</ProfileEmail>
+              <ProfileBadges>
+                <Badge><FaCheck /> Verified</Badge>
+              </ProfileBadges>
+            </ProfileInfo>
 
-          <ProfileActions>
-            <ActionButton
-              $primary
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              as={Link}
-              to="/rooms"
-            >
-              <FaHotel /> Book a Room
-            </ActionButton>
-          </ProfileActions>
-        </ProfileHeader>
+            <ProfileActions>
+              <ActionButton
+                $primary
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                as={Link}
+                to="/rooms"
+              >
+                <FaHotel /> Book a Room
+              </ActionButton>
+            </ProfileActions>
+          </ProfileHeader>
 
-        {/* Stats Grid */}
-        <StatsGrid>
-          <StatCard whileHover={{ scale: 1.02 }}>
-            <StatIcon><FaHotel /></StatIcon>
-            <StatValue>12</StatValue>
-            <StatLabel>Total Stays</StatLabel>
-          </StatCard>
-          <StatCard whileHover={{ scale: 1.02 }}>
-            <StatIcon><FaClock /></StatIcon>
-            <StatValue>24</StatValue>
-            <StatLabel>Nights Stayed</StatLabel>
-          </StatCard>
-          <StatCard whileHover={{ scale: 1.02 }}>
-            <StatIcon><FaGift /></StatIcon>
-            <StatValue>1,250</StatValue>
-            <StatLabel>Reward Points</StatLabel>
-          </StatCard>
-          <StatCard whileHover={{ scale: 1.02 }}>
-            <StatIcon><FaStar /></StatIcon>
-            <StatValue>4.8</StatValue>
-            <StatLabel>Avg Rating Given</StatLabel>
-          </StatCard>
-        </StatsGrid>
+          {/* Stats Grid */}
+          <StatsGrid>
+            <StatCard whileHover={{ scale: 1.02 }}>
+              <StatIcon><FaHotel /></StatIcon>
+              <StatValue>12</StatValue>
+              <StatLabel>Total Stays</StatLabel>
+            </StatCard>
+            <StatCard whileHover={{ scale: 1.02 }}>
+              <StatIcon><FaClock /></StatIcon>
+              <StatValue>24</StatValue>
+              <StatLabel>Nights Stayed</StatLabel>
+            </StatCard>
+          </StatsGrid>
+        </TopSection>
 
         {/* Content Grid */}
         <ContentGrid>

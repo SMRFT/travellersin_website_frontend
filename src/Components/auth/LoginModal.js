@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimes, FaPhone, FaLock, FaUser, FaEnvelope } from 'react-icons/fa';
 import { useAuth } from './AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 const ModalOverlay = styled(motion.div)`
   position: fixed;
@@ -115,14 +116,20 @@ const Input = styled.input`
 const SubmitButton = styled(motion.button)`
   margin-top: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #d4af37, #b8860b);
+  background: #1E6F5C;
   border: none;
   border-radius: 12px;
-  color: #0f0f1a;
+  color: #ffffff;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   letter-spacing: 1px;
+  box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
+
+  &:hover {
+    background: #165e4d;
+    box-shadow: 0 15px 40px rgba(30, 111, 92, 0.4);
+  }
 `;
 
 const ToggleText = styled.p`
@@ -155,8 +162,10 @@ const ErrorMessage = styled(motion.div)`
 `;
 
 const LoginModal = () => {
-  const { isLoginModalOpen, toggleLoginModal, login, signup } = useAuth();
+  const { isLoginModalOpen, toggleLoginModal, login, signup, googleLogin } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
+  const [phoneInputMode, setPhoneInputMode] = useState(false);
+  const [googleToken, setGoogleToken] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -173,6 +182,33 @@ const LoginModal = () => {
     setError('');
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setError('');
+    try {
+      const result = await googleLogin(credentialResponse.credential);
+      if (result.success) {
+        setPhoneInputMode(false);
+        setGoogleToken(null);
+        toggleLoginModal();
+      } else if (result.requiresPhone) {
+        setGoogleToken(credentialResponse.credential);
+        setPhoneInputMode(true);
+        setFormData(prev => ({
+          ...prev,
+          email: result.email || '',
+          name: result.name || ''
+        }));
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError('Google Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -180,13 +216,18 @@ const LoginModal = () => {
 
     try {
       let result;
-      if (isLogin) {
+
+      if (phoneInputMode) {
+        result = await googleLogin(googleToken, formData.phone);
+      } else if (isLogin) {
         result = await login(formData.phone, formData.password);
       } else {
         result = await signup(formData);
       }
 
       if (result.success) {
+        setPhoneInputMode(false);
+        setGoogleToken(null);
         toggleLoginModal();
       } else {
         setError(result.error);
@@ -217,89 +258,144 @@ const LoginModal = () => {
           </CloseButton>
 
           <Content>
-            <Title>{isLogin ? 'Welcome Back' : 'Join Us'}</Title>
-            <Subtitle>
-              {isLogin
-                ? 'Experience luxury at its finest'
-                : 'Create an account to start your journey'}
-            </Subtitle>
+            {phoneInputMode ? (
+              <>
+                <Title>Complete Profile</Title>
+                <Subtitle>Please confirm your phone number to continue</Subtitle>
 
-            {error && (
-              <ErrorMessage
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
-                {error}
-              </ErrorMessage>
-            )}
+                {error && (
+                  <ErrorMessage
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                  >
+                    {error}
+                  </ErrorMessage>
+                )}
 
-            <Form onSubmit={handleSubmit}>
-              {!isLogin && (
-                <>
+                <Form onSubmit={handleSubmit}>
                   <InputGroup>
-                    <IconWrapper><FaUser /></IconWrapper>
+                    <IconWrapper><FaPhone /></IconWrapper>
                     <Input
-                      type="text"
-                      name="name"
-                      placeholder="Full Name"
-                      value={formData.name}
+                      type="tel"
+                      name="phone"
+                      placeholder="Phone Number"
+                      value={formData.phone}
                       onChange={handleChange}
                       required
                     />
                   </InputGroup>
+                  <SubmitButton
+                    type="submit"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    disabled={loading}
+                  >
+                    {loading ? 'Processing...' : 'Confirm Phone'}
+                  </SubmitButton>
+                </Form>
+              </>
+            ) : (
+              <>
+                <Title>{isLogin ? 'Welcome Back' : 'Join Us'}</Title>
+                <Subtitle>
+                  {isLogin
+                    ? 'Experience luxury at its finest'
+                    : 'Create an account to start your journey'}
+                </Subtitle>
+
+                {error && (
+                  <ErrorMessage
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                  >
+                    {error}
+                  </ErrorMessage>
+                )}
+
+                <Form onSubmit={handleSubmit}>
+                  {!isLogin && (
+                    <>
+                      <InputGroup>
+                        <IconWrapper><FaUser /></IconWrapper>
+                        <Input
+                          type="text"
+                          name="name"
+                          placeholder="Full Name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                        />
+                      </InputGroup>
+                      <InputGroup>
+                        <IconWrapper><FaEnvelope /></IconWrapper>
+                        <Input
+                          type="email"
+                          name="email"
+                          placeholder="Email Address (Optional)"
+                          value={formData.email}
+                          onChange={handleChange}
+                          disabled={!!formData.email && !isLogin && googleToken} // disable if prefilled from google
+                        />
+                      </InputGroup>
+                    </>
+                  )}
+
                   <InputGroup>
-                    <IconWrapper><FaEnvelope /></IconWrapper>
+                    <IconWrapper><FaPhone /></IconWrapper>
                     <Input
-                      type="email"
-                      name="email"
-                      placeholder="Email Address (Optional)"
-                      value={formData.email}
+                      type="tel"
+                      name="phone"
+                      placeholder="Phone Number"
+                      value={formData.phone}
                       onChange={handleChange}
+                      required
                     />
                   </InputGroup>
-                </>
-              )}
 
-              <InputGroup>
-                <IconWrapper><FaPhone /></IconWrapper>
-                <Input
-                  type="tel"
-                  name="phone"
-                  placeholder="Phone Number"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
-              </InputGroup>
+                  <InputGroup>
+                    <IconWrapper><FaLock /></IconWrapper>
+                    <Input
+                      type="password"
+                      name="password"
+                      placeholder="Password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                    />
+                  </InputGroup>
 
-              <InputGroup>
-                <IconWrapper><FaLock /></IconWrapper>
-                <Input
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-              </InputGroup>
+                  <SubmitButton
+                    type="submit"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    disabled={loading}
+                  >
+                    {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
+                  </SubmitButton>
+                </Form>
 
-              <SubmitButton
-                type="submit"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                disabled={loading}
-              >
-                {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
-              </SubmitButton>
-            </Form>
+                <div style={{ margin: '1.5rem 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.9rem' }}>OR</span>
+                </div>
 
-            <ToggleText>
-              {isLogin ? "Don't have an account?" : "Already have an account?"}
-              <span onClick={() => setIsLogin(!isLogin)}>
-                {isLogin ? 'Sign Up' : 'Sign In'}
-              </span>
-            </ToggleText>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => setError('Google Login Failed')}
+                    theme="filled_black"
+                    shape="pill"
+                    width="100%"
+                  />
+                </div>
+
+                <ToggleText>
+                  {isLogin ? "Don't have an account?" : "Already have an account?"}
+                  <span onClick={() => setIsLogin(!isLogin)}>
+                    {isLogin ? 'Sign Up' : 'Sign In'}
+                  </span>
+                </ToggleText>
+              </>
+            )}
           </Content>
         </ModalContainer>
       </ModalOverlay>

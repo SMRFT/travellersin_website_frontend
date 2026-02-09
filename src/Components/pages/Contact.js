@@ -17,7 +17,7 @@ const pulse = keyframes`
 /* ================= STYLED COMPONENTS ================= */
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  background: #FAFAFA;
   min-height: 100vh;
   padding-top: 90px;
 `;
@@ -30,35 +30,32 @@ const HeroSection = styled.section`
 `;
 
 const PageLabel = styled(motion.span)`
-  display: inline-block;
-  padding: 0.5rem 1.5rem;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 50px;
-  color: #d4af37;
-  font-size: 0.8rem;
+  display: block;
+  color: #C9A24D;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
   margin-bottom: 1.5rem;
 `;
 
 const PageTitle = styled(motion.h1)`
-  color: #fff;
+  color: #0F1E2E;
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 700;
   margin-bottom: 1rem;
   
   span {
-    background: linear-gradient(135deg, #d4af37, #f5d76e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #C9A24D;
+    background: none;
+    -webkit-text-fill-color: initial;
+    background-clip: border-box;
   }
 `;
 
 const PageSubtitle = styled(motion.p)`
-  color: rgba(255, 255, 255, 0.6);
+  color: #333333;
   font-size: 1.1rem;
   max-width: 600px;
   margin: 0 auto;
@@ -70,6 +67,10 @@ const ContentSection = styled.section`
   padding: 2rem 2rem 6rem;
   max-width: 1400px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 2rem 1.5rem 6rem;
+  }
 `;
 
 const ContentGrid = styled.div`
@@ -84,16 +85,20 @@ const ContentGrid = styled.div`
 
 /* --- Contact Info Card --- */
 const ContactInfoCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0F1E2E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.05);
   border-radius: 24px;
   padding: 2.5rem;
   height: fit-content;
+
+  @media (max-width: 600px) {
+    padding: 1.5rem;
+  }
 `;
 
 const CardTitle = styled.h2`
-  color: #fff;
+  color: #C9A24D;
   font-size: 1.5rem;
   font-family: 'Playfair Display', Georgia, serif;
   margin-bottom: 2rem;
@@ -105,7 +110,7 @@ const CardTitle = styled.h2`
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(to right, rgba(212, 175, 55, 0.3), transparent);
+    background: linear-gradient(to right, rgba(201, 162, 77, 0.3), transparent);
   }
 `;
 
@@ -115,26 +120,26 @@ const ContactItem = styled.div`
   gap: 1.2rem;
   margin-bottom: 1.5rem;
   padding: 1.2rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.05);
-    border-color: rgba(212, 175, 55, 0.2);
+    background: rgba(201, 162, 77, 0.05);
+    border-color: rgba(201, 162, 77, 0.2);
   }
 `;
 
 const ContactIcon = styled.div`
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  background: linear-gradient(135deg, rgba(201, 162, 77, 0.2), rgba(201, 162, 77, 0.05));
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d4af37;
+  color: #C9A24D;
   font-size: 1.2rem;
   flex-shrink: 0;
 `;
@@ -144,7 +149,7 @@ const ContactDetails = styled.div`
 `;
 
 const ContactLabel = styled.div`
-  color: #d4af37;
+  color: #C9A24D;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -153,18 +158,18 @@ const ContactLabel = styled.div`
 `;
 
 const ContactText = styled.div`
-  color: rgba(255, 255, 255, 0.8);
+  color: #f0f0f0;
   font-size: 1rem;
   line-height: 1.6;
 `;
 
 const ContactLink = styled.a`
-  color: rgba(255, 255, 255, 0.8);
+  color: #f0f0f0;
   text-decoration: none;
   transition: color 0.2s ease;
 
   &:hover {
-    color: #d4af37;
+    color: #C9A24D;
   }
 `;
 
@@ -176,7 +181,7 @@ const SocialSection = styled.div`
 `;
 
 const SocialTitle = styled.h3`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -197,25 +202,31 @@ const SocialIcon = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.6);
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 1.1rem;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.15);
-    border-color: rgba(212, 175, 55, 0.4);
-    color: #d4af37;
+    background: rgba(201, 162, 77, 0.15);
+    border-color: rgba(201, 162, 77, 0.4);
+    color: #C9A24D;
     transform: translateY(-3px);
   }
 `;
 
 /* --- Contact Form --- */
 const ContactFormCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0F1E2E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.05);
   border-radius: 24px;
   padding: 2.5rem;
+
+  @media (max-width: 600px) {
+    padding: 1.5rem;
+  }
 `;
 
 const Form = styled.form`
@@ -238,7 +249,7 @@ const FormGroup = styled.div``;
 
 const FormLabel = styled.label`
   display: block;
-  color: rgba(255, 255, 255, 0.7);
+  color: #C9A24D;
   font-size: 0.85rem;
   margin-bottom: 0.5rem;
   letter-spacing: 0.5px;
@@ -247,31 +258,31 @@ const FormLabel = styled.label`
 const FormInput = styled.input`
   width: 100%;
   padding: 1rem 1.2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 12px;
-  color: #fff;
+  color: #333;
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: #999;
   }
 
   &:focus {
     outline: none;
-    border-color: rgba(212, 175, 55, 0.5);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(201, 162, 77, 0.5);
+    background: #fff;
   }
 `;
 
 const FormTextarea = styled.textarea`
   width: 100%;
   padding: 1rem 1.2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 12px;
-  color: #fff;
+  color: #333;
   font-size: 1rem;
   min-height: 150px;
   resize: vertical;
@@ -279,42 +290,42 @@ const FormTextarea = styled.textarea`
   transition: all 0.3s ease;
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: #999;
   }
 
   &:focus {
     outline: none;
-    border-color: rgba(212, 175, 55, 0.5);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(201, 162, 77, 0.5);
+    background: #fff;
   }
 `;
 
 const FormSelect = styled.select`
   width: 100%;
   padding: 1rem 1.2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 12px;
-  color: #fff;
+  color: #333;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: rgba(212, 175, 55, 0.5);
+    border-color: rgba(201, 162, 77, 0.5);
   }
 
   option {
-    background: #1a1a2e;
+    background: #0F1E2E;
     color: #fff;
   }
 `;
 
 const SubmitButton = styled(motion.button)`
   padding: 1.2rem 2.5rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   border: none;
   border-radius: 50px;
   font-size: 1rem;
@@ -326,13 +337,13 @@ const SubmitButton = styled(motion.button)`
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  box-shadow: 0 10px 40px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 10px 40px rgba(30, 111, 92, 0.3);
   transition: all 0.3s ease;
   align-self: flex-start;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 50px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 15px 50px rgba(30, 111, 92, 0.4);
   }
 
   &:disabled {
@@ -374,8 +385,8 @@ const MapSection = styled.section`
 `;
 
 const MapContainer = styled.div`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 24px;
   overflow: hidden;
   position: relative;
@@ -383,7 +394,7 @@ const MapContainer = styled.div`
 
 const MapHeader = styled.div`
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -392,7 +403,7 @@ const MapHeader = styled.div`
 `;
 
 const MapTitle = styled.h3`
-  color: #fff;
+  color: #0F1E2E;
   font-size: 1.2rem;
   font-family: 'Playfair Display', Georgia, serif;
   display: flex;
@@ -400,7 +411,7 @@ const MapTitle = styled.h3`
   gap: 0.8rem;
 
   svg {
-    color: #d4af37;
+    color: #C9A24D;
   }
 `;
 
@@ -409,7 +420,7 @@ const DirectionsButton = styled.a`
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.5rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  background: #C9A24D;
   color: #0f0f1a;
   text-decoration: none;
   border-radius: 50px;
@@ -419,7 +430,7 @@ const DirectionsButton = styled.a`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 5px 20px rgba(201, 162, 77, 0.3);
   }
 `;
 
@@ -578,12 +589,12 @@ const Contact = () => {
               <ContactDetails>
                 <ContactLabel>Email</ContactLabel>
                 <ContactText>
-                  <ContactLink href="mailto:info@travellersinn.com">
-                    info@travellersinn.com
+                  <ContactLink href="mailto:hoteltravellersinnslm@gmail.com">
+                    hoteltravellersinnslm@gmail.com
                   </ContactLink><br />
-                  <ContactLink href="mailto:bookings@travellersinn.com">
+                  {/* <ContactLink href="mailto:bookings@travellersinn.com">
                     bookings@travellersinn.com
-                  </ContactLink>
+                  </ContactLink> */}
                 </ContactText>
               </ContactDetails>
             </ContactItem>

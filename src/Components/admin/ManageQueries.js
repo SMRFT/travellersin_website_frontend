@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FaReply, FaTrash, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { FaTrash, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import api from '../services/api';
 
 const Container = styled.div`
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
+  background: #0F1E2E;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 `;
 
 const QueryList = styled.div`
@@ -18,7 +19,7 @@ const QueryList = styled.div`
 `;
 
 const QueryCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
+  background: #0f151a; // Darker card
   border: 1px solid ${props => props.$resolved ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
   border-radius: 20px;
   padding: 2rem;
@@ -40,11 +41,19 @@ const ManageQueries = () => {
     const [queries, setQueries] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => { fetchQueries(); }, []);
+    // Date Filter State (Default 3 days)
+    const [startDate, setStartDate] = useState(() => {
+        const d = new Date();
+        d.setDate(d.getDate() - 3);
+        return d.toISOString().split('T')[0];
+    });
+    const [endDate, setEndDate] = useState(() => new Date().toISOString().split('T')[0]);
+
+    useEffect(() => { fetchQueries(); }, [startDate, endDate]);
 
     const fetchQueries = async () => {
         try {
-            const response = await api.get('/queries/');
+            const response = await api.get(`/queries/?start_date=${startDate}&end_date=${endDate}`);
             setQueries(response.data);
         } catch (err) { console.error(err); }
         finally { setLoading(false); }
@@ -66,10 +75,33 @@ const ManageQueries = () => {
 
     if (loading) return <div>Loading Queries...</div>;
 
+    // Filter handled by backend
+    const filteredQueries = queries;
+
     return (
         <Container>
+            <div style={{ display: 'flex', gap: '1rem', padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>From:</span>
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={e => setStartDate(e.target.value)}
+                        style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px' }}
+                    />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>To:</span>
+                    <input
+                        type="date"
+                        value={endDate}
+                        onChange={e => setEndDate(e.target.value)}
+                        style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px' }}
+                    />
+                </div>
+            </div>
             <QueryList>
-                {queries.map(query => (
+                {filteredQueries.map(query => (
                     <QueryCard key={query.id} $resolved={query.status === 'resolved'}>
                         <div style={{ flex: 1 }}>
                             <Status $resolved={query.status === 'resolved'}>
@@ -78,7 +110,7 @@ const ManageQueries = () => {
                             </Status>
                             <h3 style={{ marginBottom: '0.5rem' }}>{query.name}</h3>
                             <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', marginBottom: '1rem' }}>
-                                {query.email} • {query.phone}
+                                {query.email} • {query.phone_number}
                             </div>
                             <p style={{ color: 'rgba(255,255,255,0.8)', fontStyle: 'italic' }}>"{query.message}"</p>
                         </div>

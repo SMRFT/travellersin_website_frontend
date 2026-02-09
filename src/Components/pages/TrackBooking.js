@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaCalendarAlt, FaHotel, FaPhone, FaCheckCircle, FaExclamationTriangle, FaArrowLeft, FaBed } from 'react-icons/fa';
+import { FaSearch, FaCalendarAlt, FaHotel, FaPhone, FaCheckCircle, FaExclamationTriangle, FaArrowLeft, FaBed, FaFileInvoiceDollar } from 'react-icons/fa';
 import { trackBooking, cancelBooking, initiateBookingPayment, verifyPayment } from '../services/bookingService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  background: #FAFAFA;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
   display: flex;
@@ -15,14 +15,13 @@ const PageWrapper = styled.div`
 `;
 
 const TrackingCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0F1E2E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 32px;
   width: 100%;
   max-width: 600px;
   padding: 3rem;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 
   @media (max-width: 600px) {
     padding: 2rem;
@@ -38,7 +37,7 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   text-align: center;
   margin-bottom: 2.5rem;
 `;
@@ -56,7 +55,7 @@ const FormGroup = styled.div`
 `;
 
 const Label = styled.label`
-  color: rgba(212, 175, 55, 0.9);
+  color: #C9A24D;
   font-size: 0.9rem;
   font-weight: 600;
   margin-left: 0.5rem;
@@ -73,16 +72,16 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+    border-color: #C9A24D;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(201, 162, 77, 0.1);
   }
 `;
 
 const SubmitButton = styled(motion.button)`
   padding: 1rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   font-weight: 700;
@@ -111,7 +110,7 @@ const DetailItem = styled.div`
   }
 
   .label {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.5);
     display: flex;
     align-items: center;
     gap: 0.8rem;
@@ -173,6 +172,35 @@ const TrackBooking = () => {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const location = useLocation();
+
+    // Auto-fill and search from URL params
+    React.useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const urlId = params.get('id');
+        const urlPhone = params.get('phone');
+
+        if (urlId && urlPhone) {
+            setBookingId(urlId);
+            setPhone(urlPhone);
+            // We need to call trackBooking directly here or trigger search
+            fetchBookingAuto(urlId, urlPhone);
+        }
+    }, [location]);
+
+    const fetchBookingAuto = async (bid, bphone) => {
+        setLoading(true);
+        setError('');
+        setBooking(null);
+        try {
+            const data = await trackBooking(bid, bphone);
+            setBooking(data);
+        } catch (err) {
+            setError(err.response?.data?.error || "Unable to find booking. Please check your details.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -209,46 +237,64 @@ const TrackBooking = () => {
         }
     };
 
+    const getBalance = () => {
+        if (!booking) return 0;
+        const total = parseFloat(booking.payment_details?.amount || 0);
+        const paid = parseFloat(booking.payment_details?.amount_paid || 0);
+        return Math.max(0, total - paid);
+    };
+
     const handlePayment = async () => {
         setLoading(true);
         try {
-            const { order, booking: bookingData } = await initiateBookingPayment(booking.booking_id);
+            // Frontend Approach: Directly Initialize Razorpay for Balance Amount
+            const balanceToPay = getBalance();
+            if (balanceToPay <= 0) {
+                alert("No balance to pay!");
+                setLoading(false);
+                return;
+            }
 
             const options = {
-                key: process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_placeholder",
-                amount: order.amount,
+                key: "rzp_test_YooSlpOnNDsCoN", // Direct Key usage
+                amount: balanceToPay * 100, // Amount in paise
                 currency: "INR",
                 name: "TravellersInn",
-                description: `Payment for Booking ${bookingData.booking_id}`,
-                order_id: order.id,
+                description: `Balance Payment for Booking ${booking.booking_id}`,
+                // order_id: null, // No Order ID created on backend
                 handler: async function (response) {
                     try {
                         await verifyPayment({
-                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_order_id: response.razorpay_order_id || "N/A",
                             razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature,
-                            booking_id: bookingData.booking_id
+                            razorpay_signature: response.razorpay_signature || "SKIPPED",
+                            booking_id: booking.booking_id
                         });
                         const updated = await trackBooking(bookingId, phone);
                         setBooking(updated);
-                        alert("Payment successful! Your booking is now confirmed.");
+                        alert("Payment successful! Your balance has been updated.");
                     } catch (err) {
                         alert("Payment verification failed. Please contact support.");
                     }
                 },
                 prefill: {
-                    name: bookingData.guest_name,
-                    email: bookingData.guest_email,
-                    contact: bookingData.guest_phone,
+                    name: booking.guest_name,
+                    email: booking.guest_email,
+                    contact: booking.guest_phone,
                 },
-                theme: { color: "#d4af37" }
+                theme: { color: "#d4af37" },
+                modal: {
+                    ondismiss: function () {
+                        setLoading(false);
+                    }
+                }
             };
 
             const rzp = new window.Razorpay(options);
             rzp.open();
         } catch (err) {
+            console.error(err);
             setError("Failed to initiate payment. Please try again.");
-        } finally {
             setLoading(false);
         }
     };
@@ -265,7 +311,7 @@ const TrackBooking = () => {
     const needsPayment = () => {
         if (!booking) return false;
         if (booking.booking_status === 'cancelled') return false;
-        return booking.payment_details?.status === 'unpaid';
+        return getBalance() > 0;
     };
 
     return (
@@ -278,7 +324,7 @@ const TrackBooking = () => {
                     <motion.button
                         whileHover={{ x: -2 }}
                         onClick={() => navigate(-1)}
-                        style={{ background: 'none', border: 'none', color: '#d4af37', cursor: 'pointer', fontSize: '1.2rem' }}
+                        style={{ background: 'none', border: 'none', color: '#C9A24D', cursor: 'pointer', fontSize: '1.2rem' }}
                     >
                         <FaArrowLeft />
                     </motion.button>
@@ -375,9 +421,88 @@ const TrackBooking = () => {
                                 </span>
                             </DetailItem>
                             <DetailItem>
-                                <span className="label"><FaPhone /> Phone</span>
                                 <span className="value">{booking.guest_phone}</span>
                             </DetailItem>
+
+                            {/* Payment & Billing Details */}
+                            <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                <h4 style={{ color: '#C9A24D', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <FaFileInvoiceDollar /> Payment Details
+                                </h4>
+                                <DetailItem>
+                                    <span className="label">Status</span>
+                                    <span className="value" style={{ textTransform: 'capitalize', color: booking.payment_details?.status === 'paid' ? '#10b981' : '#f59e1b' }}>
+                                        {booking.payment_details?.status || 'Unpaid'}
+                                    </span>
+                                </DetailItem>
+                                <DetailItem>
+                                    <span className="label">Total Amount</span>
+                                    <span className="value">₹{booking.payment_details?.amount || 0}</span>
+                                </DetailItem>
+                                <DetailItem>
+                                    <span className="label">Amount Paid</span>
+                                    <span className="value">₹{booking.payment_details?.amount_paid || 0}</span>
+                                </DetailItem>
+                                {booking.payment_details?.billing_numbers && booking.payment_details.billing_numbers.length > 0 && (
+                                    <DetailItem>
+                                        <span className="label">Bill Reference(s)</span>
+                                        <span className="value" style={{ fontSize: '0.9rem' }}>
+                                            {booking.payment_details.billing_numbers.join(', ')}
+                                        </span>
+                                    </DetailItem>
+                                )}
+                            </div>
+
+                            {/* Payment History Table */}
+                            {booking.bills && booking.bills.length > 0 && (
+                                <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <h4 style={{ color: '#C9A24D', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <FaFileInvoiceDollar /> Payment History
+                                    </h4>
+                                    <div style={{ overflowX: 'auto' }}>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', color: '#fff', fontSize: '0.9rem' }}>
+                                            <thead>
+                                                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left' }}>
+                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.5)' }}>Date</th>
+                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.5)' }}>Details</th>
+                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>Amount</th>
+                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {booking.bills.map((bill, index) => (
+                                                    <tr key={index} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                        <td style={{ padding: '0.5rem' }}>
+                                                            {new Date(bill.date).toLocaleDateString()}
+                                                            <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>
+                                                                {new Date(bill.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </div>
+                                                        </td>
+                                                        <td style={{ padding: '0.5rem' }}>
+                                                            <div style={{ fontWeight: 'bold' }}>{bill.payment_type.toUpperCase()}</div>
+                                                            <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace' }}>
+                                                                {bill.transaction_id || bill.billing_no}
+                                                            </div>
+                                                        </td>
+                                                        <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 'bold' }}>
+                                                            ₹{bill.amount_paid}
+                                                        </td>
+                                                        <td style={{ padding: '0.5rem', textAlign: 'right' }}>
+                                                            <span style={{
+                                                                color: bill.status === 'success' || bill.status === 'captured' ? '#10b981' : '#f59e1b',
+                                                                textTransform: 'capitalize',
+                                                                fontSize: '0.85rem'
+                                                            }}>
+                                                                {bill.status || 'Success'}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '2.5rem' }}>
                                 {needsPayment() && (
@@ -387,7 +512,7 @@ const TrackBooking = () => {
                                         onClick={handlePayment}
                                         disabled={loading}
                                     >
-                                        Pay Advance Now
+                                        Pay Balance (₹{getBalance()})
                                     </SubmitButton>
                                 )}
 

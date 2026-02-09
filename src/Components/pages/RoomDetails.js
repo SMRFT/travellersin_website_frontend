@@ -10,18 +10,20 @@ import {
   FaShower, FaBath, FaGlassMartini, FaCouch, FaTimes, FaChevronLeft, FaChevronRight
 } from 'react-icons/fa';
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL.replace('/_b_a_c_k_e_n_d/travellerinwebsite/', '');
+const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 
 const formatImageUrl = (url) => {
   if (!url) return '';
   if (url.startsWith('http')) return url;
-  return `${API_BASE_URL}${url}`;
+  const baseUrl = (API_BASE_URL || '').replace(/\/$/, '');
+  const path = url.startsWith('/') ? url : `/${url}`;
+  return `${baseUrl}${path}`;
 };
 
 /* ================= STYLED COMPONENTS ================= */
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  background: #d0d0d0;
   min-height: 100vh;
   padding-top: 90px;
 `;
@@ -46,7 +48,7 @@ const BackButton = styled(Link)`
   font-size: 0.95rem;
   margin-bottom: 2rem;
   padding: 0.8rem 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: #0F1E2E;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50px;
   transition: all 0.3s ease;
@@ -149,7 +151,18 @@ const ContentGrid = styled.div`
   }
 `;
 
-const RoomInfo = styled.div``;
+const RoomInfo = styled.div`
+  background: #0F1E2E;
+  padding: 2.5rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  height: fit-content;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+`;
 
 const RoomBadge = styled.span`
   display: inline-block;
@@ -200,11 +213,11 @@ const ReviewCount = styled.span`
 /* --- Specs Grid --- */
 const SpecsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
 `;
@@ -280,7 +293,7 @@ const AmenityItem = styled.div`
   align-items: center;
   gap: 0.8rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   color: rgba(255, 255, 255, 0.8);
@@ -303,7 +316,7 @@ const BookingCard = styled.div`
   position: sticky;
   top: 110px;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: #0F1E2E;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
@@ -394,8 +407,8 @@ const FormSelect = styled.select`
 const BookButton = styled(motion.button)`
   width: 100%;
   padding: 1.2rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #1E6F5C;
+  color: #ffffff;
   border: none;
   border-radius: 50px;
   font-size: 1rem;
@@ -407,9 +420,13 @@ const BookButton = styled(motion.button)`
   transition: all 0.3s ease;
   margin-bottom: 1rem;
 
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 50px rgba(212, 175, 55, 0.4);
+    background: #165e4d;
+    box-shadow: 0 15px 50px rgba(30, 111, 92, 0.4);
   }
 `;
 
