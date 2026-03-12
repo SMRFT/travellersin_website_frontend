@@ -338,10 +338,10 @@ const ManageRooms = () => {
                                 <FormGroup>
                                     <Label>Room Type</Label>
                                     <Input as="select" value={formData.room_type} onChange={e => setFormData({ ...formData, room_type: e.target.value })}>
-                                        <option value="Standard">Standard</option>
+                                        {/* <option value="Standard">Standard</option> */}
                                         <option value="Classic">Classic</option>
                                         <option value="Deluxe">Deluxe</option>
-                                        <option value="Suite">Suite</option>
+                                        {/* <option value="Suite">Suite</option> */}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>

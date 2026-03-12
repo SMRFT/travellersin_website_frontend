@@ -15,8 +15,9 @@ import ManageQueries from '../admin/ManageQueries';
 import RoomAvailability from '../admin/RoomAvailability';
 import ManageAdmins from '../admin/ManageAdmins';
 import AccountSummary from '../admin/AccountSummary';
+import ManageGallery from '../admin/ManageGallery';
 import api from '../services/api';
-
+import {FaImage} from 'react-icons/fa';
 /* ================= STYLED COMPONENTS ================= */
 
 const DashboardWrapper = styled.div`
@@ -272,6 +273,8 @@ const AdminDashboard = () => {
         return <ManageAdmins />;
       case 'accounts':
         return <AccountSummary />;
+      case 'gallery':
+        return <ManageGallery />;
       default:
         return null;
     }
@@ -300,6 +303,7 @@ const AdminDashboard = () => {
             { id: 'events', icon: <FaCalendarAlt />, label: 'Event Management' },
             { id: 'queries', icon: <FaQuestionCircle />, label: 'Queries' },
             { id: 'accounts', icon: <FaTachometerAlt />, label: 'Accounts' }, // Using Tachometer as placeholder
+            { id: 'gallery', icon: <FaImage />, label: 'Gallery' },
             ...(user?.is_superadmin ? [{ id: 'admins', icon: <FaUserShield />, label: 'Manage Admins' }] : [])
           ].map(item => (
             <NavItem

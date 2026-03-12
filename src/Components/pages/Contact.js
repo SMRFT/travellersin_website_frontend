@@ -20,6 +20,8 @@ const PageWrapper = styled.div`
   background: #FAFAFA;
   min-height: 100vh;
   padding-top: 90px;
+  overflow-x: hidden;
+  max-width: 100vw;
 `;
 
 /* --- Hero Section --- */
@@ -161,6 +163,8 @@ const ContactText = styled.div`
   color: #f0f0f0;
   font-size: 1rem;
   line-height: 1.6;
+  overflow-wrap: break-word;
+  word-break: break-word;
 `;
 
 const ContactLink = styled.a`

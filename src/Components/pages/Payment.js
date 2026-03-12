@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCreditCard, FaMoneyBillWave, FaShieldAlt, FaArrowLeft, FaCheck } from 'react-icons/fa';
 import { createBooking, createRazorpayOrder, verifyPayment, confirmCashBooking } from '../services/bookingService';
+import { differenceInCalendarDays, parseISO } from 'date-fns';
 
 const PageWrapper = styled.div`
   background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
@@ -169,6 +170,10 @@ const Payment = () => {
   const navigate = useNavigate();
   const { bookingDetails, roomId, totalAmount } = location.state || {};
 
+  const nights = bookingDetails?.checkIn && bookingDetails?.checkOut
+    ? Math.max(1, differenceInCalendarDays(parseISO(bookingDetails.checkOut), parseISO(bookingDetails.checkIn)))
+    : 1;
+
   const [method, setMethod] = useState('online');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -326,7 +331,7 @@ const Payment = () => {
             </SummaryLine>
             <SummaryLine>
               <span>Duration</span>
-              <span>1 Night</span>
+              <span>{nights} Night{nights > 1 ? 's' : ''}</span>
             </SummaryLine>
             <SummaryLine>
               <span>Guests</span>

@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FaCheck, FaTimes, FaCalendarAlt, FaUser, FaPhone, FaMoneyBillWave, FaEdit, FaUpload, FaSpinner, FaGoogle } from 'react-icons/fa';
-import api from '../services/api';
+import { FaCheck, FaTimes, FaCalendarAlt, FaUser, FaPhone, FaMoneyBillWave, FaEdit, FaUpload, FaSpinner, FaGoogle, FaFileExcel, FaPrint } from 'react-icons/fa';
+import * as XLSX from 'xlsx';
 
-import { getRooms } from '../services/roomService';
+import api from '../services/api';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import { format, addDays, startOfToday } from 'date-fns';
+
+import { getRooms, checkRoomAvailability } from '../services/roomService';
 import { approveCancellation, rejectCancellation } from '../services/bookingService';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
@@ -113,12 +118,21 @@ const ModalContent = styled.div`
 `;
 
 const Input = styled.input`
-  padding: 0.8rem;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   color: #fff;
   width: 100%;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #d4af37;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+  }
 `;
 
 const Label = styled.label`
@@ -126,6 +140,75 @@ const Label = styled.label`
   font-size: 0.8rem;
   margin-bottom: 0.3rem;
   display: block;
+`;
+
+const DatePickerStyles = styled.div`
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+  .react-datepicker__input-container {
+    width: 100%;
+  }
+  
+  .react-datepicker {
+    background-color: #0F1E2E;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: inherit;
+    color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .react-datepicker__header {
+    background-color: #0F1E2E;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+  }
+
+  .react-datepicker__current-month, .react-datepicker__day-name {
+    color: #d4af37;
+    font-weight: 600;
+  }
+
+  .react-datepicker__day {
+    color: #fff;
+    border-radius: 8px;
+    &:hover {
+      background-color: rgba(212, 175, 55, 0.2);
+    }
+  }
+
+  .react-datepicker__day--disabled {
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
+    background-color: #d4af37 !important;
+    color: #0F1E2E !important;
+    font-weight: 700;
+  }
+
+  .react-datepicker__time-container {
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #0F1E2E;
+  }
+
+  .react-datepicker__time {
+    background-color: #0F1E2E;
+    color: #fff;
+  }
+
+  .react-datepicker__time-list-item:hover {
+    background-color: rgba(212, 175, 55, 0.2) !important;
+  }
+
+  .react-datepicker__time-list-item--selected {
+    background-color: #d4af37 !important;
+    color: #0F1E2E !important;
+  }
+
+  .react-datepicker__navigation--next { border-left-color: #d4af37; }
+  .react-datepicker__navigation--previous { border-right-color: #d4af37; }
 `;
 
 const ManageBookings = () => {
@@ -146,8 +229,14 @@ const ManageBookings = () => {
         check_in: '',
         check_out: '',
         amount: '',
-        amount_paid: ''
+        amount_paid: '',
+        discount_amount: '',
+        guest_address: '',
+        extra_addons: []
     });
+
+
+    const [unavailableRooms, setUnavailableRooms] = useState([]);
     const [showRoomModal, setShowRoomModal] = useState(false);
 
     const [startDate, setStartDate] = useState(() => {
@@ -164,6 +253,28 @@ const ManageBookings = () => {
         fetchBookings();
         fetchRooms();
     }, [startDate, endDate]);
+
+    // Check availability whenever dates change in the manual booking form
+    useEffect(() => {
+        if (newBooking.check_in && newBooking.check_out && createModal) {
+            checkAvailability();
+        }
+    }, [newBooking.check_in, newBooking.check_out, createModal]);
+
+    const checkAvailability = async () => {
+        if (!newBooking.check_in || !newBooking.check_out) return;
+
+        try {
+            // Get all room numbers to check
+            const allRoomNumbers = availableRooms.map(r => r.room_number);
+            if (allRoomNumbers.length === 0) return;
+
+            const response = await checkRoomAvailability(allRoomNumbers, newBooking.check_in, newBooking.check_out);
+            setUnavailableRooms(response.conflicts || []);
+        } catch (err) {
+            console.error("Failed to check availability:", err);
+        }
+    };
 
     const fetchRooms = async () => {
         try {
@@ -280,6 +391,182 @@ const ManageBookings = () => {
         }
     };
 
+    const handleExcelExport = () => {
+        const dataToExport = bookings.map(b => ({
+            'Booking ID': b.booking_id,
+            'Guest Name': b.guest_name,
+            'Phone': b.guest_phone,
+            'Email': b.guest_email || 'N/A',
+            'Address': b.guest_address || 'N/A',
+            'Rooms': Array.isArray(b.room_numbers) ? b.room_numbers.join(', ') : b.room_numbers,
+            'Check In': b.check_in,
+            'Check Out': b.check_out,
+            'Total Amount': b.payment_details?.amount || 0,
+            'Discount': b.discount_amount || 0,
+            'Amount Paid': b.payment_details?.amount_paid || 0,
+            'Balance': ((b.payment_details?.amount || 0) - (b.discount_amount || 0)) - (b.payment_details?.amount_paid || 0),
+            'Status': b.booking_status,
+            'Payment Status': b.payment_details?.status,
+            'Booking Source': b.booking_source,
+            'Created At': new Date(b.created_at).toLocaleString()
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(dataToExport);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Bookings");
+        XLSX.writeFile(wb, `Bookings_Export_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+    };
+
+    const handleExcelImport = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (evt) => {
+            try {
+                const bstr = evt.target.result;
+                const wb = XLSX.read(bstr, { type: 'binary' });
+                const wsname = wb.SheetNames[0];
+                const ws = wb.Sheets[wsname];
+                const data = XLSX.utils.sheet_to_json(ws);
+
+                if (data.length === 0) {
+                    alert("No data found in Excel sheet");
+                    return;
+                }
+
+                if (window.confirm(`Found ${data.length} bookings. Import them?`)) {
+                    setLoading(true);
+                    for (const row of data) {
+                        const payload = {
+                            guest_name: row['Guest Name'] || row['name'],
+                            guest_phone: row['Phone'] || row['phone'],
+                            guest_email: row['Email'] || row['email'] || null,
+                            guest_address: row['Address'] || row['address'] || '',
+                            number_of_guests: parseInt(row['Guests'] || row['number_of_guests'] || 1),
+                            room_numbers: row['Rooms'] || row['room_numbers'] || '',
+                            check_in: row['Check In'] || row['check_in'],
+                            check_out: row['Check Out'] || row['check_out'],
+                            discount_amount: parseFloat(row['Discount'] || row['discount_amount'] || 0),
+                            payment_details: {
+                                amount: parseFloat(row['Total Amount'] || row['amount'] || 0),
+                                amount_paid: parseFloat(row['Amount Paid'] || row['amount_paid'] || 0),
+                                method: 'cash'
+                            },
+                            booking_status: 'confirmed',
+                            booking_source: 'manual'
+                        };
+                        try {
+                            await api.post('/bookings/', payload);
+                        } catch (err) {
+                            console.error("Failed to import row:", row, err);
+                        }
+                    }
+                    alert("Import completed!");
+                    fetchBookings();
+                }
+            } catch (err) {
+                alert("Failed to parse Excel file: " + err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        reader.readAsBinaryString(file);
+    };
+
+    const printBookingDetails = (booking) => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Booking Details - ${booking.booking_id}</title>
+                <style>
+                    body { font-family: sans-serif; padding: 40px; }
+                    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                    .details { margin-top: 30px; }
+                    .row { display: flex; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+                    .label { width: 150px; font-weight: bold; }
+                    .value { flex: 1; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>Traveller's Inn</h1>
+                    <p>Booking Confirmation Receipt</p>
+                </div>
+                <div class="details">
+                    <div class="row"><div class="label">Booking ID:</div><div class="value">${booking.booking_id}</div></div>
+                    <div class="row"><div class="label">Status:</div><div class="value">${booking.booking_status.toUpperCase()}</div></div>
+                    <div class="row"><div class="label">Guest Name:</div><div class="value">${booking.guest_name}</div></div>
+                    <div class="row"><div class="label">Phone:</div><div class="value">${booking.guest_phone || 'N/A'}</div></div>
+                    <div class="row"><div class="label">Email:</div><div class="value">${booking.guest_email || 'N/A'}</div></div>
+                    <div class="row"><div class="label">Address:</div><div class="value">${booking.guest_address || 'N/A'}</div></div>
+                    <div class="row"><div class="label">Check-in:</div><div class="value">${new Date(booking.check_in).toLocaleString()}</div></div>
+                    <div class="row"><div class="label">Check-out:</div><div class="value">${new Date(booking.check_out).toLocaleString()}</div></div>
+                    <div class="row"><div class="label">Rooms:</div><div class="value">${booking.room_numbers}</div></div>
+                    <div class="row"><div class="label">Total Amount:</div><div class="value">₹${booking.payment_details?.amount || 0}</div></div>
+                    <div class="row"><div class="label">Discount:</div><div class="value">₹${booking.discount_amount || 0}</div></div>
+                    <div class="row"><div class="label">Paid Amount:</div><div class="value">₹${booking.payment_details?.amount_paid || 0}</div></div>
+                    <div class="row"><div class="label">Remaining:</div><div class="value">₹${((booking.payment_details?.amount || 0) - (booking.discount_amount || 0)) - (booking.payment_details?.amount_paid || 0)}</div></div>
+                </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    };
+
+    const printAllBookings = () => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        const rows = bookings.map(b => `
+            <tr>
+                <td>${b.booking_id}<br/><small>${new Date(b.created_at).toLocaleDateString()}</small></td>
+                <td>${b.guest_name}<br/>${b.guest_phone}</td>
+                <td>${b.room_numbers}</td>
+                <td>${b.check_in.split('T')[0]} to ${b.check_out.split('T')[0]}</td>
+                <td>₹${b.payment_details?.amount || 0}</td>
+                <td>${b.booking_status}</td>
+            </tr>
+        `).join('');
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Bookings List</title>
+                <style>
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+                    th { background-color: #f2f2f2; }
+                    h2 { text-align: center; }
+                </style>
+            </head>
+            <body>
+                <h2>Traveller's Inn - Bookings Report (${startDate} to ${endDate})</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID & Date</th>
+                            <th>Guest</th>
+                            <th>Rooms</th>
+                            <th>Dates</th>
+                            <th>Amt</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    };
+
+
     const handleApproveCancel = async (bookingId) => {
         if (!window.confirm("Approve this cancellation request?")) return;
         try {
@@ -374,8 +661,12 @@ const ManageBookings = () => {
             check_out: booking.check_out ? booking.check_out.slice(0, 16) : '',
             amount: booking.payment_details?.amount || '',
             amount_paid: booking.payment_details?.amount_paid || '',
-            discount_amount: booking.discount_amount || ''
+            discount_amount: booking.discount_amount || '',
+            guest_address: booking.guest_address || '',
+            extra_addons: booking.extra_addons || []
         });
+
+
         setCreateModal(true);
     };
 
@@ -386,9 +677,11 @@ const ManageBookings = () => {
                 guest_name: newBooking.guest_name,
                 guest_phone: newBooking.guest_phone,
                 guest_email: newBooking.guest_email || null,
+                guest_address: newBooking.guest_address || '',
                 number_of_guests: parseInt(newBooking.number_of_guests),
                 id_proof_type: newBooking.id_proof_type,
                 id_proof_file: newBooking.id_proof_file || 'manual_entry',
+
                 // Handle room_numbers: backend expects comma-separated string
                 room_numbers: Array.isArray(newBooking.room_numbers) ? newBooking.room_numbers.join(',') : newBooking.room_numbers,
                 check_in: newBooking.check_in,
@@ -411,8 +704,9 @@ const ManageBookings = () => {
                 },
                 booking_status: editingBooking ? editingBooking.booking_status : 'confirmed',
                 booking_source: 'manual',
-                extra_addons: []
+                extra_addons: newBooking.extra_addons || []
             };
+
 
             if (editingBooking) {
                 await api.patch(`/bookings/${editingBooking.booking_id}/`, payload);
@@ -428,8 +722,9 @@ const ManageBookings = () => {
             setNewBooking({
                 guest_name: '', guest_phone: '', guest_email: '',
                 number_of_guests: 1, id_proof_type: 'Aadhar Card', id_proof_file: '',
-                room_numbers: [], check_in: '', check_out: '', amount: '', amount_paid: '', discount_amount: ''
+                room_numbers: [], check_in: '', check_out: '', amount: '', amount_paid: '', discount_amount: '', guest_address: ''
             });
+
         } catch (err) {
             alert("Failed to save booking: " + (err.response?.data?.error || err.message));
         }
@@ -452,23 +747,52 @@ const ManageBookings = () => {
             <div style={{ display: 'flex', gap: '1rem', padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>From:</span>
-                    <Input
-                        type="date"
-                        value={startDate}
-                        onChange={e => setStartDate(e.target.value)}
-                        style={{ width: 'auto', padding: '0.5rem' }}
-                    />
+                    <DatePickerStyles>
+                        <DatePicker
+                            selected={new Date(startDate)}
+                            onChange={date => setStartDate(format(date, 'yyyy-MM-dd'))}
+                            customInput={<Input style={{ width: '130px', padding: '0.5rem' }} />}
+                            dateFormat="yyyy-MM-dd"
+                        />
+                    </DatePickerStyles>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>To:</span>
-                    <Input
-                        type="date"
-                        value={endDate}
-                        onChange={e => setEndDate(e.target.value)}
-                        style={{ width: 'auto', padding: '0.5rem' }}
-                    />
+                    <DatePickerStyles>
+                        <DatePicker
+                            selected={new Date(endDate)}
+                            onChange={date => setEndDate(format(date, 'yyyy-MM-dd'))}
+                            customInput={<Input style={{ width: '130px', padding: '0.5rem' }} />}
+                            dateFormat="yyyy-MM-dd"
+                        />
+                    </DatePickerStyles>
                 </div>
-                <div style={{ marginLeft: 'auto' }}>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+                    <ActionBtn
+                        $color="#fff"
+                        title="Export Excel"
+                        style={{ background: '#107c41', padding: '0.6rem', borderRadius: '8px', display: 'flex', alignItems: 'center' }}
+                        onClick={handleExcelExport}
+                    >
+                        <FaFileExcel />
+                    </ActionBtn>
+                    {/* <ActionBtn
+                        $color="#fff"
+                        title="Import Excel"
+                        style={{ background: '#217346', padding: '0.6rem', borderRadius: '8px', display: 'flex', alignItems: 'center' }}
+                        onClick={() => document.getElementById('excel-import').click()}
+                    >
+                        <FaUpload />
+                        <input type="file" id="excel-import" hidden accept=".xlsx, .xls" onChange={handleExcelImport} />
+                    </ActionBtn> */}
+                    <ActionBtn
+                        $color="#fff"
+                        title="Print List"
+                        style={{ background: '#3b82f6', padding: '0.6rem', borderRadius: '8px', display: 'flex', alignItems: 'center' }}
+                        onClick={printAllBookings}
+                    >
+                        <FaPrint />
+                    </ActionBtn>
                     <ActionBtn
                         $color="#fff"
                         style={{ background: '#1E6F5C', padding: '0.6rem 1.2rem', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -477,7 +801,11 @@ const ManageBookings = () => {
                             setNewBooking({
                                 guest_name: '', guest_phone: '', guest_email: '',
                                 number_of_guests: 1, id_proof_type: 'Aadhar Card', id_proof_file: '',
-                                room_numbers: [], check_in: '', check_out: '', amount: '', amount_paid: '', discount_amount: ''
+                                room_numbers: [],
+                                // Set default times to 12:00 and 10:00
+                                check_in: new Date().toISOString().split('T')[0] + 'T12:00',
+                                check_out: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0] + 'T10:00',
+                                amount: '', amount_paid: '', discount_amount: '', guest_address: ''
                             });
                             setCreateModal(true);
                         }}
@@ -485,6 +813,7 @@ const ManageBookings = () => {
                         + Add Booking
                     </ActionBtn>
                 </div>
+
             </div>
 
             <TableWrapper>
@@ -494,6 +823,7 @@ const ManageBookings = () => {
                             <th>Booking ID</th>
                             <th>Guest</th>
                             <th>Dates & Rooms</th>
+                            <th>Add-ons</th>
                             <th>Payment Details</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -529,6 +859,22 @@ const ManageBookings = () => {
                                                 ? booking.room_numbers.replace(/^,|,$/g, '').replace(/,/g, ', ')
                                                 : (Array.isArray(booking.room_numbers) ? booking.room_numbers.join(', ') : booking.room_numbers)}
                                         </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>
+                                        {booking.extra_addons && booking.extra_addons.length > 0 ? (
+                                            <ul style={{ paddingLeft: '1rem', margin: 0 }}>
+                                                {booking.extra_addons.map((addon, idx) => (
+                                                    <li key={idx}>
+                                                        {addon.name || addon.id || addon}
+                                                        {addon.price && ` (₹${addon.price})`}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <span style={{ fontStyle: 'italic', opacity: 0.5 }}>None</span>
+                                        )}
                                     </div>
                                 </td>
                                 <td>
@@ -604,9 +950,17 @@ const ManageBookings = () => {
                                                     </ActionBtn>
                                                 )}
                                                 <ActionBtn
+                                                    $color="#3b82f6"
+                                                    title="Print Details"
+                                                    onClick={() => printBookingDetails(booking)}
+                                                >
+                                                    <FaPrint />
+                                                </ActionBtn>
+                                                <ActionBtn
                                                     $color="#ff4d4d"
                                                     title="Cancel"
                                                     disabled={booking.booking_status === 'cancelled'}
+
                                                     onClick={() => {
                                                         const reason = window.prompt("Enter cancellation reason:");
                                                         if (reason !== null) {
@@ -775,11 +1129,28 @@ const ManageBookings = () => {
                                 </div>
                                 <div>
                                     <Label>Check In</Label>
-                                    <Input required type="datetime-local" value={newBooking.check_in} onChange={e => setNewBooking({ ...newBooking, check_in: e.target.value })} />
+                                    <DatePickerStyles>
+                                        <DatePicker
+                                            selected={newBooking.check_in ? new Date(newBooking.check_in) : null}
+                                            onChange={date => setNewBooking({ ...newBooking, check_in: date ? format(date, "yyyy-MM-dd'T'HH:mm") : '' })}
+                                            showTimeSelect
+                                            dateFormat="yyyy-MM-dd HH:mm"
+                                            customInput={<Input required />}
+                                        />
+                                    </DatePickerStyles>
                                 </div>
                                 <div>
                                     <Label>Check Out</Label>
-                                    <Input required type="datetime-local" value={newBooking.check_out} onChange={e => setNewBooking({ ...newBooking, check_out: e.target.value })} />
+                                    <DatePickerStyles>
+                                        <DatePicker
+                                            selected={newBooking.check_out ? new Date(newBooking.check_out) : null}
+                                            onChange={date => setNewBooking({ ...newBooking, check_out: date ? format(date, "yyyy-MM-dd'T'HH:mm") : '' })}
+                                            showTimeSelect
+                                            dateFormat="yyyy-MM-dd HH:mm"
+                                            minDate={newBooking.check_in ? new Date(newBooking.check_in) : null}
+                                            customInput={<Input required />}
+                                        />
+                                    </DatePickerStyles>
                                 </div>
                                 <div style={{ gridColumn: 'span 2' }}>
                                     <Label>Rooms</Label>
@@ -817,6 +1188,74 @@ const ManageBookings = () => {
                                     <Label>Amount Paid (₹)</Label>
                                     <Input type="number" value={newBooking.amount_paid} onChange={e => setNewBooking({ ...newBooking, amount_paid: e.target.value })} placeholder="0" />
                                 </div>
+                                <div style={{ gridColumn: 'span 2' }}>
+                                    <Label>Guest Address</Label>
+                                    <textarea
+                                        value={newBooking.guest_address}
+                                        onChange={e => setNewBooking({ ...newBooking, guest_address: e.target.value })}
+                                        placeholder="Full address of the guest..."
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.8rem',
+                                            background: 'rgba(255, 255, 255, 0.05)',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                            borderRadius: '12px',
+                                            color: '#fff',
+                                            fontSize: '0.9rem',
+                                            minHeight: '80px',
+                                            fontFamily: 'inherit'
+                                        }}
+                                    />
+                                </div>
+
+                                <div style={{ gridColumn: 'span 2' }}>
+                                    <Label>Extra Add-ons</Label>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                                        {(newBooking.extra_addons || []).map((addon, index) => (
+                                            <div key={index} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '0.5rem', borderRadius: '8px' }}>
+                                                <Input
+                                                    placeholder="Addon Name"
+                                                    value={addon.name || ''}
+                                                    onChange={e => {
+                                                        const updated = [...newBooking.extra_addons];
+                                                        updated[index].name = e.target.value;
+                                                        setNewBooking({ ...newBooking, extra_addons: updated });
+                                                    }}
+                                                    style={{ flex: 2, padding: '0.5rem' }}
+                                                />
+                                                <Input
+                                                    type="number"
+                                                    placeholder="Price"
+                                                    value={addon.price || ''}
+                                                    onChange={e => {
+                                                        const updated = [...newBooking.extra_addons];
+                                                        updated[index].price = e.target.value;
+                                                        setNewBooking({ ...newBooking, extra_addons: updated });
+                                                    }}
+                                                    style={{ flex: 1, padding: '0.5rem' }}
+                                                />
+                                                <ActionBtn
+                                                    type="button"
+                                                    $color="#ff4d4d"
+                                                    onClick={() => {
+                                                        const updated = newBooking.extra_addons.filter((_, i) => i !== index);
+                                                        setNewBooking({ ...newBooking, extra_addons: updated });
+                                                    }}
+                                                >
+                                                    <FaTimes />
+                                                </ActionBtn>
+                                            </div>
+                                        ))}
+                                        <ActionBtn
+                                            type="button"
+                                            $color="#d4af37"
+                                            style={{ border: '1px dashed #d4af37', padding: '0.5rem', borderRadius: '8px', fontSize: '0.85rem' }}
+                                            onClick={() => setNewBooking({ ...newBooking, extra_addons: [...(newBooking.extra_addons || []), { name: '', price: '' }] })}
+                                        >
+                                            + Add Extra Add-on
+                                        </ActionBtn>
+                                    </div>
+                                </div>
 
                                 <div style={{ gridColumn: 'span 2', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                                     <ActionBtn type="submit" $color="#fff" style={{ background: '#1E6F5C', flex: 1, borderRadius: '8px', padding: '0.8rem' }} disabled={uploading}>
@@ -837,31 +1276,42 @@ const ManageBookings = () => {
                                 <button onClick={() => setShowRoomModal(false)} style={{ background: 'none', border: 'none', color: '#fff' }}><FaTimes /></button>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                                {availableRooms.map(room => (
-                                    <div
-                                        key={room.room_number}
-                                        onClick={() => {
-                                            const current = Array.isArray(newBooking.room_numbers) ? newBooking.room_numbers : [];
-                                            const updated = current.includes(room.room_number)
-                                                ? current.filter(r => r !== room.room_number)
-                                                : [...current, room.room_number];
-                                            setNewBooking({ ...newBooking, room_numbers: updated });
-                                        }}
-                                        style={{
-                                            padding: '0.8rem',
-                                            borderRadius: '8px',
-                                            border: Array.isArray(newBooking.room_numbers) && newBooking.room_numbers.includes(room.room_number) ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
-                                            background: Array.isArray(newBooking.room_numbers) && newBooking.room_numbers.includes(room.room_number) ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.05)',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            flexDirection: 'column'
-                                        }}
-                                    >
-                                        <span style={{ fontWeight: 'bold' }}>{room.room_number}</span>
-                                        <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{room.room_type}</span>
-                                        <span style={{ fontSize: '0.8rem', color: '#d4af37' }}>₹{room.price}</span>
-                                    </div>
-                                ))}
+                                {availableRooms.map(room => {
+                                    const isUnavailable = unavailableRooms.includes(room.room_number) && !newBooking.room_numbers.includes(room.room_number);
+                                    // Note: If already selected (e.g. editing), we shouldn't disable it just because it conflicts with ITSELF (if checking logic is strictly date based).
+                                    // But checkRoomAvailability usually excludes the *current* booking if we passed an ID. 
+                                    // Here we are in "Create" mode mostly or "Edit".
+                                    // If Edit, we might have issues. But for now let's just mark conflict.
+
+                                    return (
+                                        <div
+                                            key={room.room_number}
+                                            onClick={() => {
+                                                if (isUnavailable) return;
+                                                const current = Array.isArray(newBooking.room_numbers) ? newBooking.room_numbers : [];
+                                                const updated = current.includes(room.room_number)
+                                                    ? current.filter(r => r !== room.room_number)
+                                                    : [...current, room.room_number];
+                                                setNewBooking({ ...newBooking, room_numbers: updated });
+                                            }}
+                                            style={{
+                                                padding: '0.8rem',
+                                                borderRadius: '8px',
+                                                border: Array.isArray(newBooking.room_numbers) && newBooking.room_numbers.includes(room.room_number) ? '1px solid #10b981' : (isUnavailable ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(255,255,255,0.1)'),
+                                                background: Array.isArray(newBooking.room_numbers) && newBooking.room_numbers.includes(room.room_number) ? 'rgba(16, 185, 129, 0.1)' : (isUnavailable ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255,255,255,0.05)'),
+                                                cursor: isUnavailable ? 'not-allowed' : 'pointer',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                opacity: isUnavailable ? 0.6 : 1
+                                            }}
+                                        >
+                                            <span style={{ fontWeight: 'bold' }}>{room.room_number}</span>
+                                            <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{room.room_type}</span>
+                                            <span style={{ fontSize: '0.8rem', color: '#d4af37' }}>₹{room.price}</span>
+                                            {isUnavailable && <span style={{ fontSize: '0.7rem', color: '#ef4444', marginTop: '0.2rem' }}>Unavailable</span>}
+                                        </div>
+                                    )
+                                })}
                             </div>
                             <ActionBtn $color="#fff" style={{ background: '#1E6F5C', marginTop: '1rem', padding: '0.8rem', borderRadius: '8px' }} onClick={() => setShowRoomModal(false)}>
                                 Done

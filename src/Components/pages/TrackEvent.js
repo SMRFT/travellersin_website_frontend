@@ -241,13 +241,22 @@ const ActionButton = styled(motion.button)`
   }
 `;
 
+const FormGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
 const TrackEvent = () => {
     const cardRef = useRef();
     const [bookingIdInput, setBookingIdInput] = useState('');
     const [phone, setPhone] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
-
     const [error, setError] = useState('');
     const location = useLocation();
 
@@ -336,7 +345,7 @@ const TrackEvent = () => {
 
                 <SearchCard>
                     <Form onSubmit={handleSearch}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+                        <FormGrid>
                             <InputGroup>
                                 <Label>Event Booking ID</Label>
                                 <Input
@@ -356,7 +365,7 @@ const TrackEvent = () => {
                                     onChange={e => setPhone(e.target.value)}
                                 />
                             </InputGroup>
-                        </div>
+                        </FormGrid>
                         <SubmitBtn
                             type="submit"
                             disabled={loading}

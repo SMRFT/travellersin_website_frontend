@@ -397,9 +397,9 @@ const Rooms = () => {
           <FilterButton $active={filter === 'all'} onClick={() => setFilter('all')}>
             All Rooms
           </FilterButton>
-          <FilterButton $active={filter === 'standard'} onClick={() => setFilter('standard')}>
+          {/* <FilterButton $active={filter === 'standard'} onClick={() => setFilter('standard')}>
             Standard
-          </FilterButton>
+          </FilterButton> */}
           <FilterButton $active={filter === 'classic'} onClick={() => setFilter('classic')}>
             Classic
           </FilterButton>

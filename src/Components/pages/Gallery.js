@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimes, FaExpand } from 'react-icons/fa';
-import { getRoomImage } from '../../assets/imageMap';
+import api from '../services/api';
+
+const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
+
+const getImageUrl = (imageId) => {
+  if (!imageId) return '';
+  if (imageId.startsWith('http')) return imageId;
+  const baseUrl = (API_BASE_URL || '').replace(/\/$/, '');
+  const path = imageId.startsWith('/') ? imageId : `/${imageId}`;
+  // Construct standard URL to serve gridfs file if it's just an ID
+  if (!imageId.includes('/')) {
+    return `${baseUrl}/media/gridfs/${imageId}/`;
+  }
+  return `${baseUrl}${path}`;
+};
+
 
 const GalleryContainer = styled.div`
   background: #FAFAFA;
@@ -142,29 +157,46 @@ const CloseBtn = styled.button`
 const Gallery = () => {
   const [filter, setFilter] = useState('All');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState(['All']);
+  const [loading, setLoading] = useState(true);
 
-  const images = [
-    { key: 'exterior_view', category: 'Exterior', title: 'Hotel Exterior' },
-    { key: 'art_view', category: 'Interior', title: 'Artistic Lounge' },
-    { key: 'signage_view', category: 'Exterior', title: 'Welcome Portal' },
-    { key: 'interior_1', category: 'Rooms', title: 'Luxury Double' },
-    { key: 'interior_2', category: 'Rooms', title: 'Deluxe Suite' },
-    { key: 'interior_3', category: 'Rooms', title: 'Classic Comfort' },
-    { key: 'interior_4', category: 'Rooms', title: 'Premium Living' },
-    { key: 'interior_5', category: 'Rooms', title: 'Executive Retreat' },
-    { key: 'venue_grand', category: 'Events', title: 'Grand Hall' },
-    { key: 'venue_setup', category: 'Events', title: 'Event Setup' },
-    { key: 'event_wide', category: 'Events', title: 'Celebration Venue' },
-    { key: 'event_detail', category: 'Events', title: 'Table Setup' },
-    { key: 'dining_view', category: 'Dining', title: 'Signature Restaurant' },
-    { key: 'garden_view', category: 'Exterior', title: 'Lush Gardens' },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [galRes, catRes] = await Promise.all([
+          api.get('gallery/'),
+          api.get('gallery-categories/')
+        ]);
 
-  const categories = ['All', 'Exterior', 'Lobby', 'Rooms', 'Dining', 'Events'];
+        // Sort by order
+        const sorted = galRes.data.sort((a, b) => (a.order || 0) - (b.order || 0));
+        setItems(sorted);
+        setCategories(['All', ...catRes.data.map(c => c.name)]);
+      } catch (err) {
+        console.error("Failed to fetch gallery:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // const categories = ['All', 'Exterior', 'Lobby', 'Rooms', 'Dining', 'Events']; // Replaced by state
 
   const filteredImages = filter === 'All'
-    ? images
-    : images.filter(img => img.category === filter);
+    ? items
+    : items.filter(img => img.category_name === filter);
+
+  if (loading) {
+    return (
+      <GalleryContainer>
+        <Header>
+          <Title>Loading Our Gallery...</Title>
+        </Header>
+      </GalleryContainer>
+    );
+  }
 
   return (
     <GalleryContainer>
@@ -185,9 +217,9 @@ const Gallery = () => {
 
       <Grid layout>
         <AnimatePresence>
-          {filteredImages.map((img, index) => (
+          {filteredImages.map((img) => (
             <ImageCard
-              key={img.key}
+              key={img.id}
               layout
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -195,10 +227,10 @@ const Gallery = () => {
               transition={{ duration: 0.4 }}
               onClick={() => setSelectedImage(img)}
             >
-              <StyledImage src={getRoomImage(img.key)} alt={img.title} />
+              <StyledImage src={getImageUrl(img.image_id)} alt={img.title || img.category_name} />
               <HoverInfo>
                 <FaExpand size={24} />
-                <p style={{ marginTop: '0.5rem', fontWeight: 500 }}>{img.title}</p>
+                <p style={{ marginTop: '0.5rem', fontWeight: 500 }}>{img.title || img.category_name}</p>
               </HoverInfo>
             </ImageCard>
           ))}
@@ -217,7 +249,7 @@ const Gallery = () => {
               <FaTimes />
             </CloseBtn>
             <LightboxImage
-              src={getRoomImage(selectedImage.key)}
+              src={getImageUrl(selectedImage.image_id)}
               alt={selectedImage.title}
               as={motion.img}
               initial={{ scale: 0.8 }}

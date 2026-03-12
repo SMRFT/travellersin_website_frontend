@@ -735,7 +735,7 @@ const Home = () => {
       <motion.div style={{ scale: heroScale }}>
         <HeroWrapper>
           <HeroBg
-            $bgImage={getRoomImage('exterior_view')}
+            $bgImage={getRoomImage('exterior_view2')}
             variants={bgPanVariants}
             animate="animate"
           />

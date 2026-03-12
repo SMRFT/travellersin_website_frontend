@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { FaCalendarAlt, FaUserFriends, FaHotel, FaArrowRight, FaCheckCircle, FaIdCard, FaCoffee, FaWifi, FaPlus, FaClock, FaExclamationTriangle } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { addDays, isWithinInterval, parseISO, startOfToday, format } from 'date-fns';
+import { addDays, isWithinInterval, parseISO, startOfToday, format, differenceInCalendarDays } from 'date-fns';
 import { useAuth } from '../auth/AuthContext';
 import { getRoomById, checkRoomAvailability, getRoomBookings } from '../services/roomService';
 
@@ -293,10 +293,10 @@ const DatePickerStyles = styled.div`
 `;
 
 const addonsList = [
-  { id: 'breakfast', name: 'Breakfast', price: 500, icon: <FaCoffee />, perGuest: true },
-  { id: 'wifi', name: 'Premium WiFi', price: 200, icon: <FaWifi />, perGuest: false },
-  { id: 'extrabed', name: 'Extra Bed', price: 1000, icon: <FaPlus />, perGuest: false },
-  { id: 'latecheckout', name: 'Late Checkout', price: 500, icon: <FaClock />, perGuest: false },
+  { id: 'breakfast', name: 'Breakfast', price: 200, icon: <FaCoffee />, perGuest: true },
+  // { id: 'wifi', name: 'Premium WiFi', price: 200, icon: <FaWifi />, perGuest: false },
+  { id: 'extraperson', name: 'Extra Person', price: 500, icon: <FaPlus />, perGuest: false },
+  { id: 'latecheckout(2 hours)', name: 'Late Checkout (2 Hours)', price: 500, icon: <FaClock />, perGuest: false },
 ];
 
 const Booking = () => {
@@ -384,9 +384,9 @@ const Booking = () => {
     // Calculate Stay Duration
     let nights = 1;
     if (formData.checkIn && formData.checkOut) {
-      const start = new Date(formData.checkIn);
-      const end = new Date(formData.checkOut);
-      nights = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+      const start = parseISO(formData.checkIn);
+      const end = parseISO(formData.checkOut);
+      nights = Math.max(1, differenceInCalendarDays(end, start));
     }
 
     base *= nights;

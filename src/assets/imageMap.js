@@ -1,7 +1,8 @@
 // Import specific files from the 'images' folder
 // matching the exact names and extensions you provided
 
-import exterior from './images/exterior.jpg';
+import exterior from './images/exterior1.png';
+import exterior2 from './images/exterior2.png';
 import roomMain from './images/room_main.jpeg';
 import atrium from './images/atrium.jpeg';
 import signage from './images/signage.jpeg';
@@ -17,7 +18,7 @@ import room2 from './images/_DSC1193.JPG';
 import room3 from './images/_DSC1278.JPG';
 import room4 from './images/_DSC9245.jpg';
 import room5 from './images/_DSC9318.jpg';
-import venue1 from './images/_DSC9582.JPG';
+import venue1 from './images/exterior.png';
 import venue2 from './images/_DSC9586.JPG';
 import venue3 from './images/_DSC9590.JPG';
 import venue4 from './images/_DSC9592.jpeg';
@@ -42,6 +43,7 @@ export const roomImages = {
 
   // --- Hotel Views (Home Page) ---
   "exterior_view": exterior,
+  "exterior_view2": exterior2,
   "atrium_view": atrium,
   "signage_view": signage,
   "art_view": interiorArt,
