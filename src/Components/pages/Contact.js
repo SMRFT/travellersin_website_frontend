@@ -33,7 +33,7 @@ const HeroSection = styled.section`
 
 const PageLabel = styled(motion.span)`
   display: block;
-  color: #C9A24D;
+  color: #5a3078;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 3px;
@@ -42,14 +42,14 @@ const PageLabel = styled(motion.span)`
 `;
 
 const PageTitle = styled(motion.h1)`
-  color: #0F1E2E;
+  color: #5a3078;
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 700;
   margin-bottom: 1rem;
   
   span {
-    color: #C9A24D;
+    color: #5a3078;
     background: none;
     -webkit-text-fill-color: initial;
     background-clip: border-box;
@@ -87,12 +87,11 @@ const ContentGrid = styled.div`
 
 /* --- Contact Info Card --- */
 const ContactInfoCard = styled(motion.div)`
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+  background: #5a3078;
   border-radius: 24px;
   padding: 2.5rem;
   height: fit-content;
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
 
   @media (max-width: 600px) {
     padding: 1.5rem;
@@ -100,7 +99,7 @@ const ContactInfoCard = styled(motion.div)`
 `;
 
 const CardTitle = styled.h2`
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 1.5rem;
   font-family: 'Playfair Display', Georgia, serif;
   margin-bottom: 2rem;
@@ -112,7 +111,7 @@ const CardTitle = styled.h2`
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(to right, rgba(201, 162, 77, 0.3), transparent);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.3), transparent);
   }
 `;
 
@@ -128,20 +127,20 @@ const ContactItem = styled.div`
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(201, 162, 77, 0.05);
-    border-color: rgba(201, 162, 77, 0.2);
+    background: rgba(193, 128, 210, 0.05);
+    border-color: rgba(193, 128, 210, 0.2);
   }
 `;
 
 const ContactIcon = styled.div`
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, rgba(201, 162, 77, 0.2), rgba(201, 162, 77, 0.05));
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 1.2rem;
   flex-shrink: 0;
 `;
@@ -151,7 +150,7 @@ const ContactDetails = styled.div`
 `;
 
 const ContactLabel = styled.div`
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -168,12 +167,13 @@ const ContactText = styled.div`
 `;
 
 const ContactLink = styled.a`
-  color: #f0f0f0;
+  color: #ffffff;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: opacity 0.2s ease;
 
   &:hover {
-    color: #C9A24D;
+    color: #ffffff;
+    text-decoration: underline;
   }
 `;
 
@@ -206,27 +206,24 @@ const SocialIcon = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 1.1rem;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(201, 162, 77, 0.15);
-    border-color: rgba(201, 162, 77, 0.4);
-    color: #C9A24D;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
     transform: translateY(-3px);
   }
 `;
 
 /* --- Contact Form --- */
 const ContactFormCard = styled(motion.div)`
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+  background: #5a3078;
   border-radius: 24px;
   padding: 2.5rem;
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
 
   @media (max-width: 600px) {
     padding: 1.5rem;
@@ -253,7 +250,7 @@ const FormGroup = styled.div``;
 
 const FormLabel = styled.label`
   display: block;
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 0.85rem;
   margin-bottom: 0.5rem;
   letter-spacing: 0.5px;
@@ -275,7 +272,7 @@ const FormInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: rgba(201, 162, 77, 0.5);
+    border-color: rgba(193, 128, 210, 0.5);
     background: #fff;
   }
 `;
@@ -299,7 +296,7 @@ const FormTextarea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: rgba(201, 162, 77, 0.5);
+    border-color: rgba(193, 128, 210, 0.5);
     background: #fff;
   }
 `;
@@ -317,19 +314,19 @@ const FormSelect = styled.select`
 
   &:focus {
     outline: none;
-    border-color: rgba(201, 162, 77, 0.5);
+    border-color: rgba(193, 128, 210, 0.5);
   }
 
   option {
-    background: #0F1E2E;
+    background: #5a3078;
     color: #fff;
   }
 `;
 
 const SubmitButton = styled(motion.button)`
   padding: 1.2rem 2.5rem;
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #5a3078;
   border: none;
   border-radius: 50px;
   font-size: 1rem;
@@ -341,13 +338,11 @@ const SubmitButton = styled(motion.button)`
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  box-shadow: 0 10px 40px rgba(30, 111, 92, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   align-self: flex-start;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 50px rgba(30, 111, 92, 0.4);
   }
 
   &:disabled {
@@ -407,7 +402,7 @@ const MapHeader = styled.div`
 `;
 
 const MapTitle = styled.h3`
-  color: #0F1E2E;
+  color: #5a3078;
   font-size: 1.2rem;
   font-family: 'Playfair Display', Georgia, serif;
   display: flex;
@@ -415,7 +410,7 @@ const MapTitle = styled.h3`
   gap: 0.8rem;
 
   svg {
-    color: #C9A24D;
+    color: #5a3078;
   }
 `;
 
@@ -424,8 +419,8 @@ const DirectionsButton = styled.a`
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.5rem;
-  background: #C9A24D;
-  color: #0f0f1a;
+  background: #5a3078;
+  color: #ffffff;
   text-decoration: none;
   border-radius: 50px;
   font-size: 0.85rem;
@@ -434,7 +429,7 @@ const DirectionsButton = styled.a`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(201, 162, 77, 0.3);
+    box-shadow: 0 5px 20px rgba(193, 128, 210, 0.3);
   }
 `;
 

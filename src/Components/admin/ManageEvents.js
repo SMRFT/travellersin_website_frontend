@@ -6,31 +6,32 @@ import api from '../services/api';
 import { getAllEventBookings, updateEventBookingStatus } from '../services/eventService';
 
 const Container = styled.div`
-  background: #0F1E2E;
+  background: #5a3078;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(193, 128, 210, 0.15);
 `;
 
 const TabGroup = styled.div`
   display: flex;
   gap: 1rem;
   padding: 2rem 2rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const Tab = styled.button`
   padding: 1rem 2rem;
-  background: ${props => props.$active ? 'rgba(212, 175, 55, 0.1)' : 'transparent'};
+  background: ${props => props.$active ? 'rgba(255, 255, 255, 0.25)' : 'transparent'};
   border: none;
-  border-bottom: 2px solid ${props => props.$active ? '#d4af37' : 'transparent'};
-  color: ${props => props.$active ? '#d4af37' : 'rgba(255, 255, 255, 0.4)'};
+  border-bottom: 2px solid ${props => props.$active ? '#ffffff' : 'transparent'};
+  color: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    color: #d4af37;
+    color: #ffffff;
   }
 `;
 
@@ -46,9 +47,9 @@ const Controls = styled.div`
 
 const ActionButton = styled(motion.button)`
   padding: 0.8rem 1.5rem;
-  background: ${props => props.$variant === 'secondary' ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #d4af37 0%, #b8860b 100%)'};
-  color: ${props => props.$variant === 'secondary' ? '#fff' : '#0f0f1a'};
-  border: ${props => props.$variant === 'secondary' ? '1px solid rgba(255,255,255,0.1)' : 'none'};
+  background: ${props => props.$variant === 'secondary' ? 'rgba(255,255,255,0.1)' : '#ffffff'};
+  color: ${props => props.$variant === 'secondary' ? '#fff' : '#431d59'};
+  border: ${props => props.$variant === 'secondary' ? '1px solid rgba(255,255,255,0.2)' : 'none'};
   border-radius: 12px;
   font-weight: 600;
   display: flex;
@@ -59,7 +60,7 @@ const ActionButton = styled(motion.button)`
 
 const TableWrapper = styled.div`
   overflow-x: auto;
-  background: #0F1E2E;
+  background: transparent;
   border-radius: 20px;
   border: none;
 `;
@@ -71,11 +72,11 @@ const Table = styled.table`
 
   th, td {
     padding: 1.2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   th {
-    background: #15202b;
+    background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     font-weight: 600;
     font-size: 0.9rem;
@@ -92,16 +93,16 @@ const StatusBadge = styled.span`
   text-transform: uppercase;
   background: ${props => {
         switch (props.$status) {
-            case 'confirmed': return 'rgba(16, 185, 129, 0.1)';
-            case 'cancelled': return 'rgba(239, 68, 68, 0.1)';
-            default: return 'rgba(212, 175, 55, 0.1)';
+            case 'confirmed': return 'rgba(16, 185, 129, 0.2)';
+            case 'cancelled': return 'rgba(239, 68, 68, 0.2)';
+            default: return 'rgba(255, 255, 255, 0.2)';
         }
     }};
   color: ${props => {
         switch (props.$status) {
             case 'confirmed': return '#10b981';
             case 'cancelled': return '#ef4444';
-            default: return '#d4af37';
+            default: return '#ffffff';
         }
     }};
 `;
@@ -113,15 +114,15 @@ const EventsGrid = styled.div`
 `;
 
 const EventCard = styled(motion.div)`
-  background: #0f151a; // Very dark blue/black for cards
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   padding: 1.5rem;
   position: relative;
 `;
 
 const IconBtn = styled.button`
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.15);
   border: none;
   color: ${props => props.$color || '#fff'};
   padding: 0.5rem;
@@ -131,7 +132,7 @@ const IconBtn = styled.button`
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.25);
     transform: scale(1.1);
   }
 
@@ -142,13 +143,14 @@ const IconBtn = styled.button`
 `;
 
 const ModalOverlay = styled(motion.div)`
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
   display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 2rem;
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #161625; border: 1px solid rgba(255,255,255,0.1); border-radius: 32px;
+  background: #431d59; border: 1px solid rgba(255,255,255,0.25); border-radius: 32px;
   width: 100%; max-width: 500px; padding: 3rem;
+  color: #ffffff;
 `;
 
 const ManageEvents = () => {
@@ -280,17 +282,17 @@ const ManageEvents = () => {
                                     <tbody>
                                         {bookings.map(booking => (
                                             <tr key={booking.booking_id}>
-                                                <td style={{ fontWeight: '600', color: '#d4af37' }}>{booking.booking_id}</td>
+                                                <td style={{ fontWeight: '600', color: '#ffffff' }}>{booking.booking_id}</td>
                                                 <td>
                                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                         <span style={{ fontWeight: '500' }}>{booking.name}</span>
-                                                        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>{booking.phone}</span>
+                                                        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>{booking.phone}</span>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                         <span style={{ fontWeight: '500' }}>{booking.event_type}</span>
-                                                        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>
+                                                        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>
                                                             {new Date(booking.event_date).toLocaleDateString()}
                                                         </span>
                                                     </div>
@@ -321,7 +323,7 @@ const ManageEvents = () => {
                                         ))}
                                         {bookings.length === 0 && (
                                             <tr>
-                                                <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.2)' }}>
+                                                <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>
                                                     <FaInfoCircle size={30} style={{ marginBottom: '1rem', display: 'block', margin: '0 auto' }} />
                                                     No event inquiries found.
                                                 </td>
@@ -347,12 +349,12 @@ const ManageEvents = () => {
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                                             <h3 style={{ fontFamily: 'Playfair Display' }}>{event.event_name}</h3>
                                             <div>
-                                                <IconBtn $color="#d4af37" onClick={() => handleOpenModal(event)}><FaEdit /></IconBtn>
+                                                <IconBtn $color="#ffffff" onClick={() => handleOpenModal(event)}><FaEdit /></IconBtn>
                                                 <IconBtn $color="#ff4d4d" onClick={() => handleDelete(event.id)}><FaTrash /></IconBtn>
                                             </div>
                                         </div>
-                                        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginBottom: '1rem' }}>{event.about}</p>
-                                        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: '#d4af37' }}>
+                                        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.85)', marginBottom: '1rem' }}>{event.about}</p>
+                                        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: '#ffffff' }}>
                                             <span>Capacity: {event.size}</span>
                                             <span>Starting: ₹{parseFloat(event.price).toLocaleString()}</span>
                                         </div>
@@ -370,12 +372,12 @@ const ManageEvents = () => {
                         <ModalContent initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}>
                             <h2 style={{ marginBottom: '2rem', fontFamily: 'Playfair Display' }}>{editingEvent ? 'Edit Hall' : 'New Hall'}</h2>
                             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                <input placeholder="Hall Name" value={formData.event_name} onChange={e => setFormData({ ...formData, event_name: e.target.value })} style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '12px' }} />
-                                <textarea placeholder="About" value={formData.about} onChange={e => setFormData({ ...formData, about: e.target.value })} style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '12px', minHeight: '100px' }} />
-                                <input placeholder="Capacity (e.g. 500 guests)" value={formData.size} onChange={e => setFormData({ ...formData, size: e.target.value })} style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '12px' }} />
-                                <input type="number" placeholder="Price" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '12px' }} />
+                                <input placeholder="Hall Name" value={formData.event_name} onChange={e => setFormData({ ...formData, event_name: e.target.value })} style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: '12px' }} />
+                                <textarea placeholder="About" value={formData.about} onChange={e => setFormData({ ...formData, about: e.target.value })} style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: '12px', minHeight: '100px' }} />
+                                <input placeholder="Capacity (e.g. 500 guests)" value={formData.size} onChange={e => setFormData({ ...formData, size: e.target.value })} style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: '12px' }} />
+                                <input type="number" placeholder="Price" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: '12px' }} />
                                 <ActionButton type="submit" style={{ marginTop: '1rem' }}><FaSave /> Save Hall</ActionButton>
-                                <button type="button" onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>Cancel</button>
+                                <button type="button" onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer' }}>Cancel</button>
                             </form>
                         </ModalContent>
                     </ModalOverlay>

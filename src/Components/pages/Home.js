@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { getRoomImage } from '../../assets/imageMap';
 import { getRooms } from '../services/roomService';
 import { FaExpand, FaTimes } from 'react-icons/fa';
+import { useAuth } from '../auth/AuthContext';
 
 /* ================= KEYFRAME ANIMATIONS ================= */
 
@@ -54,7 +55,7 @@ const Particle = styled.div`
   position: absolute;
   width: ${props => props.size || 4}px;
   height: ${props => props.size || 4}px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.8) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
   border-radius: 50%;
   animation: ${float} ${props => props.duration || 6}s ease-in-out infinite;
   animation-delay: ${props => props.delay || 0}s;
@@ -74,7 +75,7 @@ const HeroWrapper = styled.div`
   align-items: center;
   text-align: center;
   color: white;
-  background: #0F1E2E; /* Fallback */
+  background: #5a3078; /* Fallback */
   isolation: isolate;
 `;
 
@@ -130,30 +131,30 @@ const HeroTitle = styled(motion.h1)`
   letter-spacing: 4px;
   background: linear-gradient(
     135deg,
-    #bf953f 0%,
-    #fcf6ba 25%,
-    #b38728 50%,
-    #fbf5b7 75%,
-    #aa771c 100%
+    #e8e8e8 0%,
+    #ffffff 20%,
+    #c0c0c0 40%,
+    #f5f5f5 60%,
+    #a8a8a8 80%,
+    #e0e0e0 100%
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: ${shimmer} 6s linear infinite;
-  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.8));
+  animation: ${shimmer} 4s linear infinite;
+  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.6));
 `;
 
 const HeroSubtitle = styled(motion.p)`
   font-size: clamp(1.1rem, 2.5vw, 1.4rem);
   line-height: 1.9;
-  line-height: 1.9;
   font-weight: 400;
-  color: #f0f0f0;
+  color: #ffffff;
   max-width: 650px;
   margin: 0 auto;
   letter-spacing: 1px;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
 `;
 
 const CTAButtonGroup = styled(motion.div)`
@@ -167,13 +168,13 @@ const CTAButtonGroup = styled(motion.div)`
 const CTAButton = styled(motion(Link))`
   padding: 1.2rem 3rem;
   background: ${props => props.$primary
-    ? '#1E6F5C'
+    ? '#5a3078'
     : '#ffffff'};
   backdrop-filter: blur(10px);
   border: 1px solid ${props => props.$primary
     ? 'transparent'
-    : '#ffffff'};
-  color: ${props => props.$primary ? '#ffffff' : '#1E6F5C'};
+    : '#5a3078'};
+  color: ${props => props.$primary ? '#ffffff' : '#5a3078'};
   border-radius: 50px;
   font-size: 0.95rem;
   letter-spacing: 2px;
@@ -185,17 +186,14 @@ const CTAButton = styled(motion(Link))`
   gap: 0.5rem;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: ${props => props.$primary
-    ? '0 10px 40px rgba(30, 111, 92, 0.3)'
-    : '0 10px 40px rgba(255, 255, 255, 0.1)'};
+    ? '0 10px 40px rgba(193, 128, 210, 0.15)'
+    : '0 10px 40px rgba(255, 255, 255, 0.05)'};
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: ${props => props.$primary
-    ? '0 15px 50px rgba(30, 111, 92, 0.4)'
-    : '0 15px 50px rgba(255, 255, 255, 0.2)'};
     background: ${props => props.$primary
-    ? '#165e4d'
-    : '#f0f0f0'};
+    ? '#5a3078'
+    : '#ffffff'};
   }
 `;
 
@@ -217,7 +215,7 @@ const ScrollIndicator = styled(motion.div)`
 const ScrollLine = styled(motion.div)`
   width: 1px;
   height: 60px;
-  background: linear-gradient(to bottom, #C9A24D, transparent);
+  background: linear-gradient(to bottom, #5a3078, transparent);
 `;
 
 /* --- Section Styles --- */
@@ -240,7 +238,7 @@ const SectionHeader = styled(motion.div)`
 
 const SectionLabel = styled(motion.span)`
   display: block;
-  color: #C9A24D;
+  color: #5a3078;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 3px;
@@ -249,14 +247,14 @@ const SectionLabel = styled(motion.span)`
 `;
 
 const SectionTitle = styled(motion.h2)`
-  color: #0F1E2E;
+  color: #5a3078;
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 600;
   margin-bottom: 1.5rem;
   
   span {
-    color: #C9A24D;
+    color: #5a3078;
     background: none;
     -webkit-text-fill-color: initial;
     background-clip: border-box;
@@ -282,10 +280,10 @@ const FeaturesGrid = styled(motion.div)`
 const FeatureCard = styled(motion.div)`
   position: relative;
   padding: 2.5rem;
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #5a3078;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px rgba(193, 128, 210, 0.15);
   overflow: hidden;
   transition: all 0.4s ease;
 
@@ -296,15 +294,15 @@ const FeatureCard = styled(motion.div)`
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, transparent, #C9A24D, transparent);
+    background: linear-gradient(90deg, transparent, #ffffff, transparent);
     opacity: 0;
     transition: opacity 0.4s ease;
   }
 
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-    border-color: rgba(201, 162, 77, 0.3);
+    box-shadow: 0 20px 45px rgba(193, 128, 210, 0.25);
+    border-color: rgba(255, 255, 255, 0.35);
 
     &::before {
       opacity: 1;
@@ -315,7 +313,7 @@ const FeatureCard = styled(motion.div)`
 const FeatureIcon = styled.div`
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, rgba(201, 162, 77, 0.2), rgba(201, 162, 77, 0.05));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -325,7 +323,7 @@ const FeatureIcon = styled.div`
 `;
 
 const FeatureTitle = styled.h3`
-  color: #C9A24D;
+  color: #ffffff; 
   font-size: 1.4rem;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -333,7 +331,8 @@ const FeatureTitle = styled.h3`
 `;
 
 const FeatureText = styled.p`
-  color: rgba(255, 255, 255, 0.7);
+  color: #ffffff; /* Make text fully white/bright for excellence in hygiene & readability */
+  opacity: 0.95;
   line-height: 1.7;
   font-size: 0.95rem;
 `;
@@ -383,7 +382,7 @@ const GalleryItem = styled(motion.div)`
     background: linear-gradient(
       to bottom,
       transparent 40%,
-      rgba(15, 15, 26, 0.9) 100%
+      rgba(193, 128, 210, 0.95) 100%
     );
     opacity: 0.8;
     transition: opacity 0.4s ease;
@@ -431,7 +430,7 @@ const GalleryTitle = styled.h4`
 `;
 
 const GallerySubtitle = styled.p`
-  color: #C9A24D;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.85rem;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -443,8 +442,8 @@ const StatsSection = styled(motion.div)`
   grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
   padding: 4rem 3rem;
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #5a3078;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 30px;
   margin: 4rem 0;
 
@@ -466,12 +465,12 @@ const StatNumber = styled.div`
   font-size: 3.5rem;
   font-weight: 700;
   font-family: 'Playfair Display', Georgia, serif;
-  color: #C9A24D;
+  color: #ffffff;
   margin-bottom: 0.5rem;
 `;
 
 const StatLabel = styled.div`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -483,9 +482,9 @@ const TestimonialCard = styled(motion.div)`
   margin: 0 auto;
   padding: 4rem;
   padding: 4rem;
-  background: #0F1E2E;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-  border: 1px solid rgba(201, 162, 77, 0.2);
+  background: #5a3078;
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 30px;
   text-align: center;
   position: relative;
@@ -497,7 +496,7 @@ const TestimonialCard = styled(motion.div)`
     left: 40px;
     font-size: 8rem;
     font-family: Georgia, serif;
-    color: rgba(201, 162, 77, 0.15);
+    color: rgba(193, 128, 210, 0.15);
     line-height: 1;
   }
 `;
@@ -513,13 +512,13 @@ const TestimonialText = styled.p`
 `;
 
 const TestimonialAuthor = styled.div`
-  color: #C9A24D;
+  color: #ffffff;
   font-weight: 600;
   font-size: 1.1rem;
 `;
 
 const TestimonialRole = styled.div`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.9rem;
   margin-top: 0.3rem;
 `;
@@ -527,8 +526,8 @@ const TestimonialRole = styled.div`
 /* --- CTA Banner --- */
 const CTABanner = styled(motion.div)`
   padding: 5rem 3rem;
-  background: #0F1E2E;
-  border: 1px solid rgba(201, 162, 77, 0.2);
+  background: #5a3078;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 30px;
   text-align: center;
   position: relative;
@@ -543,7 +542,7 @@ const CTABanner = styled(motion.div)`
     height: 200%;
     background: radial-gradient(
       circle,
-      rgba(201, 162, 77, 0.1) 0%,
+      rgba(193, 128, 210, 0.1) 0%,
       transparent 50%
     );
     animation: ${pulse} 4s ease-in-out infinite;
@@ -641,17 +640,24 @@ const CloseBtn = styled.button`
 
   &:hover {
     transform: rotate(90deg) scale(1.1);
-    color: #d4af37;
+    color: #5a3078;
   }
 `;
 
 /* ================= COMPONENT ================= */
 
 const Home = () => {
+  const { user, openLoginModal, loading } = useAuth();
   const { scrollYProgress } = useScroll();
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      openLoginModal();
+    }
+  }, [loading, user, openLoginModal]);
 
   const features = [
     {
@@ -751,7 +757,7 @@ const Home = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              <SectionLabel style={{ marginBottom: '2rem' }}>
+              <SectionLabel style={{ marginBottom: '2rem', color: '#ffffff', opacity: 0.92, textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}>
                 Welcome to Paradise
               </SectionLabel>
             </motion.div>
@@ -912,7 +918,7 @@ const Home = () => {
                     <GalleryTitle>{item.title}</GalleryTitle>
                     <GallerySubtitle>{item.subtitle}</GallerySubtitle>
                   </div>
-                  <FaExpand style={{ color: '#d4af37', fontSize: '1.2rem', marginBottom: '0.5rem' }} />
+                  <FaExpand style={{ color: '#ffffff', fontSize: '1.2rem', marginBottom: '0.5rem' }} />
                 </div>
               </GalleryCaption>
             </GalleryItem>
@@ -985,6 +991,7 @@ const Home = () => {
             $primary
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            style={{ background: '#ffffff', color: '#5a3078' }}
           >
             Reserve Now
           </CTAButton>

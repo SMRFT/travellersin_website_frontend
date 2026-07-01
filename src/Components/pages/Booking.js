@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FaCalendarAlt, FaUserFriends, FaHotel, FaArrowRight, FaCheckCircle, FaIdCard, FaCoffee, FaWifi, FaPlus, FaClock, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCalendarAlt, FaUserFriends, FaHotel, FaArrowRight, FaCheckCircle, FaIdCard, FaCoffee, FaWifi, FaPlus, FaClock, FaExclamationTriangle, FaUpload, FaSpinner } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays, isWithinInterval, parseISO, startOfToday, format, differenceInCalendarDays } from 'date-fns';
 import { useAuth } from '../auth/AuthContext';
 import { getRoomById, checkRoomAvailability, getRoomBookings } from '../services/roomService';
+import api from '../services/api';
 
 const PageWrapper = styled.div`
-  background: #d0d0d0;
+  background: #F3EEF1;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
   display: flex;
@@ -19,16 +20,14 @@ const PageWrapper = styled.div`
 `;
 
 const BookingCard = styled(motion.div)`
-  background: #0F1E2E;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #5a3078;
   border-radius: 32px;
   width: 100%;
   max-width: 900px;
   display: grid;
   grid-template-columns: 1fr 1.2fr;
   overflow: hidden;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 50px rgba(193, 128, 210, 0.15);
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
@@ -37,12 +36,12 @@ const BookingCard = styled(motion.div)`
 
 const InfoSection = styled.div`
   padding: 3rem;
-  background: linear-gradient(180deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 
   @media (max-width: 900px) {
     border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   @media (max-width: 600px) {
@@ -59,12 +58,12 @@ const FormSection = styled.div`
 `;
 
 const Badge = styled.span`
-  background: rgba(212, 175, 55, 0.1);
-  color: #d4af37;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
   padding: 0.5rem 1rem;
   border-radius: 50px;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 1.5rem;
@@ -93,7 +92,7 @@ const DetailItem = styled.div`
   color: rgba(255, 255, 255, 0.7);
 
   svg {
-    color: #d4af37;
+    color: #ffffff;
     font-size: 1.2rem;
   }
 `;
@@ -151,7 +150,7 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
+    border-color: #ffffff;
     background: rgba(255, 255, 255, 0.08);
   }
 
@@ -179,8 +178,8 @@ const Grid = styled.div`
 const SubmitButton = styled(motion.button)`
   margin-top: 1rem;
   padding: 1.2rem;
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #5a3078;
   border: none;
   border-radius: 16px;
   font-size: 1rem;
@@ -190,11 +189,10 @@ const SubmitButton = styled(motion.button)`
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    background: #165e4d;
-    box-shadow: 0 15px 40px rgba(30, 111, 92, 0.4);
+    transform: translateY(-2px);
   }
 `;
 
@@ -217,8 +215,8 @@ const AddonGrid = styled.div`
 
 const AddonCard = styled.div`
   padding: 1rem;
-  background: ${props => props.$active ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.02)'};
-  border: 1px solid ${props => props.$active ? '#d4af37' : 'rgba(255, 255, 255, 0.08)'};
+  background: ${props => props.$active ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)'};
+  border: 1px solid ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.1)'};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -227,14 +225,14 @@ const AddonCard = styled.div`
   gap: 0.8rem;
 
   svg {
-    color: ${props => props.$active ? '#d4af37' : 'rgba(255, 255, 255, 0.3)'};
+    color: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'};
   }
 
   .info {
     display: flex;
     flex-direction: column;
     .name { color: #fff; font-size: 0.85rem; font-weight: 500; }
-    .price { color: rgba(255, 255, 255, 0.4); font-size: 0.75rem; }
+    .price { color: rgba(255, 255, 255, 0.85); font-size: 0.75rem; }
   }
 `;
 
@@ -260,25 +258,25 @@ const DatePickerStyles = styled.div`
   }
   
   .react-datepicker {
-    background-color: #0F1E2E;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #5a3078;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     font-family: inherit;
     color: #fff;
   }
 
   .react-datepicker__header {
-    background-color: #0F1E2E;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #5a3078;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .react-datepicker__current-month, .react-datepicker__day-name {
-    color: #d4af37;
+    color: #ffffff;
   }
 
   .react-datepicker__day {
     color: #fff;
     &:hover {
-      background-color: rgba(212, 175, 55, 0.2);
+      background-color: rgba(255, 255, 255, 0.25);
     }
   }
 
@@ -287,8 +285,8 @@ const DatePickerStyles = styled.div`
   }
 
   .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
-    background-color: #d4af37;
-    color: #0F1E2E;
+    background-color: #ffffff;
+    color: #5a3078;
   }
 `;
 
@@ -303,6 +301,13 @@ const Booking = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { user, openLoginModal } = useAuth();
+  const [toasts, setToasts] = useState([]);
+
+  const showToast = (message, type = 'success') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
+  };
 
   const [formData, setFormData] = useState({
     checkIn: '',
@@ -316,8 +321,11 @@ const Booking = () => {
     guestName: user?.name || '',
     guestPhone: user?.phone || '',
     guestEmail: user?.email || '',
-    selectedAddons: []
+    selectedAddons: [],
+    idProofFile: ''
   });
+
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -436,6 +444,27 @@ const Booking = () => {
     }));
   };
 
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const upData = new FormData();
+    upData.append('image', file);
+
+    try {
+      setUploading(true);
+      const response = await api.post('/upload/room-image/', upData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setFormData(prev => ({ ...prev, idProofFile: response.data.url }));
+      showToast('ID Proof uploaded successfully!');
+    } catch (err) {
+      showToast('Upload failed: ' + (err.response?.data?.error || err.message), 'error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -448,13 +477,13 @@ const Booking = () => {
       phone: formData.guestPhone,
       customerId: user ? user.customer_id : null,
       room_numbers: [room.room_number || roomId],
-      idProofFile: formData.idProofNumber, // Using number as representative for now
+      id_proof_file: formData.idProofFile || 'manual_entry',
       idProofNumber: formData.idProofNumber,
       idProofType: formData.idProofType,
     };
 
     if (!room.room_number && !roomId) {
-      alert("Error: Room Number is missing. Please try refreshing the page.");
+      showToast("Error: Room Number is missing. Please try refreshing the page.", "error");
       return;
     }
 
@@ -710,9 +739,35 @@ const Booking = () => {
                   right: '1.5rem',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  color: 'rgba(212, 175, 55, 0.5)'
+                  color: 'rgba(255, 255, 255, 0.6)'
                 }} />
               </div>
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Upload ID Proof (Image or PDF)</Label>
+              <div style={{ position: 'relative' }}>
+                <Input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={handleFileUpload}
+                  style={{ width: '100%', padding: '0.8rem 1.5rem' }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  right: '1.5rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  {uploading ? <FaSpinner className="fa-spin" style={{ color: '#ffffff' }} /> : (formData.idProofFile ? <FaCheckCircle style={{ color: '#ffffff' }} /> : <FaUpload style={{ color: 'rgba(255, 255, 255, 0.6)' }} />)}
+                </div>
+              </div>
+              {formData.idProofFile && (
+                <span style={{ fontSize: '0.75rem', color: '#10b981', marginLeft: '0.5rem' }}>File uploaded successfully!</span>
+              )}
             </FormGroup>
 
             <AddonsSection>
@@ -737,7 +792,7 @@ const Booking = () => {
             <SubmitButton
               type="submit"
               disabled={availability.loading || (availability.checked && !availability.available)}
-              whileHover={{ scale: 1.02, boxShadow: '0 20px 40px rgba(212, 175, 55, 0.4)' }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               style={{ opacity: (availability.loading || (availability.checked && !availability.available)) ? 0.5 : 1 }}
             >
@@ -746,6 +801,48 @@ const Booking = () => {
           </Form>
         </FormSection>
       </BookingCard>
+
+      {/* Toast Notifications */}
+      <div style={{
+        position: 'fixed', bottom: '2rem', right: '2rem',
+        display: 'flex', flexDirection: 'column', gap: '0.75rem',
+        zIndex: 99999, pointerEvents: 'none'
+      }}>
+        {toasts.map(toast => (
+          <div key={toast.id} style={{
+            background: toast.type === 'error' ? 'rgba(239, 68, 68, 0.95)' : 'rgba(16, 185, 129, 0.95)',
+            color: '#fff',
+            padding: '1rem 1.5rem',
+            borderRadius: '16px',
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            animation: 'slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            pointerEvents: 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem'
+          }}>
+            {toast.type === 'error' ? <FaExclamationTriangle /> : <FaCheckCircle />}
+            {toast.message}
+          </div>
+        ))}
+      </div>
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(120%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .fa-spin {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </PageWrapper>
   );
 };

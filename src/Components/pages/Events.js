@@ -23,6 +23,10 @@ const shimmer = keyframes`
   100% { background-position: 200% center; }
 `;
 
+const spin = keyframes`
+  to { transform: rotate(360deg); }
+`;
+
 /* ================= STYLED COMPONENTS ================= */
 
 const PageWrapper = styled.div`
@@ -77,7 +81,7 @@ const HeroContent = styled(motion.div)`
 
 const PageLabel = styled(motion.span)`
   display: block;
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 3px;
@@ -93,7 +97,7 @@ const PageTitle = styled(motion.h1)`
   margin-bottom: 1.5rem;
   
   span {
-    color: #C9A24D;
+    color: #5a3078;
     background: none;
     -webkit-text-fill-color: initial;
     background-clip: border-box;
@@ -126,7 +130,7 @@ const SectionHeader = styled(motion.div)`
 
 const SectionLabel = styled.span`
   display: block;
-  color: #C9A24D;
+  color: #5a3078;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 3px;
@@ -135,14 +139,14 @@ const SectionLabel = styled.span`
 `;
 
 const SectionTitle = styled.h2`
-  color: #0F1E2E;
-  font-size: clamp(2rem, 4vw, 2.8rem);
+  color: #5a3078;
+  font-size: clamp(2, 4vw, 2.8rem);
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 600;
   margin-bottom: 1rem;
   
   span {
-    color: #C9A24D;
+    color: #5a3078;
     background: none;
     -webkit-text-fill-color: initial;
     background-clip: border-box;
@@ -168,9 +172,9 @@ const EventTypesGrid = styled.div`
 const EventTypeCard = styled(motion.div)`
   position: relative;
   padding: 2.5rem;
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  background: #5a3078;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(193, 128, 210, 0.15);
   border-radius: 24px;
   text-align: center;
   overflow: hidden;
@@ -183,7 +187,7 @@ const EventTypeCard = styled(motion.div)`
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    background: linear-gradient(90deg, transparent, #ffffff, transparent);
     opacity: 0.5;
   }
 `;
@@ -191,19 +195,19 @@ const EventTypeCard = styled(motion.div)`
 const EventIcon = styled.div`
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, rgba(201, 162, 77, 0.2), rgba(201, 162, 77, 0.05));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
   font-size: 2rem;
-  color: #C9A24D;
+  color: #ffffff;
   margin: 0 auto 1.5rem;
 `;
 
 const EventTypeTitle = styled.h3`
-  color: #C9A24D;
+  color: #5a3078;
   font-size: 1.4rem;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -255,7 +259,7 @@ const VenueItem = styled(motion.div)`
     background: linear-gradient(
       to bottom,
       transparent 40%,
-      rgba(15, 15, 26, 0.9) 100%
+      rgba(193, 128, 210, 0.95) 100%
     );
     opacity: 0.7;
     transition: opacity 0.4s ease;
@@ -275,6 +279,26 @@ const VenueImg = styled.img`
   height: 100%;
   object-fit: cover;
   transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: ${props => props.$loaded ? 'block' : 'none'};
+`;
+
+const ImgSpinner = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(90, 48, 120, 0.15);
+
+  &::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #5a3078;
+    border-radius: 50%;
+    animation: ${spin} 0.8s linear infinite;
+  }
 `;
 
 const VenueCaption = styled.div`
@@ -303,7 +327,7 @@ const VenueTitle = styled.h4`
 `;
 
 const VenueCapacity = styled.p`
-  color: #C9A24D;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.85rem;
   letter-spacing: 1px;
 `;
@@ -320,15 +344,15 @@ const FeatureItem = styled(motion.div)`
   align-items: flex-start;
   gap: 1.5rem;
   padding: 2rem;
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+  background: #5a3078;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 5px 20px rgba(193, 128, 210, 0.1);
   border-radius: 16px;
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    border-color: rgba(201, 162, 77, 0.2);
+    box-shadow: 0 10px 30px rgba(193, 128, 210, 0.2);
+    border-color: rgba(255, 255, 255, 0.35);
   }
 `;
 
@@ -336,12 +360,12 @@ const FeatureIcon = styled.div`
   width: 50px;
   height: 50px;
   min-width: 50px;
-  background: linear-gradient(135deg, rgba(201, 162, 77, 0.2), rgba(201, 162, 77, 0.05));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 1.2rem;
 `;
 
@@ -363,8 +387,8 @@ const FeatureText = styled.p`
 /* --- CTA Section --- */
 const CTASection = styled(motion.div)`
   padding: 5rem 3rem;
-  background: #0F1E2E;
-  border: 1px solid rgba(201, 162, 77, 0.2);
+  background: #5a3078;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 30px;
   text-align: center;
   position: relative;
@@ -380,7 +404,7 @@ const CTATitle = styled.h3`
 `;
 
 const CTAText = styled.p`
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1.1rem;
   margin-bottom: 2rem;
   max-width: 500px;
@@ -390,21 +414,20 @@ const CTAText = styled.p`
 
 const CTAButton = styled(motion.button)`
   padding: 1.2rem 3rem;
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #5a3078;
   border: none;
   border-radius: 50px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 10px 40px rgba(30, 111, 92, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   transition: all 0.4s ease;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 50px rgba(30, 111, 92, 0.4);
   }
 
   &:disabled {
@@ -450,9 +473,9 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #C9A24D;
+    border-color: #5a3078;
     background: #fff;
-    box-shadow: 0 0 15px rgba(201, 162, 77, 0.1);
+    box-shadow: 0 0 15px rgba(193, 128, 210, 0.1);
   }
 `;
 
@@ -468,7 +491,7 @@ const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #C9A24D;
+    border-color: #5a3078;
   }
 
   option {
@@ -489,7 +512,7 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
+    border-color: #5a3078;
   }
 `;
 
@@ -531,7 +554,7 @@ const CardHeader = styled.div`
 `;
 
 const CardBrand = styled.div`
-  color: #C9A24D;
+  color: #5a3078;
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
   font-weight: 700;
@@ -574,9 +597,9 @@ const ActionButtons = styled.div`
 const CompactButton = styled(motion.button)`
   flex: 1;
   padding: 0.8rem 1.5rem;
-  background: ${props => props.$outline ? 'transparent' : '#1E6F5C'};
-  color: ${props => props.$outline ? '#C9A24D' : '#fff'};
-  border: ${props => props.$outline ? '2px solid #C9A24D' : 'none'};
+  background: ${props => props.$outline ? 'transparent' : '#5a3078'};
+  color: ${props => props.$outline ? '#5a3078' : '#fff'};
+  border: ${props => props.$outline ? '2px solid #5a3078' : 'none'};
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -633,8 +656,8 @@ const LightboxClose = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.2);
-    border-color: rgba(212, 175, 55, 0.5);
+    background: rgba(193, 128, 210, 0.2);
+    border-color: rgba(193, 128, 210, 0.5);
   }
 `;
 
@@ -675,6 +698,7 @@ const Events = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [bookingId, setBookingId] = useState('');
+  const [loadedImages, setLoadedImages] = useState({});
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -862,7 +886,13 @@ const Events = () => {
               $large={venue.large}
               onClick={() => setLightboxImage(getRoomImage(venue.img))}
             >
-              <VenueImg src={getRoomImage(venue.img)} alt={venue.title} />
+              {!loadedImages[index] && <ImgSpinner />}
+              <VenueImg
+                src={getRoomImage(venue.img)}
+                alt={venue.title}
+                $loaded={!!loadedImages[index]}
+                onLoad={() => setLoadedImages(prev => ({ ...prev, [index]: true }))}
+              />
               <VenueCaption>
                 <VenueTitle>{venue.title}</VenueTitle>
                 <VenueCapacity>{venue.capacity}</VenueCapacity>
@@ -934,7 +964,7 @@ const Events = () => {
 
                     <DetailRow>
                       <span>Booking ID</span>
-                      <span style={{ color: '#d4af37' }}>{bookingId}</span>
+                      <span style={{ color: '#5a3078' }}>{bookingId}</span>
                     </DetailRow>
                     <DetailRow>
                       <span>Full Name</span>

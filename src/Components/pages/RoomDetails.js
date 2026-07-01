@@ -23,7 +23,7 @@ const formatImageUrl = (url) => {
 /* ================= STYLED COMPONENTS ================= */
 
 const PageWrapper = styled.div`
-  background: #d0d0d0;
+  background: #F3EEF1;
   min-height: 100vh;
   padding-top: 90px;
 `;
@@ -43,20 +43,20 @@ const BackButton = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
   font-size: 0.95rem;
   margin-bottom: 2rem;
   padding: 0.8rem 1.5rem;
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #5a3078;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50px;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.1);
-    border-color: rgba(212, 175, 55, 0.3);
-    color: #d4af37;
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #5a3078;
   }
 `;
 
@@ -152,11 +152,10 @@ const ContentGrid = styled.div`
 `;
 
 const RoomInfo = styled.div`
-  background: #0F1E2E;
+  background: #5a3078;
   padding: 2.5rem;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 40px rgba(193, 128, 210, 0.15);
   height: fit-content;
 
   @media (max-width: 768px) {
@@ -167,10 +166,10 @@ const RoomInfo = styled.div`
 const RoomBadge = styled.span`
   display: inline-block;
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #d4af37, #b8860b);
-  color: #0f0f1a;
+  background: #ffffff;
+  color: #5a3078;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
   border-radius: 50px;
@@ -198,10 +197,10 @@ const RatingBadge = styled.div`
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 1rem;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  color: #d4af37;
+  color: #ffffff;
   font-weight: 600;
 `;
 
@@ -231,12 +230,12 @@ const SpecItem = styled.div`
 const SpecIcon = styled.div`
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d4af37;
+  color: #ffffff;
   font-size: 1.2rem;
 `;
 
@@ -269,7 +268,7 @@ const SectionTitle = styled.h2`
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(to right, rgba(212, 175, 55, 0.3), transparent);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.3), transparent);
   }
 `;
 
@@ -301,13 +300,13 @@ const AmenityItem = styled.div`
   transition: all 0.3s ease;
 
   svg {
-    color: #d4af37;
+    color: #ffffff;
     font-size: 1.1rem;
   }
 
   &:hover {
-    background: rgba(212, 175, 55, 0.05);
-    border-color: rgba(212, 175, 55, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
   }
 `;
 
@@ -316,9 +315,8 @@ const BookingCard = styled.div`
   position: sticky;
   top: 110px;
   padding: 2rem;
-  background: #0F1E2E;
+  background: #5a3078;
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   height: fit-content;
 `;
@@ -339,13 +337,13 @@ const PriceLabel = styled.div`
 const PriceAmount = styled.div`
   font-size: 2.5rem;
   font-weight: 700;
-  color: #d4af37;
+  color: #ffffff;
   font-family: 'Playfair Display', Georgia, serif;
 
   span {
     font-size: 1rem;
     font-weight: 400;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.85);
   }
 `;
 
@@ -375,7 +373,7 @@ const FormInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: rgba(212, 175, 55, 0.5);
+    border-color: #5a3078;
   }
 
   &::placeholder {
@@ -395,11 +393,11 @@ const FormSelect = styled.select`
 
   &:focus {
     outline: none;
-    border-color: rgba(212, 175, 55, 0.5);
+    border-color: #5a3078;
   }
 
   option {
-    background: #1a1a2e;
+    background: #431d59;
     color: #fff;
   }
 `;
@@ -407,8 +405,8 @@ const FormSelect = styled.select`
 const BookButton = styled(motion.button)`
   width: 100%;
   padding: 1.2rem;
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #5a3078;
   border: none;
   border-radius: 50px;
   font-size: 1rem;
@@ -416,17 +414,12 @@ const BookButton = styled(motion.button)`
   letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 10px 40px rgba(212, 175, 55, 0.3);
-  transition: all 0.3s ease;
-  margin-bottom: 1rem;
-
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   margin-bottom: 1rem;
 
   &:hover {
     transform: translateY(-2px);
-    background: #165e4d;
-    box-shadow: 0 15px 50px rgba(30, 111, 92, 0.4);
   }
 `;
 
@@ -451,7 +444,7 @@ const FeatureItem = styled.div`
   margin-bottom: 0.8rem;
 
   svg {
-    color: #d4af37;
+    color: #ffffff;
   }
 `;
 
@@ -502,8 +495,8 @@ const LightboxNav = styled.button`
   ${props => props.$left ? 'left: -70px;' : 'right: -70px;'}
 
   &:hover {
-    background: rgba(212, 175, 55, 0.2);
-    border-color: rgba(212, 175, 55, 0.5);
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
   }
 
   @media (max-width: 1300px) {
@@ -530,8 +523,8 @@ const LightboxClose = styled.button`
   z-index: 10;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.2);
-    border-color: rgba(212, 175, 55, 0.5);
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
   }
 `;
 
@@ -597,7 +590,7 @@ const RoomDetails = () => {
       <Container>
         <div style={{ color: '#fff', textAlign: 'center', padding: '10rem 5rem' }}>
           <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
-            <FaSnowflake style={{ fontSize: '3rem', color: '#d4af37' }} />
+            <FaSnowflake style={{ fontSize: '3rem', color: '#ffffff' }} />
           </motion.div>
           <h2 style={{ fontFamily: 'Playfair Display', marginTop: '2rem' }}>Loading luxury details...</h2>
         </div>
@@ -646,12 +639,12 @@ const RoomDetails = () => {
             {room.offers?.discount_percent && <RoomBadge>{room.offers.discount_percent}% OFF</RoomBadge>}
             <RoomName>{room.room_type} - {room.room_number}</RoomName>
 
-            <RatingRow>
+            {/* <RatingRow>
               <RatingBadge>
                 <FaStar /> {room.rating}
               </RatingBadge>
               <ReviewCount>{room.reviews} reviews</ReviewCount>
-            </RatingRow>
+            </RatingRow> */}
 
             <SpecsGrid>
               <SpecItem>
@@ -676,9 +669,9 @@ const RoomDetails = () => {
                 </SpecDetails>
               </SpecItem>
             </SpecsGrid>
-
+{/* 
             <SectionTitle>About This Room</SectionTitle>
-            <Description>{room.about || 'A luxurious room designed for your comfort.'}</Description>
+            <Description>{room.about || 'A luxurious room designed for your comfort.'}</Description> */}
 
             <SectionTitle>Amenities</SectionTitle>
             <AmenitiesGrid>
@@ -699,9 +692,9 @@ const RoomDetails = () => {
               </PriceAmount>
             </PriceSection>
 
-            <div style={{ margin: '2rem 0', padding: '1.5rem', background: 'rgba(212, 175, 55, 0.05)', borderRadius: '16px', border: '1px solid rgba(212, 175, 55, 0.1)' }}>
-              <div style={{ fontSize: '0.9rem', color: '#d4af37', fontWeight: '600', marginBottom: '0.5rem' }}>Select your dates & guests</div>
-              <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>Complete your reservation details on the next page.</div>
+            <div style={{ margin: '2rem 0', padding: '1.5rem', background: 'rgba(255, 255, 255, 0.15)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
+              <div style={{ fontSize: '0.9rem', color: '#ffffff', fontWeight: '600', marginBottom: '0.5rem' }}>Select your dates & guests</div>
+              <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>Complete your reservation details on the next page.</div>
             </div>
 
             <BookButton

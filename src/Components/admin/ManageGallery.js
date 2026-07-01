@@ -17,18 +17,18 @@ const formatImageUrl = (url) => {
 };
 
 const Container = styled.div`
-  background: #0F1E2E;
+  background: #5a3078;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(193, 128, 210, 0.15);
 `;
 
 const TableWrapper = styled.div`
   overflow-x: auto;
   width: 100%;
   &::-webkit-scrollbar { height: 6px; }
-  &::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.2); border-radius: 3px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
 `;
 
 const Controls = styled.div`
@@ -39,9 +39,9 @@ const Controls = styled.div`
 
 const ActionButton = styled(motion.button)`
   padding: 0.8rem 1.5rem;
-  background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.1)' : '#1E6F5C'};
-  color: ${props => props.$variant === 'danger' ? '#ff4d4d' : '#ffffff'};
-  border: ${props => props.$variant === 'danger' ? '1px solid rgba(255, 77, 77, 0.2)' : 'none'};
+  background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.15)' : '#ffffff'};
+  color: ${props => props.$variant === 'danger' ? '#ff4d4d' : '#431d59'};
+  border: ${props => props.$variant === 'danger' ? '1px solid rgba(255, 77, 77, 0.3)' : 'none'};
   border-radius: 12px;
   font-weight: 600;
   display: flex;
@@ -58,11 +58,11 @@ const RoomsTable = styled.table`
 
   th, td {
     padding: 1.2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   th {
-    background: #15202b; // Slightly lighter/different blue for header
+    background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     font-weight: 600;
     font-size: 0.9rem;
@@ -71,14 +71,14 @@ const RoomsTable = styled.table`
   }
 
   tr:hover {
-    background: rgba(212, 175, 55, 0.05);
+    background: rgba(255, 255, 255, 0.05);
   }
 `;
 
 const ModalOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
@@ -88,14 +88,15 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #161625;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #431d59;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 32px;
   width: 100%;
   max-width: 600px;
   padding: 3rem;
   max-height: 90vh;
   overflow-y: auto;
+  color: #ffffff;
 `;
 
 const Form = styled.form`
@@ -112,21 +113,21 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
 `;
 
 const Input = styled.input`
   padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   color: #fff;
   font-size: 0.95rem;
 
-  &:focus { outline: none; border-color: #d4af37; }
+  &:focus { outline: none; border-color: #ffffff; }
 
   option {
-    background-color: #1a1a2e;
+    background-color: #431d59;
     color: #fff;
   }
 `;
@@ -295,7 +296,7 @@ const ManageGallery = () => {
     return (
         <Container>
             <Controls style={{ gap: '1rem' }}>
-                <ActionButton onClick={() => setIsCategoryModalOpen(true)} style={{ background: '#C9A24D' }}>
+                <ActionButton onClick={() => setIsCategoryModalOpen(true)} style={{ background: '#ffffff', color: '#431d59' }}>
                     Manage Categories
                 </ActionButton>
                 <ActionButton whileHover={{ scale: 1.05 }} onClick={() => handleOpenModal()}>
@@ -328,8 +329,8 @@ const ManageGallery = () => {
                                                 style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
                                             />
                                         ) : (
-                                            <div style={{ width: '80px', height: '60px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <FaImage style={{ opacity: 0.3 }} />
+                                            <div style={{ width: '80px', height: '60px', background: 'rgba(255,255,255,0.15)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <FaImage style={{ opacity: 0.5 }} />
                                             </div>
                                         )}
                                     </td>
@@ -338,7 +339,7 @@ const ManageGallery = () => {
                                     <td>{item.order}</td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '1rem' }}>
-                                            <button onClick={() => handleOpenModal(item)} style={{ background: 'none', border: 'none', color: '#d4af37', cursor: 'pointer' }}><FaEdit /></button>
+                                            <button onClick={() => handleOpenModal(item)} style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer' }}><FaEdit /></button>
                                             <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer' }}><FaTrash /></button>
                                         </div>
                                     </td>
@@ -362,7 +363,7 @@ const ManageGallery = () => {
                             <div style={{ marginBottom: '2rem', maxHeight: '300px', overflowY: 'auto' }}>
                                 <ul style={{ listStyle: 'none', padding: 0 }}>
                                     {categories.map(cat => (
-                                        <li key={cat.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                        <li key={cat.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
                                             <span>{cat.name}</span>
                                             <button onClick={() => handleDeleteCategory(cat.id)} style={{ color: '#ff4d4d', background: 'none', border: 'none', cursor: 'pointer' }}><FaTrash /></button>
                                         </li>
@@ -422,14 +423,15 @@ const ManageGallery = () => {
                                         )}
                                         <label style={{
                                             padding: '1rem',
-                                            background: 'rgba(255,255,255,0.05)',
+                                            background: 'rgba(255,255,255,0.15)',
                                             borderRadius: '12px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             gap: '0.5rem',
                                             cursor: uploading ? 'not-allowed' : 'pointer',
-                                            border: '1px dashed rgba(255,255,255,0.2)'
+                                            border: '1px dashed rgba(255,255,255,0.3)',
+                                            color: 'rgba(255,255,255,0.85)'
                                         }}>
                                             {uploading ? <FaSpinner className="fa-spin" /> : <FaUpload />}
                                             {uploading ? 'Uploading...' : 'Upload Image'}

@@ -38,7 +38,7 @@ const FullPageOverlay = styled(motion.div)`
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  background: #5a3078;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,7 +51,7 @@ const LoaderLogo = styled.div`
   font-weight: 700;
   font-family: 'Playfair Display', Georgia, serif;
   letter-spacing: 2px;
-  background: linear-gradient(135deg, #fff 0%, #d4af37 25%, #fff 50%, #d4af37 75%, #fff 100%);
+  background: linear-gradient(135deg, #fff 0%, #fff 25%, #fff 50%, #fff 75%, #fff 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -61,7 +61,7 @@ const LoaderLogo = styled.div`
 `;
 
 const LogoAccent = styled.span`
-  -webkit-text-fill-color: #d4af37;
+  -webkit-text-fill-color: #ffffff;
 `;
 
 /* --- Spinner Loader --- */
@@ -77,7 +77,7 @@ const SpinnerRing = styled.div`
   height: 100%;
   border-radius: 50%;
   border: 3px solid transparent;
-  border-top-color: #d4af37;
+  border-top-color: #ffffff;
   animation: ${rotate} 1s linear infinite;
 
   &::before,
@@ -93,7 +93,7 @@ const SpinnerRing = styled.div`
     left: 5px;
     right: 5px;
     bottom: 5px;
-    border-top-color: rgba(212, 175, 55, 0.5);
+    border-top-color: rgba(255, 255, 255, 0.5);
     animation: ${rotate} 2s linear infinite reverse;
   }
 
@@ -102,7 +102,7 @@ const SpinnerRing = styled.div`
     left: 12px;
     right: 12px;
     bottom: 12px;
-    border-top-color: rgba(212, 175, 55, 0.3);
+    border-top-color: rgba(255, 255, 255, 0.3);
     animation: ${rotate} 1.5s linear infinite;
   }
 `;
@@ -118,7 +118,7 @@ const DotsContainer = styled.div`
 const Dot = styled.div`
   width: ${props => props.$size || 12}px;
   height: ${props => props.$size || 12}px;
-  background: linear-gradient(135deg, #d4af37, #b8860b);
+  background: #ffffff;
   border-radius: 50%;
   animation: ${bounce} 1.4s ease-in-out infinite both;
   animation-delay: ${props => props.$delay || 0}s;
@@ -135,7 +135,7 @@ const WaveContainer = styled.div`
 const WaveBar = styled.div`
   width: 6px;
   height: ${props => props.$height || 20}px;
-  background: linear-gradient(to top, #d4af37, #f5d76e);
+  background: #ffffff;
   border-radius: 3px;
   animation: ${wave} 1s ease-in-out infinite;
   animation-delay: ${props => props.$delay || 0}s;
@@ -183,8 +183,8 @@ const InlineContainer = styled.div`
 const MiniSpinner = styled.div`
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(212, 175, 55, 0.2);
-  border-top-color: #d4af37;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: ${rotate} 0.8s linear infinite;
 `;
@@ -210,7 +210,7 @@ const ProgressContainer = styled.div`
 
 const ProgressBar = styled(motion.div)`
   height: 100%;
-  background: linear-gradient(90deg, #d4af37, #f5d76e);
+  background: #ffffff;
   border-radius: 2px;
 `;
 
@@ -302,6 +302,41 @@ export const ProgressLoader = ({ progress = 0 }) => (
             transition={{ duration: 0.3 }}
         />
     </ProgressContainer>
+);
+
+// PageSpinner - branded centered spinner for page-level loading states
+const PageSpinnerWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  gap: 1.5rem;
+`;
+
+const PageSpinnerRing = styled.div`
+  width: 56px;
+  height: 56px;
+  border: 4px solid rgba(90, 48, 120, 0.15);
+  border-top-color: #5a3078;
+  border-radius: 50%;
+  animation: ${rotate} 0.9s linear infinite;
+`;
+
+const PageSpinnerText = styled.p`
+  color: #5a3078;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.8;
+`;
+
+export const PageSpinner = ({ text = 'Loading...' }) => (
+    <PageSpinnerWrap>
+        <PageSpinnerRing />
+        <PageSpinnerText>{text}</PageSpinnerText>
+    </PageSpinnerWrap>
 );
 
 // Default export - the most common loader

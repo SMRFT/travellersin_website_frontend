@@ -6,7 +6,7 @@ import { trackBooking, cancelBooking, initiateBookingPayment, verifyPayment } fr
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const PageWrapper = styled.div`
-  background: #FAFAFA;
+  background: #F3EEF1;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
   display: flex;
@@ -15,13 +15,12 @@ const PageWrapper = styled.div`
 `;
 
 const TrackingCard = styled(motion.div)`
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #5a3078;
   border-radius: 32px;
   width: 100%;
   max-width: 600px;
   padding: 3rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
 
   @media (max-width: 600px) {
     padding: 2rem;
@@ -37,7 +36,7 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  color: rgba(255, 255, 255, 0.7);
+  color: #ffffff;
   text-align: center;
   margin-bottom: 2.5rem;
 `;
@@ -55,15 +54,15 @@ const FormGroup = styled.div`
 `;
 
 const Label = styled.label`
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 0.9rem;
   font-weight: 600;
   margin-left: 0.5rem;
 `;
 
 const Input = styled.input`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   padding: 1rem 1.2rem;
   border-radius: 12px;
   color: #fff;
@@ -72,16 +71,15 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #C9A24D;
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 15px rgba(201, 162, 77, 0.1);
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
   }
 `;
 
 const SubmitButton = styled(motion.button)`
   padding: 1rem;
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #5a3078;
   border: none;
   border-radius: 12px;
   font-weight: 700;
@@ -103,14 +101,14 @@ const DetailItem = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 1rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   
   &:last-child {
     border-bottom: none;
   }
 
   .label {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.9);
     display: flex;
     align-items: center;
     gap: 0.8rem;
@@ -130,35 +128,17 @@ const StatusBadge = styled.span`
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
-  background: ${props => {
-        switch (props.$status) {
-            case 'confirmed': return 'rgba(16, 185, 129, 0.15)';
-            case 'cancelled': return 'rgba(239, 68, 68, 0.15)';
-            default: return 'rgba(245, 158, 11, 0.15)';
-        }
-    }};
-  color: ${props => {
-        switch (props.$status) {
-            case 'confirmed': return '#10b981';
-            case 'cancelled': return '#ef4444';
-            default: return '#f59e1b';
-        }
-    }};
-  border: 1px solid ${props => {
-        switch (props.$status) {
-            case 'confirmed': return 'rgba(16, 185, 129, 0.3)';
-            case 'cancelled': return 'rgba(239, 68, 68, 0.3)';
-            default: return 'rgba(245, 158, 11, 0.3)';
-        }
-    }};
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 `;
 
 const ErrorMsg = styled(motion.div)`
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   gap: 0.8rem;
@@ -256,7 +236,7 @@ const TrackBooking = () => {
             }
 
             const options = {
-                key: "rzp_test_YooSlpOnNDsCoN", // Direct Key usage
+                key: process.env.REACT_APP_RAZORPAY_KEY || "rzp_test_YooSlpOnNDsCoN", // Direct Key usage
                 amount: balanceToPay * 100, // Amount in paise
                 currency: "INR",
                 name: "TravellersInn",
@@ -282,7 +262,7 @@ const TrackBooking = () => {
                     email: booking.guest_email,
                     contact: booking.guest_phone,
                 },
-                theme: { color: "#d4af37" },
+                theme: { color: "#5a3078" },
                 modal: {
                     ondismiss: function () {
                         setLoading(false);
@@ -324,7 +304,7 @@ const TrackBooking = () => {
                     <motion.button
                         whileHover={{ x: -2 }}
                         onClick={() => navigate(-1)}
-                        style={{ background: 'none', border: 'none', color: '#C9A24D', cursor: 'pointer', fontSize: '1.2rem' }}
+                        style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', fontSize: '1.2rem' }}
                     >
                         <FaArrowLeft />
                     </motion.button>
@@ -392,7 +372,7 @@ const TrackBooking = () => {
 
                             {booking.booking_status === 'cancelled' && booking.cancellation_reason && (
                                 <ErrorMsg
-                                    style={{ background: 'rgba(239, 68, 68, 0.05)', marginBottom: '2rem' }}
+                                    style={{ background: 'rgba(255, 255, 255, 0.15)', marginBottom: '2rem' }}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                 >
@@ -426,12 +406,12 @@ const TrackBooking = () => {
 
                             {/* Payment & Billing Details */}
                             <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                                <h4 style={{ color: '#C9A24D', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <h4 style={{ color: '#ffffff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <FaFileInvoiceDollar /> Payment Details
                                 </h4>
                                 <DetailItem>
                                     <span className="label">Status</span>
-                                    <span className="value" style={{ textTransform: 'capitalize', color: booking.payment_details?.status === 'paid' ? '#10b981' : '#f59e1b' }}>
+                                    <span className="value" style={{ textTransform: 'capitalize', color: '#ffffff' }}>
                                         {booking.payment_details?.status || 'Unpaid'}
                                     </span>
                                 </DetailItem>
@@ -456,17 +436,17 @@ const TrackBooking = () => {
                             {/* Payment History Table */}
                             {booking.bills && booking.bills.length > 0 && (
                                 <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                                    <h4 style={{ color: '#C9A24D', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <h4 style={{ color: '#ffffff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <FaFileInvoiceDollar /> Payment History
                                     </h4>
                                     <div style={{ overflowX: 'auto' }}>
                                         <table style={{ width: '100%', borderCollapse: 'collapse', color: '#fff', fontSize: '0.9rem' }}>
                                             <thead>
                                                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left' }}>
-                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.5)' }}>Date</th>
-                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.5)' }}>Details</th>
-                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>Amount</th>
-                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>Status</th>
+                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.9)' }}>Date</th>
+                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.9)' }}>Details</th>
+                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.9)', textAlign: 'right' }}>Amount</th>
+                                                    <th style={{ padding: '0.5rem', color: 'rgba(255,255,255,0.9)', textAlign: 'right' }}>Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -489,7 +469,7 @@ const TrackBooking = () => {
                                                         </td>
                                                         <td style={{ padding: '0.5rem', textAlign: 'right' }}>
                                                             <span style={{
-                                                                color: bill.status === 'success' || bill.status === 'captured' ? '#10b981' : '#f59e1b',
+                                                                color: '#ffffff',
                                                                 textTransform: 'capitalize',
                                                                 fontSize: '0.85rem'
                                                             }}>
@@ -511,6 +491,7 @@ const TrackBooking = () => {
                                         whileTap={{ scale: 0.98 }}
                                         onClick={handlePayment}
                                         disabled={loading}
+                                        style={{ background: '#ffffff', color: '#5a3078' }}
                                     >
                                         Pay Balance (₹{getBalance()})
                                     </SubmitButton>
@@ -518,8 +499,8 @@ const TrackBooking = () => {
 
                                 {canCancel() && (
                                     <SubmitButton
-                                        style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)' }}
-                                        whileHover={booking.booking_status === 'cancellation_requested' ? {} : { background: 'rgba(239, 68, 68, 0.2)' }}
+                                        style={{ background: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', border: '1px solid rgba(255, 255, 255, 0.3)' }}
+                                        whileHover={booking.booking_status === 'cancellation_requested' ? {} : { background: 'rgba(255, 255, 255, 0.25)' }}
                                         onClick={handleCancel}
                                         disabled={loading || booking.booking_status === 'cancellation_requested'}
                                     >
@@ -528,7 +509,7 @@ const TrackBooking = () => {
                                 )}
 
                                 <SubmitButton
-                                    style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.1)' }}
+                                    style={{ background: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', border: '1px solid rgba(255, 255, 255, 0.3)' }}
                                     onClick={() => setBooking(null)}
                                 >
                                     Search Another

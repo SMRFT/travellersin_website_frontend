@@ -20,13 +20,13 @@ const DateInput = styled.div`
   gap: 1rem;
   padding: 1rem 1.2rem;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid ${props => props.$isOpen ? 'rgba(212, 175, 55, 0.5)' : 'rgba(255, 255, 255, 0.1)'};
+  border: 1px solid ${props => props.$isOpen ? '#ffffff' : 'rgba(255, 255, 255, 0.1)'};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: rgba(212, 175, 55, 0.3);
+    border-color: #ffffff;
     background: rgba(255, 255, 255, 0.08);
   }
 
@@ -36,7 +36,7 @@ const DateInput = styled.div`
 `;
 
 const CalendarIcon = styled.div`
-  color: #d4af37;
+  color: #ffffff;
   font-size: 1.1rem;
   display: flex;
   align-items: center;
@@ -59,7 +59,7 @@ const ClearButton = styled.button`
   transition: color 0.2s ease;
 
   &:hover {
-    color: #d4af37;
+    color: #ffffff;
   }
 `;
 
@@ -69,10 +69,10 @@ const CalendarDropdown = styled(motion.div)`
   top: calc(100% + 8px);
   left: 0;
   z-index: 1000;
-  background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: #5a3078;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
   overflow: hidden;
   min-width: 320px;
 
@@ -87,8 +87,8 @@ const CalendarHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1.2rem 1rem;
-  background: rgba(212, 175, 55, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 `;
 
 const MonthYearDisplay = styled.div`
@@ -112,9 +112,9 @@ const NavButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.15);
-    border-color: rgba(212, 175, 55, 0.3);
-    color: #d4af37;
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
   }
 
   &:disabled {
@@ -132,7 +132,7 @@ const WeekdaysRow = styled.div`
 
 const Weekday = styled.div`
   text-align: center;
-  color: #d4af37;
+  color: #ffffff;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -165,7 +165,7 @@ const DayCell = styled.button`
       transform: translateX(-50%);
       width: 4px;
       height: 4px;
-      background: #d4af37;
+      background: #ffffff;
       border-radius: 50%;
     }
   `}
@@ -180,12 +180,12 @@ const DayCell = styled.button`
         }
         if (props.$isSelected) {
             return css`
-        background: linear-gradient(135deg, #d4af37, #b8860b);
-        color: #0f0f1a;
+        background: #ffffff;
+        color: #5a3078;
         font-weight: 600;
 
         &::after {
-          background: #0f0f1a;
+          background: #5a3078;
         }
       `;
         }
@@ -196,11 +196,11 @@ const DayCell = styled.button`
       `;
         }
         return css`
-      background: rgba(255, 255, 255, 0.03);
-      color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.85);
 
       &:hover {
-        background: rgba(212, 175, 55, 0.15);
+        background: rgba(255, 255, 255, 0.25);
         color: #fff;
       }
     `;
@@ -225,9 +225,9 @@ const QuickSelectButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.1);
-    border-color: rgba(212, 175, 55, 0.3);
-    color: #d4af37;
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
   }
 `;
 

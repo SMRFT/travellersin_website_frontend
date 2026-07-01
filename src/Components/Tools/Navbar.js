@@ -26,14 +26,14 @@ const Nav = styled(motion.nav)`
   padding: 0 4rem;
   z-index: 1000;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: ${({ $scrolled }) => $scrolled ? '#0F1E2E' : 'rgba(15, 30, 46, 0.85)'};
+  background: #431d59;
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid ${({ $scrolled }) => $scrolled ? 'rgba(201, 162, 77, 0.1)' : 'transparent'};
-  box-shadow: ${({ $scrolled }) => $scrolled ? '0 4px 30px rgba(0, 0, 0, 0.3)' : 'none'};
-  padding: ${({ $scrolled }) => $scrolled ? '0 4rem' : '1.5rem 4rem'};
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  padding: 0 4rem;
 
   @media (max-width: 1024px) {
-    padding: ${({ $scrolled }) => $scrolled ? '0 2rem' : '1.5rem 2rem'};
+    padding: 0 2rem;
   }
 
   @media (max-width: 768px) {
@@ -43,22 +43,39 @@ const Nav = styled(motion.nav)`
 `;
 
 const Logo = styled(Link)`
-  font-size: 1.8rem;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
   text-decoration: none;
   z-index: 1001;
-  font-family: 'Playfair Display', Georgia, serif;
-  letter-spacing: 1px;
-  background: linear-gradient(135deg, #fff 0%, #C9A24D 50%, #fff 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  transition: all 0.3s ease;
+`;
+
+const LogoImage = styled.img`
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: #ffffff;
+  padding: 2px;
+  transition: transform 0.3s ease;
 
   &:hover {
-    animation: ${shimmer} 2s linear infinite;
+    transform: scale(1.05);
   }
+
+  @media (max-width: 768px) {
+    height: 38px;
+  }
+`;
+
+const LogoText = styled.span`
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: 'Playfair Display', Georgia, serif;
+  letter-spacing: 1px;
+  color: #ffffff;
+  transition: all 0.3s ease;
 
   @media (max-width: 768px) {
     font-size: 1.5rem;
@@ -66,8 +83,7 @@ const Logo = styled(Link)`
 `;
 
 const LogoAccent = styled.span`
-  color: #C9A24D;
-  -webkit-text-fill-color: #C9A24D;
+  color: #ffffff;
 `;
 
 /* --- DESKTOP MENU --- */
@@ -97,7 +113,7 @@ const UserMenu = styled.div`
 const LoginBtn = styled(motion.button)`
   background: transparent;
   color: #fff;
-  border: 1px solid rgba(201, 162, 77, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 0.7rem 1.8rem;
   border-radius: 50px;
   cursor: pointer;
@@ -107,8 +123,8 @@ const LoginBtn = styled(motion.button)`
   margin-right: 1rem;
 
   &:hover {
-    background: rgba(201, 162, 77, 0.1);
-    border-color: #C9A24D;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
   }
 `;
 
@@ -116,18 +132,18 @@ const UserAvatar = styled(Link)`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(201, 162, 77, 0.2);
+  background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #C9A24D;
-  border: 1px solid rgba(201, 162, 77, 0.3);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   text-decoration: none;
   transition: all 0.3s ease;
   margin-right: 0.5rem;
 
   &:hover {
-    background: rgba(201, 162, 77, 0.3);
+    background: rgba(255, 255, 255, 0.3);
     transform: scale(1.05);
   }
 `;
@@ -153,7 +169,7 @@ const LinkItem = styled.div`
 `;
 
 const StyledLink = styled(Link)`
-  color: ${({ $isActive }) => $isActive ? '#C9A24D' : 'rgba(255, 255, 255, 0.8)'};
+  color: ${({ $isActive }) => $isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.8)'};
   font-weight: 500;
   text-decoration: none;
   font-size: 0.95rem;
@@ -163,6 +179,7 @@ const StyledLink = styled(Link)`
   letter-spacing: 0.5px;
   position: relative;
   display: inline-block;
+  white-space: nowrap;
 
   &::before {
     content: '';
@@ -172,7 +189,7 @@ const StyledLink = styled(Link)`
     transform: translateX(-50%) scaleX(0);
     width: 20px;
     height: 2px;
-    background: linear-gradient(90deg, #C9A24D, #f5d76e);
+    background: #ffffff;
     border-radius: 2px;
     transition: transform 0.3s ease;
   }
@@ -187,7 +204,7 @@ const StyledLink = styled(Link)`
   }
 
   ${({ $isActive }) => $isActive && css`
-    color: #C9A24D;
+    color: #ffffff;
     
     &::before {
       transform: translateX(-50%) scaleX(1);
@@ -202,22 +219,22 @@ const Underline = styled(motion.div)`
   transform: translateX(-50%);
   width: 20px;
   height: 2px;
-  background: linear-gradient(90deg, #C9A24D, #f5d76e);
+  background: #ffffff;
   border-radius: 2px;
 `;
 
 const BookButton = styled(motion.button)`
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #5a3078;
   padding: 0.85rem 2rem;
-  border: none;
+  border: 2px solid #ffffff;
   border-radius: 50px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  box-shadow: 0 4px 20px rgba(30, 111, 92, 0.3);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   overflow: hidden;
@@ -229,13 +246,14 @@ const BookButton = styled(motion.button)`
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(90, 48, 120, 0.15), transparent);
     transition: left 0.5s ease;
   }
 
   &:hover {
+    background: #f5f0ff;
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(30, 111, 92, 0.4);
+    box-shadow: 0 8px 30px rgba(255, 255, 255, 0.35);
 
     &::before {
       left: 100%;
@@ -264,8 +282,8 @@ const MobileIcon = styled(motion.div)`
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.1);
-    border-color: rgba(212, 175, 55, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
   }
 
   @media (max-width: 768px) {
@@ -291,16 +309,16 @@ const MobileMenuContainer = styled(motion.div)`
   width: 320px;
   max-width: 85%;
   height: 100vh;
-  background: #0F1E2E;
+  background: #431d59;
   display: flex;
   flex-direction: column;
   padding: 100px 2rem 2rem;
   z-index: 999;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
-  border-left: 1px solid rgba(201, 162, 77, 0.1);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(201, 162, 77, 0.3) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -311,7 +329,7 @@ const MobileMenuContainer = styled(motion.div)`
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(201, 162, 77, 0.3);
+    background-color: rgba(255, 255, 255, 0.3);
     border-radius: 20px;
   }
 `;
@@ -339,7 +357,7 @@ const MobileNavLinks = styled.div`
 const MobileLink = styled(motion(Link))`
   font-size: 1.3rem;
   font-weight: 600;
-  color: ${({ $isActive }) => $isActive ? '#C9A24D' : 'rgba(255, 255, 255, 0.8)'};
+  color: ${({ $isActive }) => $isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.8)'};
   text-decoration: none;
   padding: 1rem 1.5rem;
   border-radius: 12px;
@@ -357,7 +375,7 @@ const MobileLink = styled(motion(Link))`
     top: 0;
     height: 100%;
     width: 3px;
-    background: linear-gradient(180deg, #C9A24D, #f5d76e);
+    background: #ffffff;
     transform: scaleY(0);
     transition: transform 0.3s ease;
   }
@@ -373,7 +391,7 @@ const MobileLink = styled(motion(Link))`
   }
 
   ${({ $isActive }) => $isActive && css`
-    background: rgba(201, 162, 77, 0.1);
+    background: rgba(255, 255, 255, 0.1);
     
     &::before {
       transform: scaleY(1);
@@ -383,7 +401,7 @@ const MobileLink = styled(motion(Link))`
 
 const MobileLinkNumber = styled.span`
   font-size: 0.8rem;
-  color: rgba(201, 162, 77, 0.6);
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 400;
 `;
 
@@ -395,8 +413,8 @@ const MobileMenuFooter = styled.div`
 
 const MobileBookButton = styled(motion.button)`
   width: 100%;
-  background: #1E6F5C;
-  color: #0f0f1a;
+  background: #ffffff;
+  color: #431d59;
   padding: 1.2rem 2rem;
   border: none;
   border-radius: 14px;
@@ -405,11 +423,11 @@ const MobileBookButton = styled(motion.button)`
   font-size: 1rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  box-shadow: 0 4px 20px rgba(30, 111, 92, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   
   &:hover {
-    box-shadow: 0 8px 30px rgba(30, 111, 92, 0.4);
+    transform: translateY(-1px);
   }
 `;
 
@@ -444,7 +462,7 @@ const linkVariants = {
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  // Removed transparency specific state since header is now solid #0F1E2E
+  // Removed transparency specific state since header is now solid #1C0D24
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, toggleLoginModal } = useAuth();
@@ -485,8 +503,7 @@ const Navbar = () => {
     { title: 'Rooms', path: '/rooms' },
     { title: 'Gallery', path: '/gallery' },
     { title: 'Events', path: '/events' },
-    { title: 'Track Stay', path: '/track-booking' },
-    { title: 'Track Event', path: '/trackevent' },
+    { title: 'Track Stay & Event', path: '/track' },
     { title: 'Contact', path: '/contact' }
   ];
 
@@ -499,7 +516,8 @@ const Navbar = () => {
         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
         <Logo to="/" onClick={closeMenu}>
-          Travellers<LogoAccent>Inn</LogoAccent>
+          <LogoImage src="/TRAVELLERSINN_LOGO.jpeg" alt="Travellers Inn Logo" />
+          <LogoText>Travellers<LogoAccent>Inn</LogoAccent></LogoText>
         </Logo>
 
         {/* --- DESKTOP VIEW --- */}

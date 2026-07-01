@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimes, FaPhone, FaLock, FaUser, FaEnvelope } from 'react-icons/fa';
 import { useAuth } from './AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
+import { useNavigate } from 'react-router-dom';
 
 const ModalOverlay = styled(motion.div)`
   position: fixed;
@@ -12,7 +13,6 @@ const ModalOverlay = styled(motion.div)`
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -21,14 +21,14 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContainer = styled(motion.div)`
-  background: #1a1a2e;
+  background: #5a3078;
   width: 100%;
   max-width: 450px;
   border-radius: 24px;
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   overflow: hidden;
   position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 45px rgba(193, 128, 210, 0.15);
 `;
 
 const CloseButton = styled.button`
@@ -49,8 +49,8 @@ const CloseButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.2);
-    color: #d4af37;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
   }
 `;
 
@@ -67,7 +67,7 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.85);
   text-align: center;
   margin-bottom: 2.5rem;
   font-size: 0.9rem;
@@ -88,15 +88,15 @@ const IconWrapper = styled.div`
   left: 1.2rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #d4af37;
+  color: #ffffff;
   font-size: 1rem;
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 1rem 1rem 1rem 3rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   color: #fff;
   font-size: 1rem;
@@ -104,42 +104,41 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
-    background: rgba(255, 255, 255, 0.08);
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
   }
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.6);
   }
 `;
 
 const SubmitButton = styled(motion.button)`
   margin-top: 1rem;
   padding: 1rem;
-  background: #1E6F5C;
+  background: #ffffff;
   border: none;
   border-radius: 12px;
-  color: #ffffff;
+  color: #5a3078;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   letter-spacing: 1px;
-  box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    background: #165e4d;
-    box-shadow: 0 15px 40px rgba(30, 111, 92, 0.4);
+    transform: translateY(-1px);
   }
 `;
 
 const ToggleText = styled.p`
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.75);
   text-align: center;
   margin-top: 2rem;
   font-size: 0.9rem;
 
   span {
-    color: #d4af37;
+    color: #ffffff;
     cursor: pointer;
     font-weight: 600;
     margin-left: 0.5rem;
@@ -161,8 +160,74 @@ const ErrorMessage = styled(motion.div)`
   border: 1px solid rgba(239, 68, 68, 0.2);
 `;
 
+const TabContainer = styled.div`
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 2rem;
+  margin-top: -1rem;
+`;
+
+const Tab = styled.button`
+  flex: 1;
+  padding: 1rem;
+  background: ${props => props.$active ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-bottom: 2px solid ${props => props.$active ? '#ffffff' : 'transparent'};
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+`;
+
+const BookNowContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+`;
+
+const BookNowIcon = styled.div`
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+`;
+
+const BookNowText = styled.p`
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
+  line-height: 1.6;
+`;
+
+const BrandName = styled.h3`
+  color: #ffffff;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #e0e0e0 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+`;
+
 const LoginModal = () => {
   const { isLoginModalOpen, toggleLoginModal, login, signup, googleLogin } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('signin'); // 'signin' or 'booknow'
   const [isLogin, setIsLogin] = useState(true);
   const [phoneInputMode, setPhoneInputMode] = useState(false);
   const [googleToken, setGoogleToken] = useState(null);
@@ -258,6 +323,14 @@ const LoginModal = () => {
           </CloseButton>
 
           <Content>
+            <BrandName>Travellers Inn</BrandName>
+            {!phoneInputMode && (
+              <TabContainer>
+                <Tab $active={activeTab === 'signin'} onClick={() => setActiveTab('signin')}>Sign In</Tab>
+                <Tab $active={activeTab === 'booknow'} onClick={() => setActiveTab('booknow')}>Book Now</Tab>
+              </TabContainer>
+            )}
+
             {phoneInputMode ? (
               <>
                 <Title>Complete Profile</Title>
@@ -294,7 +367,7 @@ const LoginModal = () => {
                   </SubmitButton>
                 </Form>
               </>
-            ) : (
+            ) : activeTab === 'signin' ? (
               <>
                 <Title>{isLogin ? 'Welcome Back' : 'Join Us'}</Title>
                 <Subtitle>
@@ -395,6 +468,26 @@ const LoginModal = () => {
                   </span>
                 </ToggleText>
               </>
+            ) : (
+              <BookNowContent>
+                <BookNowIcon>🏨</BookNowIcon>
+                <Title>Book Your Stay</Title>
+                <BookNowText>
+                  Start your journey today. Experience premium amenities, 
+                  personalized hospitality, and stunning accommodations.
+                </BookNowText>
+                <SubmitButton
+                  style={{ width: '100%' }}
+                  onClick={() => {
+                    toggleLoginModal();
+                    navigate('/quick-booking');
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Book Now
+                </SubmitButton>
+              </BookNowContent>
             )}
           </Content>
         </ModalContainer>

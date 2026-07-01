@@ -31,7 +31,7 @@ const GlobalPrintStyle = createGlobalStyle`
 `;
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  background: #F3EEF1;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
   display: flex;
@@ -49,15 +49,13 @@ const PageWrapper = styled.div`
 `;
 
 const ConfirmationCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #5a3078;
   border-radius: 32px;
   width: 100%;
   max-width: 600px;
   padding: 3rem;
   text-align: center;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
 
   @media print {
     border: none;
@@ -94,11 +92,11 @@ const PrintHeader = styled.div`
     display: block;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #d4af37;
+    border-bottom: 2px solid #5a3078;
     
     h1 {
       font-family: 'Playfair Display', serif;
-      color: #d4af37 !important;
+      color: #5a3078 !important;
       margin: 0;
       font-size: 2.2rem;
     }
@@ -114,12 +112,12 @@ const PrintHeader = styled.div`
     display: block;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #d4af37;
+    border-bottom: 2px solid #5a3078;
     text-align: left;
     
     h1 {
       font-family: 'Playfair Display', serif;
-      color: #d4af37 !important;
+      color: #5a3078 !important;
       margin: 0;
       font-size: 2.2rem;
     }
@@ -133,9 +131,9 @@ const PrintHeader = styled.div`
 
 const SuccessIcon = styled(motion.div)`
   font-size: 5rem;
-  color: #d4af37;
+  color: #ffffff;
   margin-bottom: 2rem;
-  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
 `;
 
 const Title = styled.h2`
@@ -150,7 +148,7 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
   font-size: 1.1rem;
   margin-bottom: 2.5rem;
   @media print {
@@ -159,8 +157,8 @@ const Subtitle = styled.p`
 `;
 
 const BookingDetails = styled.div`
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   padding: 2rem;
   margin-bottom: 2.5rem;
@@ -178,7 +176,7 @@ const DetailLine = styled.div`
   justify-content: space-between;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 
   @media print {
     border-bottom: 1px solid #eee;
@@ -191,7 +189,7 @@ const DetailLine = styled.div`
   }
 
   .label {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -231,48 +229,46 @@ const Button = styled(motion.button)`
   transition: all 0.3s ease;
   
   ${props => props.$primary ? `
-    background: #1E6F5C;
-    color: #ffffff;
+    background: #ffffff;
+    color: #5a3078;
     border: none;
-    box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 
     &:hover {
-      background: #165e4d;
-      box-shadow: 0 15px 40px rgba(30, 111, 92, 0.4);
       transform: translateY(-2px);
     }
   ` : `
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.15);
     color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
   `}
 `;
 
 const HomeLink = styled(Link)`
-  color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
   text-decoration: none;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: color 0.3s ease;
+  transition: opacity 0.3s ease;
 
   &:hover {
-    color: #d4af37;
+    opacity: 0.8;
   }
 `;
 
 const PolicySection = styled.div`
   margin: 1.5rem 0;
   padding: 1.2rem;
-  background: rgba(212, 175, 55, 0.05);
-  border: 1px dashed rgba(212, 175, 55, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
   border-radius: 16px;
   text-align: left;
 
   h4 {
-    color: #d4af37;
+    color: #ffffff;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
     display: flex;
@@ -281,7 +277,7 @@ const PolicySection = styled.div`
   }
 
   p {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 0.8rem;
     line-height: 1.4;
   }
@@ -412,7 +408,7 @@ const Confirmation = () => {
           </DetailLine>
           <DetailLine>
             <span className="label"><FaCalendarAlt /> Status</span>
-            <span className="value" style={{ color: '#10b981' }}>Confirmed</span>
+            <span className="value" style={{ color: '#ffffff' }}>Confirmed</span>
           </DetailLine>
           {location.state?.check_in && (
             <DetailLine>
@@ -424,7 +420,7 @@ const Confirmation = () => {
                   month: 'short',
                   day: 'numeric'
                 })}
-                <span style={{ color: 'rgba(255,255,255,0.4)', marginLeft: '0.5rem' }}>
+                <span style={{ color: 'rgba(255,255,255,0.85)', marginLeft: '0.5rem' }}>
                   ({location.state?.checkInTime || '12:00 PM'})
                 </span>
               </span>
@@ -440,7 +436,7 @@ const Confirmation = () => {
                   month: 'short',
                   day: 'numeric'
                 })}
-                <span style={{ color: 'rgba(255,255,255,0.4)', marginLeft: '0.5rem' }}>
+                <span style={{ color: 'rgba(255,255,255,0.85)', marginLeft: '0.5rem' }}>
                   ({location.state?.checkOutTime || '10:00 AM'})
                 </span>
               </span>

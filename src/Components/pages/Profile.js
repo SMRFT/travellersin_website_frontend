@@ -47,13 +47,11 @@ const ProfileHeader = styled.section`
   align-items: flex-start;
   gap: 2rem;
   padding: 3rem;
-  background: #0F1E2E;
-  backdrop-filter: none;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  background: #5a3078;
   border-radius: 24px;
   flex: 2;
   margin-bottom: 0;
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -71,12 +69,12 @@ const Avatar = styled.div`
   width: 140px;
   height: 140px;
   border-radius: 24px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.1));
+  background: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 3.5rem;
-  color: #d4af37;
+  color: #ffffff;
   position: relative;
   overflow: hidden;
 
@@ -98,10 +96,10 @@ const AvatarEdit = styled.button`
   right: -5px;
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #d4af37, #b8860b);
-  border: 3px solid #0f0f1a;
+  background: #ffffff;
+  border: 3px solid #5a3078;
   border-radius: 10px;
-  color: #0f0f1a;
+  color: #5a3078;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -145,14 +143,10 @@ const Badge = styled.span`
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem 1rem;
-  background: ${props => props.$gold
-    ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05))'
-    : 'rgba(255, 255, 255, 0.05)'};
-  border: 1px solid ${props => props.$gold
-    ? 'rgba(212, 175, 55, 0.3)'
-    : 'rgba(255, 255, 255, 0.1)'};
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 50px;
-  color: ${props => props.$gold ? '#d4af37' : 'rgba(255, 255, 255, 0.7)'};
+  color: #ffffff;
   font-size: 0.8rem;
   font-weight: 500;
 `;
@@ -169,13 +163,9 @@ const ProfileActions = styled.div`
 
 const ActionButton = styled(motion.button)`
   padding: 0.9rem 2rem;
-  background: ${props => props.$primary
-    ? '#1E6F5C'
-    : 'rgba(255, 255, 255, 0.05)'};
-  border: 1px solid ${props => props.$primary
-    ? 'transparent'
-    : 'rgba(255, 255, 255, 0.1)'};
-  color: ${props => props.$primary ? '#ffffff' : 'rgba(255, 255, 255, 0.8)'};
+  background: ${props => props.$primary ? '#ffffff' : 'transparent'};
+  border: 1px solid ${props => props.$primary ? 'transparent' : '#ffffff'};
+  color: ${props => props.$primary ? '#5a3078' : '#ffffff'};
   border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -187,9 +177,6 @@ const ActionButton = styled(motion.button)`
 
   &:hover {
     transform: translateY(-2px);
-    ${props => props.$primary
-    ? 'background: #165e4d; box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);'
-    : 'background: rgba(255, 255, 255, 0.08);'}
   }
 `;
 
@@ -204,14 +191,13 @@ const StatsGrid = styled.div`
 
 const StatCard = styled(motion.div)`
   padding: 1.5rem;
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #5a3078;
   border-radius: 16px;
   text-align: center;
   transition: all 0.3s ease;
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
 
   &:hover {
-    border-color: rgba(212, 175, 55, 0.2);
     transform: translateY(-5px);
   }
 `;
@@ -219,12 +205,12 @@ const StatCard = styled(motion.div)`
 const StatIcon = styled.div`
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d4af37;
+  color: #ffffff;
   font-size: 1.3rem;
   margin: 0 auto 1rem;
 `;
@@ -238,7 +224,7 @@ const StatValue = styled.div`
 `;
 
 const StatLabel = styled.div`
-  color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
   font-size: 0.85rem;
 `;
 
@@ -255,9 +241,8 @@ const ContentGrid = styled.div`
 
 /* --- Sidebar Navigation --- */
 const Sidebar = styled.div`
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  background: #5a3078;
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
   border-radius: 20px;
   padding: 1.5rem;
   height: fit-content;
@@ -270,7 +255,7 @@ const Sidebar = styled.div`
 `;
 
 const SidebarTitle = styled.h3`
-  color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -281,14 +266,10 @@ const SidebarTitle = styled.h3`
 const NavItem = styled.button`
   width: 100%;
   padding: 1rem 1.2rem;
-  background: ${props => props.$active
-    ? 'rgba(212, 175, 55, 0.1)'
-    : 'transparent'};
+  background: ${props => props.$active ? 'rgba(255, 255, 255, 0.15)' : 'transparent'};
   border: none;
   border-radius: 12px;
-  color: ${props => props.$active
-    ? '#d4af37'
-    : 'rgba(255, 255, 255, 0.7)'};
+  color: #ffffff;
   font-size: 0.95rem;
   text-align: left;
   cursor: pointer;
@@ -308,13 +289,13 @@ const NavItem = styled.button`
       transform: translateY(-50%);
       width: 3px;
       height: 60%;
-      background: linear-gradient(180deg, #d4af37, #f5d76e);
+      background: #ffffff;
       border-radius: 3px;
     }
   `}
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
     color: #fff;
   }
 
@@ -324,14 +305,14 @@ const NavItem = styled.button`
 `;
 
 const LogoutButton = styled(NavItem)`
-  color: #ef4444;
+  color: #ffffff;
   margin-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding-top: 1.5rem;
 
   &:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
   }
 `;
 
@@ -343,9 +324,8 @@ const NavLogoutButton = styled(LogoutButton)`
 const MainContent = styled.div``;
 
 const ContentCard = styled(motion.div)`
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  background: #5a3078;
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
   border-radius: 20px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -369,7 +349,7 @@ const CardTitle = styled.h2`
   gap: 0.8rem;
 
   svg {
-    color: #d4af37;
+    color: #ffffff;
   }
 `;
 
@@ -388,7 +368,7 @@ const FormGroup = styled.div``;
 
 const FormLabel = styled.label`
   display: block;
-  color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
   font-size: 0.85rem;
   margin-bottom: 0.5rem;
 `;
@@ -396,8 +376,8 @@ const FormLabel = styled.label`
 const FormInput = styled.input`
   width: 100%;
   padding: 1rem 1.2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   color: #fff;
   font-size: 1rem;
@@ -405,7 +385,8 @@ const FormInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: rgba(212, 175, 55, 0.5);
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
   }
 
   &:disabled {
@@ -425,14 +406,14 @@ const BookingCard = styled.div`
   display: flex;
   gap: 1.5rem;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(212, 175, 55, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 
   @media (max-width: 600px) {
@@ -443,12 +424,12 @@ const BookingCard = styled.div`
 const BookingImage = styled.div`
   width: 120px;
   height: 90px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d4af37;
+  color: #ffffff;
   font-size: 2rem;
   flex-shrink: 0;
 
@@ -472,7 +453,7 @@ const BookingMeta = styled.div`
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
-  color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
   font-size: 0.9rem;
   margin-bottom: 0.8rem;
 
@@ -482,7 +463,7 @@ const BookingMeta = styled.div`
     gap: 0.4rem;
 
     svg {
-      color: #d4af37;
+      color: #ffffff;
     }
   }
 `;
@@ -495,36 +476,9 @@ const BookingStatus = styled.span`
   border-radius: 50px;
   font-size: 0.8rem;
   font-weight: 500;
-
-  ${props => {
-    switch (props.$status) {
-      case 'confirmed':
-        return css`
-          background: rgba(16, 185, 129, 0.1);
-          color: #10b981;
-        `;
-      case 'pending':
-        return css`
-          background: rgba(245, 158, 11, 0.1);
-          color: #f59e0b;
-        `;
-      case 'completed':
-        return css`
-          background: rgba(59, 130, 246, 0.1);
-          color: #3b82f6;
-        `;
-      case 'cancelled':
-        return css`
-          background: rgba(239, 68, 68, 0.1);
-          color: #ef4444;
-        `;
-      default:
-        return css`
-          background: rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.7);
-        `;
-    }
-  }}
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 `;
 
 const BookingActions = styled.div`
@@ -535,18 +489,16 @@ const BookingActions = styled.div`
 
 const SmallButton = styled.button`
   padding: 0.6rem 1.2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: ${props => props.$primary ? '#ffffff' : 'rgba(255, 255, 255, 0.15)'};
+  border: 1px solid ${props => props.$primary ? 'transparent' : 'rgba(255, 255, 255, 0.3)'};
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.7);
+  color: ${props => props.$primary ? '#5a3078' : '#ffffff'};
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.1);
-    border-color: rgba(212, 175, 55, 0.3);
-    color: #d4af37;
+    transform: translateY(-1px);
   }
 `;
 
@@ -554,17 +506,17 @@ const SmallButton = styled.button`
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const EmptyIcon = styled.div`
   font-size: 4rem;
-  color: rgba(212, 175, 55, 0.3);
+  color: #ffffff;
   margin-bottom: 1.5rem;
 `;
 
 const EmptyTitle = styled.h3`
-  color: rgba(255, 255, 255, 0.7);
+  color: #ffffff;
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
 `;
@@ -579,8 +531,8 @@ const EmptyButton = styled(Link)`
   align-items: center;
   gap: 0.5rem;
   padding: 0.9rem 2rem;
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #5a3078;
   text-decoration: none;
   border-radius: 50px;
   font-weight: 600;
@@ -588,8 +540,6 @@ const EmptyButton = styled(Link)`
 
   &:hover {
     transform: translateY(-2px);
-    background: #165e4d;
-    box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
   }
 `;
 
@@ -611,8 +561,7 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #1a1a2e;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #5a3078;
   border-radius: 32px;
   width: 100%;
   max-width: 550px;
@@ -620,13 +569,13 @@ const ModalContent = styled(motion.div)`
   overflow-y: auto;
   position: relative;
   padding: 3rem;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
 
   &::-webkit-scrollbar {
     width: 6px;
   }
   &::-webkit-scrollbar-thumb {
-    background: rgba(212, 175, 55, 0.3);
+    background: rgba(255, 255, 255, 0.3);
     border-radius: 3px;
   }
 `;
@@ -659,7 +608,7 @@ const DetailGroup = styled.div`
 `;
 
 const DetailLabel = styled.h4`
-  color: #d4af37;
+  color: #ffffff;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -672,10 +621,10 @@ const DetailLabel = styled.h4`
 const DetailValue = styled.div`
   color: #fff;
   font-size: 1.1rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.15);
   padding: 1rem 1.2rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 `;
 
 const Profile = () => {
@@ -926,7 +875,7 @@ const Profile = () => {
                           {booking.discount_amount > 0 ? (
                             <>
                               <span style={{ textDecoration: 'line-through', opacity: 0.7, marginRight: '5px' }}>₹{booking.payment_details?.amount}</span>
-                              <span style={{ color: '#10b981' }}>₹{(booking.payment_details?.amount - booking.discount_amount).toLocaleString()}</span>
+                              <span style={{ color: '#ffffff' }}>₹{(booking.payment_details?.amount - booking.discount_amount).toLocaleString()}</span>
                             </>
                           ) : (
                             `₹${booking.payment_details?.amount?.toLocaleString()}`
@@ -947,7 +896,7 @@ const Profile = () => {
                         <SmallButton
                           $primary
                           onClick={() => handlePayNow(booking)}
-                          style={{ background: 'linear-gradient(135deg, #d4af37 0%, #b8860b 100%)', color: '#0f0f1a' }}
+                          style={{ background: '#ffffff', color: '#5a3078' }}
                         >
                           Pay Now
                         </SmallButton>
@@ -955,7 +904,7 @@ const Profile = () => {
                       {canCancel(booking) && (
                         <SmallButton
                           onClick={() => handleCancelBooking(booking.booking_id)}
-                          style={{ color: '#ef4444' }}
+                          style={{ color: '#ffffff', borderColor: 'rgba(255, 255, 255, 0.3)' }}
                         >
                           Cancel
                         </SmallButton>
@@ -1013,14 +962,12 @@ const Profile = () => {
               <div style={{
                 fontSize: '4rem',
                 fontFamily: "'Playfair Display', Georgia, serif",
-                background: 'linear-gradient(135deg, #d4af37, #f5d76e)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: '#ffffff',
                 marginBottom: '0.5rem'
               }}>
                 1,250
               </div>
-              <div style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '2rem' }}>
+              <div style={{ color: '#ffffff', marginBottom: '2rem' }}>
                 Reward Points
               </div>
               <Badge $gold>Gold Member</Badge>
@@ -1173,7 +1120,7 @@ const Profile = () => {
                   <DetailLabel><FaCreditCard /> Payment Information</DetailLabel>
                   <DetailValue>
                     <div>Total Amount: ₹{selectedBooking.payment_details?.amount?.toLocaleString()}</div>
-                    <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.5rem' }}>
+                    <div style={{ fontSize: '0.9rem', color: '#ffffff', marginTop: '0.5rem' }}>
                       Method: {selectedBooking.payment_details?.method?.toUpperCase()} | Status: {selectedBooking.payment_details?.status?.toUpperCase()}
                     </div>
                   </DetailValue>
@@ -1181,8 +1128,8 @@ const Profile = () => {
 
                 {selectedBooking.booking_status === 'cancelled' && selectedBooking.cancellation_reason && (
                   <DetailGroup>
-                    <DetailLabel style={{ color: '#ef4444' }}><FaExclamationTriangle /> Cancellation Reason</DetailLabel>
-                    <DetailValue style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
+                    <DetailLabel style={{ color: '#ffffff' }}><FaExclamationTriangle /> Cancellation Reason</DetailLabel>
+                    <DetailValue style={{ background: 'rgba(255, 255, 255, 0.15)', border: '1px solid rgba(255, 255, 255, 0.3)', color: '#ffffff' }}>
                       {selectedBooking.cancellation_reason}
                     </DetailValue>
                   </DetailGroup>
@@ -1195,7 +1142,7 @@ const Profile = () => {
                     </ActionButton>
                   )}
                   {canCancel(selectedBooking) && (
-                    <ActionButton style={{ flex: 1, color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)' }} onClick={() => { handleCancelBooking(selectedBooking.booking_id); setSelectedBooking(null); }}>
+                    <ActionButton style={{ flex: 1, color: '#ffffff', border: '1px solid rgba(255, 255, 255, 0.3)' }} onClick={() => { handleCancelBooking(selectedBooking.booking_id); setSelectedBooking(null); }}>
                       Cancel Trip
                     </ActionButton>
                   )}

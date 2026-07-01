@@ -6,7 +6,7 @@ import { FaUserPlus, FaUser, FaPhone, FaEnvelope, FaLock, FaArrowLeft } from 're
 import api from '../services/api';
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  background: #F3EEF1;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -15,14 +15,12 @@ const PageWrapper = styled.div`
 `;
 
 const SignupCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #5a3078;
   border-radius: 32px;
   width: 100%;
   max-width: 500px;
   padding: 3rem;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
   position: relative;
 `;
 
@@ -32,7 +30,7 @@ const BackButton = styled(motion.button)`
   left: 2rem;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -41,22 +39,21 @@ const BackButton = styled(motion.button)`
   transition: color 0.3s ease;
 
   &:hover {
-    color: #d4af37;
+    color: #ffffff;
   }
 `;
 
 const IconWrapper = styled.div`
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
-  color: #0f0f1a;
+  color: #ffffff;
   font-size: 2rem;
-  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
 `;
 
 const Title = styled.h2`
@@ -68,7 +65,7 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
   margin-bottom: 2rem;
   font-size: 0.9rem;
   text-align: center;
@@ -87,7 +84,7 @@ const FormGroup = styled.div`
 `;
 
 const Label = styled.label`
-  color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
   font-size: 0.85rem;
   padding-left: 0.5rem;
 `;
@@ -100,15 +97,15 @@ const InputWrapper = styled.div`
   svg {
     position: absolute;
     left: 1.2rem;
-    color: rgba(212, 175, 55, 0.5);
+    color: rgba(255, 255, 255, 0.6);
   }
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 1rem 1rem 1rem 3.2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 16px;
   color: #fff;
   font-size: 0.95rem;
@@ -116,16 +113,16 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
-    background: rgba(255, 255, 255, 0.08);
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
   }
 `;
 
 const SubmitButton = styled(motion.button)`
   margin-top: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0f0f1a;
+  background: #ffffff;
+  color: #5a3078;
   border: none;
   border-radius: 16px;
   font-size: 1rem;
@@ -135,7 +132,7 @@ const SubmitButton = styled(motion.button)`
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 
   &:disabled {
     opacity: 0.7;

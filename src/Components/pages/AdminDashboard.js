@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import {
   FaHotel, FaCalendarCheck, FaCalendarAlt, FaQuestionCircle,
-  FaSignOutAlt, FaTachometerAlt, FaPlus, FaTrash, FaEdit, FaCheck, FaTimes, FaShieldAlt,
+  FaSignOutAlt, FaTachometerAlt, FaPlus, FaTrash, FaEdit, FaCheck, FaTimes,
   FaBars, FaUserShield
 } from 'react-icons/fa';
 import ManageRooms from '../admin/ManageRooms';
@@ -24,7 +24,6 @@ const DashboardWrapper = styled.div`
   display: grid;
   grid-template-columns: 280px 1fr;
   min-height: 100vh;
-  padding-top: 90px; // Clear fixed navbar
   background: #FAFAFA;
   color: #333333;
 
@@ -38,14 +37,14 @@ const DashboardWrapper = styled.div`
 `;
 
 const Sidebar = styled.aside`
-  background: #0F1E2E;
+  background: #5a3078;
   border-right: 1px solid rgba(0, 0, 0, 0.05);
   padding: 3rem 1.5rem;
   display: flex;
   flex-direction: column;
   position: sticky;
-  top: 90px;
-  height: calc(100vh - 90px);
+  top: 0;
+  height: 100vh;
   z-index: 900;
   transition: all 0.3s ease;
 
@@ -53,7 +52,7 @@ const Sidebar = styled.aside`
     position: fixed;
     left: ${props => props.$isOpen ? '0' : '-100%'};
     width: 280px;
-    background: #0F1E2E;
+    background: #5a3078;
   }
 `;
 
@@ -73,7 +72,7 @@ const Hamburger = styled.button`
   display: none;
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  color: #0F1E2E;
+  color: #1C0D24;
   padding: 0.8rem;
   border-radius: 12px;
   cursor: pointer;
@@ -89,25 +88,53 @@ const Hamburger = styled.button`
 const Brand = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 4rem;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
   padding: 0 0.5rem;
-  height: 60px;
 
-  h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: #C9A24D;
+  img {
+    height: 48px;
+    width: 48px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 3px;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    @media (max-width: 1024px) { height: 38px; width: 38px; }
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
     @media (max-width: 1024px) { display: none; }
-    @media (max-width: 768px) { display: block; font-size: 1.2rem; }
+    @media (max-width: 768px) { display: flex; }
+
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.55);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
   }
 
   .mobile-only {
     display: none;
     @media (max-width: 768px) {
       display: block;
-      color: rgba(255, 255, 255, 0.4);
+      margin-left: auto;
+      color: rgba(255, 255, 255, 0.5);
       font-size: 1.2rem;
+      cursor: pointer;
       &:hover { color: #ff4d4d; }
     }
   }
@@ -123,16 +150,16 @@ const NavList = styled.nav`
 const NavItem = styled.button`
   width: 100%;
   padding: 1rem;
-  background: ${props => props.$active ? 'rgba(201, 162, 77, 0.15)' : 'transparent'};
+  background: ${props => props.$active ? 'rgba(255, 255, 255, 0.2)' : 'transparent'};
   border: none;
   border-radius: 12px;
-  color: ${props => props.$active ? '#C9A24D' : 'rgba(255, 255, 255, 0.7)'};
+  color: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.75)'};
   display: flex;
   align-items: center;
   gap: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-weight: 500;
+  font-weight: 600;
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -160,7 +187,7 @@ const LogoutBtn = styled(NavItem)`
 const MainContent = styled.main`
   padding: 3rem;
   overflow-y: auto;
-  height: calc(100vh - 90px);
+  height: 100vh;
 
   @media (max-width: 768px) {
     padding: 1.5rem;
@@ -177,7 +204,7 @@ const Header = styled.div`
   h1 {
     font-family: 'Playfair Display', serif;
     font-size: 2.5rem;
-    color: #0F1E2E;
+    color: #1C0D24;
   }
 `;
 
@@ -186,10 +213,10 @@ const Header = styled.div`
 const QuickStats = ({ stats }) => (
   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
     {[
-      { label: 'Total Bookings', value: stats.totalBookings || '0', icon: <FaCalendarCheck />, color: '#0F1E2E' },
-      { label: 'Live Rooms', value: stats.liveRooms || '0', icon: <FaHotel />, color: '#4d94ff' },
-      { label: 'Pending Queries', value: stats.pendingQueries || '0', icon: <FaQuestionCircle />, color: '#ff4d4d' },
-      { label: 'Active Events', value: stats.activeEvents || '0', icon: <FaCalendarAlt />, color: '#1E6F5C' }
+      { label: 'Total Bookings', value: stats.totalBookings || '0', icon: <FaCalendarCheck />, color: '#ffffff' },
+      { label: 'Live Rooms', value: stats.liveRooms || '0', icon: <FaHotel />, color: '#ffffff' },
+      { label: 'Pending Queries', value: stats.pendingQueries || '0', icon: <FaQuestionCircle />, color: '#ffffff' },
+      { label: 'Active Events', value: stats.activeEvents || '0', icon: <FaCalendarAlt />, color: '#ffffff' }
     ].map((stat, i) => (
       <motion.div
         key={i}
@@ -197,17 +224,17 @@ const QuickStats = ({ stats }) => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: i * 0.1 }}
         style={{
-          background: '#0F1E2E',
+          background: '#5a3078',
           padding: '2rem',
           borderRadius: '24px',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 5px 20px rgba(0,0,0,0.15)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          boxShadow: '0 10px 30px rgba(193, 128, 210, 0.15)',
           textAlign: 'center'
         }}
       >
-        <div style={{ color: '#d4af37', fontSize: '2rem', marginBottom: '1rem' }}>{stat.icon}</div>
+        <div style={{ color: stat.color, fontSize: '2rem', marginBottom: '1rem' }}>{stat.icon}</div>
         <div style={{ fontSize: '2rem', fontWeight: '700', color: '#fff' }}>{stat.value}</div>
-        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginTop: '0.5rem' }}>{stat.label}</div>
+        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.9rem', marginTop: '0.5rem' }}>{stat.label}</div>
       </motion.div>
     ))}
   </div>
@@ -285,11 +312,13 @@ const AdminDashboard = () => {
       <MobileOverlay $isOpen={isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(false)} />
       <Sidebar $isOpen={isMobileMenuOpen}>
         <Brand>
-          <FaShieldAlt style={{ fontSize: '1.8rem', color: '#C9A24D' }} />
-          <h2>Admin Panel</h2>
+          <img src="/TRAVELLERSINN_LOGO.jpeg" alt="Travellers Inn" />
+          <div className="brand-text">
+            <span className="brand-name">TravellersInn</span>
+            <span className="brand-sub">Admin Panel</span>
+          </div>
           <FaTimes
             className="mobile-only"
-            style={{ marginLeft: 'auto', cursor: 'pointer', display: 'none' }}
             onClick={() => setIsMobileMenuOpen(false)}
           />
         </Brand>
