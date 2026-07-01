@@ -4,9 +4,10 @@ import styled, { css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCreditCard, FaMoneyBillWave, FaShieldAlt, FaArrowLeft, FaCheck } from 'react-icons/fa';
 import { createBooking, createRazorpayOrder, verifyPayment, confirmCashBooking } from '../services/bookingService';
+import { differenceInCalendarDays, parseISO } from 'date-fns';
 
 const PageWrapper = styled.div`
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  background: #F3EEF1;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
   display: flex;
@@ -19,12 +20,10 @@ const Container = styled(motion.div)`
 `;
 
 const PaymentCard = styled.div`
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #5a3078;
   border-radius: 24px;
   padding: 2.5rem;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
 `;
 
 const Title = styled.h2`
@@ -38,8 +37,8 @@ const Title = styled.h2`
 `;
 
 const SummaryBox = styled.div`
-  background: rgba(212, 175, 55, 0.05);
-  border: 1px solid rgba(212, 175, 55, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -49,14 +48,14 @@ const SummaryLine = styled.div`
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
 
   &:last-child {
     margin-bottom: 0;
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
     color: #fff;
     font-weight: 700;
     font-size: 1.2rem;
@@ -64,16 +63,23 @@ const SummaryLine = styled.div`
 `;
 
 const MethodGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 2.5rem;
+
+  > div {
+    flex: 1;
+    min-width: 150px;
+    max-width: 300px;
+  }
 `;
 
 const MethodCard = styled.div`
   padding: 1.5rem;
-  background: ${props => props.$active ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.02)'};
-  border: 1px solid ${props => props.$active ? '#d4af37' : 'rgba(255, 255, 255, 0.08)'};
+  background: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.1)'};
+  border: 1px solid ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.2)'};
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -85,11 +91,11 @@ const MethodCard = styled.div`
 
   svg {
     font-size: 2rem;
-    color: ${props => props.$active ? '#d4af37' : 'rgba(255, 255, 255, 0.4)'};
+    color: ${props => props.$active ? '#5a3078' : '#ffffff'};
   }
 
   span {
-    color: ${props => props.$active ? '#fff' : 'rgba(255, 255, 255, 0.5)'};
+    color: ${props => props.$active ? '#5a3078' : '#ffffff'};
     font-weight: 500;
     font-size: 0.9rem;
   }
@@ -102,17 +108,17 @@ const MethodCard = styled.div`
       right: 12px;
       width: 18px;
       height: 18px;
-      background: #d4af37;
+      background: #5a3078;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+      box-shadow: 0 0 10px rgba(193, 128, 210, 0.3);
     }
   `}
 
   &:hover {
-    border-color: ${props => props.$active ? '#d4af37' : 'rgba(212, 175, 55, 0.3)'};
+    border-color: #ffffff;
     transform: translateY(-2px);
   }
 `;
@@ -120,8 +126,8 @@ const MethodCard = styled.div`
 const PayButton = styled(motion.button)`
   width: 100%;
   padding: 1.2rem;
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #5a3078;
   border: none;
   border-radius: 16px;
   font-size: 1.1rem;
@@ -131,12 +137,11 @@ const PayButton = styled(motion.button)`
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  box-shadow: 0 15px 30px rgba(30, 111, 92, 0.3);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   margin-bottom: 1.5rem;
 
   &:hover {
-    background: #165e4d;
-    box-shadow: 0 20px 40px rgba(30, 111, 92, 0.4);
+    /* No color change on hover, keeping it clean white/purple */
   }
 
   &:disabled {
@@ -150,7 +155,7 @@ const SecurityInfo = styled.div`
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.8rem;
 `;
 
@@ -169,9 +174,20 @@ const Payment = () => {
   const navigate = useNavigate();
   const { bookingDetails, roomId, totalAmount } = location.state || {};
 
-  const [method, setMethod] = useState('online');
+  const nights = bookingDetails?.checkIn && bookingDetails?.checkOut
+    ? Math.max(1, differenceInCalendarDays(parseISO(bookingDetails.checkOut), parseISO(bookingDetails.checkIn)))
+    : 1;
+
+  const [method, setMethod] = useState('online'); // Default to online payment since cash is disabled for customer bookings
+  const [paymentOption, setPaymentOption] = useState('full'); // 'full' or 'advance'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const advanceAmount = totalAmount * 0.15;
+  const amountToPay = method === 'online' 
+    ? (paymentOption === 'full' ? totalAmount : advanceAmount)
+    : 0; // cash implies paying 0 upfront
+
 
   useEffect(() => {
     // Load Razorpay Script dynamically
@@ -208,15 +224,15 @@ const Payment = () => {
         },
         id_proof_type: bookingDetails.idProofType,
         id_proof_number: bookingDetails.idProofNumber,
-        id_proof_file: bookingDetails.idProofFile || "uploaded_id_placeholder",
+        id_proof_file: bookingDetails.id_proof_file || "manual_entry",
         extra_addons: bookingDetails.extra_addons || []
       };
 
       if (method === 'online') {
         // 1. Initialize Razorpay Options DIRECTLY (Frontend Approach)
         const options = {
-          key: "rzp_test_YooSlpOnNDsCoN",
-          amount: totalAmount * 100, // Amount in paise
+          key: process.env.REACT_APP_RAZORPAY_KEY || "rzp_test_YooSlpOnNDsCoN",
+          amount: amountToPay * 100, // Amount in paise
           currency: "INR",
           name: "TravellersInn",
           description: `Booking for Room ${roomId}`,
@@ -233,7 +249,8 @@ const Payment = () => {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id || "N/A",
                 razorpay_signature: response.razorpay_signature || "SKIPPED",
-                booking_id: booking.booking_id
+                booking_id: booking.booking_id,
+                amount_paid: amountToPay
               });
 
               navigate('/confirmation', {
@@ -259,7 +276,7 @@ const Payment = () => {
             contact: bookingDetails.phone,
           },
           theme: {
-            color: "#d4af37",
+            color: "#5a3078",
           },
           modal: {
             ondismiss: function () {
@@ -326,7 +343,7 @@ const Payment = () => {
             </SummaryLine>
             <SummaryLine>
               <span>Duration</span>
-              <span>1 Night</span>
+              <span>{nights} Night{nights > 1 ? 's' : ''}</span>
             </SummaryLine>
             <SummaryLine>
               <span>Guests</span>
@@ -336,6 +353,12 @@ const Payment = () => {
               <span>Total Amount</span>
               <span>₹{totalAmount.toLocaleString()}</span>
             </SummaryLine>
+            {method === 'online' && paymentOption === 'advance' && (
+              <SummaryLine style={{ borderTop: 'none', marginTop: 0, paddingTop: 0, fontWeight: 'normal', fontSize: '0.95rem' }}>
+                <span>Advance to Pay Now (15%)</span>
+                <span style={{ color: '#ffffff' }}>₹{amountToPay.toLocaleString()}</span>
+              </SummaryLine>
+            )}
           </SummaryBox>
 
           <MethodGrid>
@@ -345,15 +368,43 @@ const Payment = () => {
             >
               <FaCreditCard />
               <span>Online Payment</span>
-            </MethodCard>
-            <MethodCard
+            </MethodCard> 
+            {/* <MethodCard
               $active={method === 'cash'}
               onClick={() => setMethod('cash')}
             >
               <FaMoneyBillWave />
               <span>Pay at Hotel</span>
-            </MethodCard>
+            </MethodCard> */}
           </MethodGrid>
+
+          {method === 'online' && (
+            <div style={{ marginBottom: '2.5rem', display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+              <MethodCard 
+                $active={paymentOption === 'full'} 
+                onClick={() => setPaymentOption('full')}
+                style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <FaCheck style={{ opacity: paymentOption === 'full' ? 1 : 0 }} />
+                  <span>Pay Full Amount</span>
+                </div>
+                <span style={{ color: '#ffffff', fontWeight: 'bold' }}>₹{totalAmount.toLocaleString()}</span>
+              </MethodCard>
+              
+              <MethodCard 
+                $active={paymentOption === 'advance'} 
+                onClick={() => setPaymentOption('advance')}
+                style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <FaCheck style={{ opacity: paymentOption === 'advance' ? 1 : 0 }} />
+                  <span>Pay 15% Advance</span>
+                </div>
+                <span style={{ color: '#ffffff', fontWeight: 'bold' }}>₹{advanceAmount.toLocaleString()}</span>
+              </MethodCard>
+            </div>
+          )}
 
           <PayButton
             disabled={loading}
@@ -374,7 +425,7 @@ const Payment = () => {
           <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
             <button
               onClick={() => navigate(-1)}
-              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}
+              style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}
             >
               <FaArrowLeft /> Edit Details
             </button>

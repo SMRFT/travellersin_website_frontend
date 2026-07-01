@@ -8,12 +8,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  background: #0F1E2E;
+  background: #5a3078;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 24px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(193, 128, 210, 0.15);
 `;
 
 const Header = styled.div`
@@ -30,8 +30,8 @@ const Grid = styled.div`
 `;
 
 const AdminCard = styled(motion.div)`
-  background: #0f151a;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   padding: 1.5rem;
   position: relative;
@@ -46,8 +46,8 @@ const Badge = styled.span`
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  background: ${props => props.$super ? 'rgba(212, 175, 55, 0.1)' : 'rgba(77, 148, 255, 0.1)'};
-  color: ${props => props.$super ? '#d4af37' : '#4d94ff'};
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 0.3rem;
@@ -58,16 +58,16 @@ const InfoRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.9rem;
 
-  svg { color: #d4af37; font-size: 0.8rem; }
+  svg { color: #ffffff; font-size: 0.8rem; }
 `;
 
 const ActionBtn = styled.button`
-  background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.1)' : 'rgba(212, 175, 55, 0.1)'};
-  color: ${props => props.$variant === 'danger' ? '#ff4d4d' : '#d4af37'};
-  border: 1px solid ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.2)' : 'rgba(212, 175, 55, 0.2)'};
+  background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.15)' : 'rgba(255, 255, 255, 0.2)'};
+  color: ${props => props.$variant === 'danger' ? '#ff4d4d' : '#ffffff'};
+  border: 1px solid ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.3)' : 'rgba(255, 255, 255, 0.3)'};
   padding: 0.6rem;
   border-radius: 10px;
   cursor: pointer;
@@ -80,7 +80,7 @@ const ActionBtn = styled.button`
   font-size: 0.85rem;
 
   &:hover {
-    background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.2)' : 'rgba(212, 175, 55, 0.2)'};
+    background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.25)' : 'rgba(255, 255, 255, 0.3)'};
     transform: translateY(-2px);
   }
 
@@ -93,7 +93,7 @@ const ActionBtn = styled.button`
 const ModalOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -103,13 +103,14 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #11111a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #431d59;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 28px;
   width: 100%;
   max-width: 500px;
   padding: 2.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+  color: #ffffff;
 `;
 
 const FormGroup = styled.div`
@@ -121,12 +122,12 @@ const FormGroup = styled.div`
 
 const Input = styled.input`
   padding: 0.8rem 1.2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   color: #fff;
   transition: all 0.3s;
-  &:focus { border-color: #d4af37; background: rgba(255, 255, 255, 0.08); outline: none; }
+  &:focus { border-color: #ffffff; background: rgba(255, 255, 255, 0.2); outline: none; }
 `;
 
 const CheckboxLabel = styled.label`
@@ -134,7 +135,7 @@ const CheckboxLabel = styled.label`
   align-items: center;
   gap: 0.8rem;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.95);
   font-size: 0.9rem;
   margin: 1rem 0;
 
@@ -144,15 +145,15 @@ const CheckboxLabel = styled.label`
 const SubmitBtn = styled.button`
   width: 100%;
   padding: 1rem;
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #431d59;
   border: none;
   border-radius: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
   margin-top: 1rem;
-  &:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(30, 111, 92, 0.3); }
+  &:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05); }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
 
@@ -212,7 +213,7 @@ const ManageAdmins = () => {
             <Header>
                 <div>
                     <h2 style={{ fontFamily: 'Playfair Display', fontSize: '1.8rem' }}>Admin Accounts</h2>
-                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.9rem' }}>Manage administrative access and permissions</p>
+                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.9rem' }}>Manage administrative access and permissions</p>
                 </div>
                 <SubmitBtn
                     style={{ width: 'auto', padding: '0.8rem 1.5rem', marginTop: 0 }}
@@ -233,12 +234,12 @@ const ManageAdmins = () => {
                         >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ padding: '0.8rem', background: 'rgba(212, 175, 55, 0.1)', borderRadius: '12px' }}>
-                                        <FaUserShield color="#d4af37" size={20} />
+                                    <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '12px' }}>
+                                        <FaUserShield color="#ffffff" size={20} />
                                     </div>
                                     <div>
                                         <h3 style={{ fontSize: '1.1rem', fontWeight: '600' }}>{admin.name}</h3>
-                                        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)' }}>{admin.admin_id}</span>
+                                        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>{admin.admin_id}</span>
                                     </div>
                                 </div>
                                 <Badge $super={admin.is_superadmin}>
@@ -283,7 +284,7 @@ const ManageAdmins = () => {
 
                             <form onSubmit={handleCreateAdmin}>
                                 <FormGroup>
-                                    <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>Full Name</label>
+                                    <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>Full Name</label>
                                     <Input
                                         required
                                         value={formData.name}
@@ -293,7 +294,7 @@ const ManageAdmins = () => {
                                 </FormGroup>
 
                                 <FormGroup>
-                                    <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>Phone Number</label>
+                                    <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>Phone Number</label>
                                     <Input
                                         required
                                         value={formData.phone}
@@ -303,7 +304,7 @@ const ManageAdmins = () => {
                                 </FormGroup>
 
                                 <FormGroup>
-                                    <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>Email (Optional)</label>
+                                    <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>Email (Optional)</label>
                                     <Input
                                         type="email"
                                         value={formData.email}
@@ -313,7 +314,7 @@ const ManageAdmins = () => {
                                 </FormGroup>
 
                                 <FormGroup>
-                                    <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>Secure Password</label>
+                                    <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>Secure Password</label>
                                     <Input
                                         required
                                         type="password"

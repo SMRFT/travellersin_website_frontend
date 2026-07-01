@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimes, FaExpand } from 'react-icons/fa';
-import { getRoomImage } from '../../assets/imageMap';
+import api from '../services/api';
+
+const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
+
+const getImageUrl = (imageId) => {
+  if (!imageId) return '';
+  if (imageId.startsWith('http')) return imageId;
+  const baseUrl = (API_BASE_URL || '').replace(/\/$/, '');
+  const path = imageId.startsWith('/') ? imageId : `/${imageId}`;
+  // Construct standard URL to serve gridfs file if it's just an ID
+  if (!imageId.includes('/')) {
+    return `${baseUrl}/media/gridfs/${imageId}/`;
+  }
+  return `${baseUrl}${path}`;
+};
+
 
 const GalleryContainer = styled.div`
   background: #FAFAFA;
@@ -20,7 +35,7 @@ const Title = styled.h1`
   font-family: 'Playfair Display', serif;
   font-size: clamp(2.5rem, 5vw, 4rem);
   margin-bottom: 1rem;
-  color: #0F1E2E;
+  color: #5a3078;
 `;
 
 const FilterGroup = styled.div`
@@ -32,9 +47,9 @@ const FilterGroup = styled.div`
 `;
 
 const FilterBtn = styled.button`
-  background: ${props => props.$active ? '#C9A24D' : 'transparent'};
-  border: 1px solid ${props => props.$active ? '#C9A24D' : 'rgba(0, 0, 0, 0.1)'};
-  color: ${props => props.$active ? '#fff' : '#0F1E2E'};
+  background: ${props => props.$active ? '#5a3078' : 'transparent'};
+  border: 1px solid ${props => props.$active ? '#5a3078' : 'rgba(0, 0, 0, 0.1)'};
+  color: ${props => props.$active ? '#fff' : '#5a3078'};
   padding: 0.6rem 1.5rem;
   border-radius: 50px;
   cursor: pointer;
@@ -44,8 +59,8 @@ const FilterBtn = styled.button`
   text-transform: uppercase;
 
   &:hover {
-    border-color: #C9A24D;
-    color: #C9A24D;
+    border-color: #5a3078;
+    color: #5a3078;
   }
 `;
 
@@ -82,7 +97,8 @@ const StyledImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.5s ease, opacity 0.3s ease;
+  opacity: ${props => props.$loaded ? 1 : 0};
 
   ${ImageCard}:hover & {
     transform: scale(1.1);
@@ -116,11 +132,13 @@ const LightboxOverlay = styled(motion.div)`
   padding: 2rem;
 `;
 
-const LightboxImage = styled.img`
+const LightboxImage = styled(motion.img)`
   max-width: 90%;
   max-height: 85vh;
   border-radius: 10px;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+  opacity: ${props => props.$loaded ? 1 : 0};
+  transition: opacity 0.3s ease;
 `;
 
 const CloseBtn = styled.button`
@@ -139,32 +157,133 @@ const CloseBtn = styled.button`
   }
 `;
 
+const SpinnerOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  z-index: 1;
+`;
+
+const Spinner = styled.div`
+  width: 40px;
+  height: 40px;
+  border: 3px solid ${props => props.$light ? 'rgba(255, 255, 255, 0.1)' : 'rgba(90, 48, 120, 0.1)'};
+  border-top-color: ${props => props.$light ? '#ffffff' : '#5a3078'};
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+
+const ImageCardItem = ({ img, onSelect }) => {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <ImageCard
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.4 }}
+      onClick={() => onSelect(img)}
+    >
+      {!loaded && (
+        <SpinnerOverlay>
+          <Spinner />
+        </SpinnerOverlay>
+      )}
+      <StyledImage
+        src={getImageUrl(img.image_id)}
+        alt={img.title || img.category_name}
+        $loaded={loaded}
+        onLoad={() => setLoaded(true)}
+      />
+      <HoverInfo>
+        <FaExpand size={24} />
+        <p style={{ marginTop: '0.5rem', fontWeight: 500 }}>{img.title || img.category_name}</p>
+      </HoverInfo>
+    </ImageCard>
+  );
+};
+
+const LightboxView = ({ selectedImage, onClose }) => {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <LightboxOverlay
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <CloseBtn onClick={onClose}>
+        <FaTimes />
+      </CloseBtn>
+      <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {!loaded && (
+          <SpinnerOverlay>
+            <Spinner $light />
+          </SpinnerOverlay>
+        )}
+        <LightboxImage
+          src={getImageUrl(selectedImage.image_id)}
+          alt={selectedImage.title}
+          $loaded={loaded}
+          onLoad={() => setLoaded(true)}
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+        />
+      </div>
+    </LightboxOverlay>
+  );
+};
+
 const Gallery = () => {
   const [filter, setFilter] = useState('All');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState(['All']);
+  const [loading, setLoading] = useState(true);
 
-  const images = [
-    { key: 'exterior_view', category: 'Exterior', title: 'Hotel Exterior' },
-    { key: 'art_view', category: 'Interior', title: 'Artistic Lounge' },
-    { key: 'signage_view', category: 'Exterior', title: 'Welcome Portal' },
-    { key: 'interior_1', category: 'Rooms', title: 'Luxury Double' },
-    { key: 'interior_2', category: 'Rooms', title: 'Deluxe Suite' },
-    { key: 'interior_3', category: 'Rooms', title: 'Classic Comfort' },
-    { key: 'interior_4', category: 'Rooms', title: 'Premium Living' },
-    { key: 'interior_5', category: 'Rooms', title: 'Executive Retreat' },
-    { key: 'venue_grand', category: 'Events', title: 'Grand Hall' },
-    { key: 'venue_setup', category: 'Events', title: 'Event Setup' },
-    { key: 'event_wide', category: 'Events', title: 'Celebration Venue' },
-    { key: 'event_detail', category: 'Events', title: 'Table Setup' },
-    { key: 'dining_view', category: 'Dining', title: 'Signature Restaurant' },
-    { key: 'garden_view', category: 'Exterior', title: 'Lush Gardens' },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [galRes, catRes] = await Promise.all([
+          api.get('gallery/'),
+          api.get('gallery-categories/')
+        ]);
 
-  const categories = ['All', 'Exterior', 'Lobby', 'Rooms', 'Dining', 'Events'];
+        // Sort by order
+        const sorted = galRes.data.sort((a, b) => (a.order || 0) - (b.order || 0));
+        setItems(sorted);
+        setCategories(['All', ...catRes.data.map(c => c.name)]);
+      } catch (err) {
+        console.error("Failed to fetch gallery:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const filteredImages = filter === 'All'
-    ? images
-    : images.filter(img => img.category === filter);
+    ? items
+    : items.filter(img => img.category_name === filter);
+
+  if (loading) {
+    return (
+      <GalleryContainer>
+        <Header>
+          <Title>Loading Our Gallery...</Title>
+        </Header>
+      </GalleryContainer>
+    );
+  }
 
   return (
     <GalleryContainer>
@@ -185,45 +304,22 @@ const Gallery = () => {
 
       <Grid layout>
         <AnimatePresence>
-          {filteredImages.map((img, index) => (
-            <ImageCard
-              key={img.key}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.4 }}
-              onClick={() => setSelectedImage(img)}
-            >
-              <StyledImage src={getRoomImage(img.key)} alt={img.title} />
-              <HoverInfo>
-                <FaExpand size={24} />
-                <p style={{ marginTop: '0.5rem', fontWeight: 500 }}>{img.title}</p>
-              </HoverInfo>
-            </ImageCard>
+          {filteredImages.map((img) => (
+            <ImageCardItem
+              key={img.id}
+              img={img}
+              onSelect={setSelectedImage}
+            />
           ))}
         </AnimatePresence>
       </Grid>
 
       <AnimatePresence>
         {selectedImage && (
-          <LightboxOverlay
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-          >
-            <CloseBtn onClick={() => setSelectedImage(null)}>
-              <FaTimes />
-            </CloseBtn>
-            <LightboxImage
-              src={getRoomImage(selectedImage.key)}
-              alt={selectedImage.title}
-              as={motion.img}
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-            />
-          </LightboxOverlay>
+          <LightboxView
+            selectedImage={selectedImage}
+            onClose={() => setSelectedImage(null)}
+          />
         )}
       </AnimatePresence>
     </GalleryContainer>

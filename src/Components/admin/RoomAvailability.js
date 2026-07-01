@@ -5,10 +5,11 @@ import { FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaUser, FaIdCard, FaClock,
 import api from '../services/api';
 
 const Container = styled.div`
-  background: #0F1E2E;
+  background: #5a3078;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(193, 128, 210, 0.15);
   padding: 2rem;
 `;
 
@@ -25,10 +26,10 @@ const DateInputWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.15);
   padding: 0.8rem 1.5rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 
   input {
     background: transparent;
@@ -50,13 +51,10 @@ const Grid = styled.div`
 `;
 
 const RoomCard = styled(motion.div)`
-  background: #0f151a;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 1.5rem;
-  border: 1px solid ${props =>
-        props.$status === 'available' ? 'rgba(16, 185, 129, 0.2)' :
-            props.$status === 'confirmed' ? 'rgba(239, 68, 68, 0.2)' :
-                'rgba(245, 158, 11, 0.2)'};
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
 
@@ -70,7 +68,8 @@ const RoomCard = styled(motion.div)`
     background: ${props =>
         props.$status === 'available' ? '#10b981' :
             props.$status === 'confirmed' ? '#ef4444' :
-                '#f59e0b'};
+                props.$status === 'inactive' ? '#f59e0b' :
+                    '#ffffff'};
   }
 `;
 
@@ -93,18 +92,20 @@ const StatusBadge = styled.span`
   text-transform: uppercase;
   font-weight: 600;
   background: ${props =>
-        props.$status === 'available' ? 'rgba(16, 185, 129, 0.1)' :
-            props.$status === 'confirmed' ? 'rgba(239, 68, 68, 0.1)' :
-                'rgba(245, 158, 11, 0.1)'};
+        props.$status === 'available' ? 'rgba(16, 185, 129, 0.2)' :
+            props.$status === 'confirmed' ? 'rgba(239, 68, 68, 0.2)' :
+                props.$status === 'inactive' ? 'rgba(245, 158, 11, 0.2)' :
+                    'rgba(255, 255, 255, 0.2)'};
   color: ${props =>
         props.$status === 'available' ? '#10b981' :
             props.$status === 'confirmed' ? '#ef4444' :
-                '#f59e0b'};
+                props.$status === 'inactive' ? '#f59e0b' :
+                    '#ffffff'};
 `;
 
 const BookingInfo = styled.div`
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.95);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -117,17 +118,17 @@ const InfoItem = styled.div`
   
   svg {
     font-size: 0.8rem;
-    color: #d4af37;
+    color: #ffffff;
   }
 `;
 
 const EditButton = styled.button`
   margin-top: 1rem;
   padding: 0.6rem 1rem;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  color: #d4af37;
+  color: #ffffff;
   font-size: 0.8rem;
   cursor: pointer;
   display: flex;
@@ -138,7 +139,7 @@ const EditButton = styled.button`
   width: 100%;
 
   &:hover {
-    background: rgba(212, 175, 55, 0.2);
+    background: rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
   }
 `;
@@ -146,7 +147,7 @@ const EditButton = styled.button`
 const ModalOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
@@ -156,8 +157,8 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #161625;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #431d59;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 32px;
   width: 100%;
   max-width: 450px;
@@ -165,6 +166,7 @@ const ModalContent = styled(motion.div)`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  color: #ffffff;
 `;
 
 const FormField = styled.div`
@@ -175,19 +177,19 @@ const FormField = styled.div`
 
 const Label = styled.label`
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
 `;
 
 const Input = styled.input`
   padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   color: #fff;
   font-size: 0.95rem;
   outline: none;
 
-  &:focus { border-color: #d4af37; }
+  &:focus { border-color: #ffffff; }
 
   &::-webkit-calendar-picker-indicator {
     filter: invert(1);
@@ -197,16 +199,16 @@ const Input = styled.input`
 
 const Select = styled.select`
   padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   color: #fff;
   font-size: 0.95rem;
   outline: none;
   cursor: pointer;
 
-  &:focus { border-color: #d4af37; }
-  option { background: #161625; }
+  &:focus { border-color: #ffffff; }
+  option { background: #431d59; }
 `;
 
 const RoomAvailability = ({ onEditBooking }) => {
@@ -245,11 +247,11 @@ const RoomAvailability = ({ onEditBooking }) => {
     };
 
     const handleEditClick = (booking) => {
-        // Format dates for datetime-local input using UTC to match stored data
+        // Format dates for datetime-local input using local timezone to match stored data
         const formatForInput = (dateStr) => {
             const d = new Date(dateStr);
             const pad = (n) => n.toString().padStart(2, '0');
-            return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
         };
 
         setEditingBooking({
@@ -264,7 +266,6 @@ const RoomAvailability = ({ onEditBooking }) => {
     const handleSaveEdit = async () => {
         setSaveLoading(true);
         try {
-            // Append 'Z' to treat as UTC when saving
             const checkInISO = new Date(editingBooking.check_in).toISOString();
             const checkOutISO = new Date(editingBooking.check_out).toISOString();
 
@@ -288,8 +289,7 @@ const RoomAvailability = ({ onEditBooking }) => {
             month: 'short',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'UTC'
+            minute: '2-digit'
         });
     };
 
@@ -297,7 +297,7 @@ const RoomAvailability = ({ onEditBooking }) => {
         <Container>
             <ControlBar>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <FaCalendarAlt style={{ color: '#d4af37', fontSize: '1.5rem' }} />
+                    <FaCalendarAlt style={{ color: '#ffffff', fontSize: '1.5rem' }} />
                     <h2 style={{ fontSize: '1.5rem' }}>Room Availability</h2>
                 </div>
 
@@ -311,7 +311,7 @@ const RoomAvailability = ({ onEditBooking }) => {
             </ControlBar>
 
             {loading ? (
-                <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,0.4)' }}>
+                <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,0.7)' }}>
                     Loading availability data...
                 </div>
             ) : (
@@ -333,7 +333,7 @@ const RoomAvailability = ({ onEditBooking }) => {
                                     </StatusBadge>
                                 </RoomHeader>
 
-                                <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+                                <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', marginBottom: '1rem' }}>
                                     {room.room_type}
                                 </div>
 
@@ -364,7 +364,7 @@ const RoomAvailability = ({ onEditBooking }) => {
             )}
 
             {!loading && rooms.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,0.4)' }}>
+                <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,0.7)' }}>
                     No rooms found in the system.
                 </div>
             )}
@@ -374,12 +374,12 @@ const RoomAvailability = ({ onEditBooking }) => {
                     <ModalOverlay initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         <ModalContent initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <h2 style={{ fontFamily: 'Playfair Display', color: '#d4af37' }}>Edit Booking</h2>
+                                <h2 style={{ fontFamily: 'Playfair Display', color: '#ffffff' }}>Edit Booking</h2>
                                 <FaTimes style={{ cursor: 'pointer', opacity: 0.5 }} onClick={() => setIsEditModalOpen(false)} />
                             </div>
 
-                            <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
-                                <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)' }}>Booking ID: {editingBooking.booking_id}</div>
+                            <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.15)', borderRadius: '16px' }}>
+                                <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.85)' }}>Booking ID: {editingBooking.booking_id}</div>
                                 <div style={{ fontWeight: '600', marginTop: '0.2rem' }}>{editingBooking.guest_name}</div>
                             </div>
 
@@ -416,7 +416,7 @@ const RoomAvailability = ({ onEditBooking }) => {
                             <EditButton
                                 onClick={handleSaveEdit}
                                 disabled={saveLoading}
-                                style={{ background: 'linear-gradient(135deg, #d4af37 0%, #b8860b 100%)', color: '#0a0a12', fontWeight: '700', marginTop: '1rem' }}
+                                style={{ background: '#ffffff', color: '#431d59', fontWeight: '700', marginTop: '1rem', border: 'none' }}
                             >
                                 {saveLoading ? <FaSpinner className="fa-spin" /> : <><FaSave /> Save Changes</>}
                             </EditButton>

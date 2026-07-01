@@ -6,7 +6,7 @@ import { FaFileInvoiceDollar, FaSearch, FaDownload } from 'react-icons/fa';
 import api from '../services/api';
 
 const Container = styled.div`
-  background: #0F1E2E;
+  background: #1C0D24;
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -24,7 +24,7 @@ const Header = styled.div`
 
 const Title = styled.h2`
   font-family: 'Playfair Display', serif;
-  color: #C9A24D;
+  color: #5a3078;
   margin: 0;
   display: flex;
   align-items: center;
@@ -71,8 +71,8 @@ const StatusBadge = styled.span`
   border-radius: 50px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: rgba(201, 162, 77, 0.15);
-  color: #C9A24D;
+  background: rgba(193, 128, 210, 0.15);
+  color: #5a3078;
   text-transform: capitalize;
 `;
 
@@ -87,7 +87,7 @@ const DateInput = styled.input`
   color-scheme: dark;
 
   &:focus {
-    border-color: #C9A24D;
+    border-color: #5a3078;
   }
 `;
 
@@ -311,7 +311,7 @@ const AccountSummary = () => {
 
             <div style={{ padding: '0 1.5rem 1.5rem', display: 'flex', gap: '2rem', fontSize: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginTop: '1rem' }}>
                 <div style={{ color: '#10b981', fontWeight: 'bold' }}>Total Paid: ₹{stats.totalRevenue.toLocaleString()}</div>
-                <div style={{ color: '#C9A24D' }}>Cash: ₹{stats.cash.toLocaleString()}</div>
+                <div style={{ color: '#5a3078' }}>Cash: ₹{stats.cash.toLocaleString()}</div>
                 <div style={{ color: '#3b82f6' }}>Other: ₹{stats.online.toLocaleString()}</div>
             </div>
 
@@ -333,7 +333,7 @@ const AccountSummary = () => {
                         <tbody>
                             {bills.map(bill => (
                                 <tr key={bill.billing_no}>
-                                    <td style={{ fontFamily: 'monospace', color: '#C9A24D' }}>{bill.billing_no}</td>
+                                    <td style={{ fontFamily: 'monospace', color: '#5a3078' }}>{bill.billing_no}</td>
                                     <td>{new Date(bill.created_date).toLocaleString()}</td>
                                     <td>{bill.booking}</td>
                                     <td style={{ color: '#10b981', fontWeight: 'bold' }}>₹{bill.amount_paid}</td>

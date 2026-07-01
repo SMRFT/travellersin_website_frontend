@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCalendarAlt, FaHotel, FaArrowRight, FaCheckCircle, FaExclamationTriangle, FaUsers, FaBed, FaWifi, FaCoffee, FaPlus, FaClock, FaIdCard } from 'react-icons/fa';
+import { FaCalendarAlt, FaHotel, FaArrowRight, FaCheckCircle, FaExclamationTriangle, FaUsers, FaBed, FaWifi, FaCoffee, FaPlus, FaClock, FaIdCard, FaUpload, FaSpinner } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays, isWithinInterval, parseISO, startOfToday, format } from 'date-fns';
 import { useAuth } from '../auth/AuthContext';
 import { getRooms, checkRoomAvailability, getRoomBookings } from '../services/roomService';
+import api from '../services/api';
 
 const PageWrapper = styled.div`
-  background: #d0d0d0;
+  background: #F3EEF1;
   min-height: 100vh;
   padding: 120px 2rem 4rem;
   display: flex;
@@ -23,14 +24,12 @@ const PageWrapper = styled.div`
 `;
 
 const MultiStepCard = styled(motion.div)`
-  background: #0F1E2E;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #5a3078;
   border-radius: 32px;
   width: 100%;
   max-width: 1000px;
   padding: 3rem;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 50px rgba(193, 128, 210, 0.15);
 
   @media (max-width: 768px) {
     padding: 1.5rem;
@@ -59,10 +58,10 @@ const Step = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${props => props.$active ? '#d4af37' : 'rgba(255, 255, 255, 0.1)'};
-  color: ${props => props.$active ? '#0f0f1a' : 'rgba(255, 255, 255, 0.5)'};
+  background: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.15)'};
+  color: ${props => props.$active ? '#5a3078' : 'rgba(255, 255, 255, 0.8)'};
   font-weight: 700;
-  border: 2px solid ${props => props.$completed ? '#d4af37' : 'transparent'};
+  border: 2px solid ${props => props.$completed ? '#ffffff' : 'transparent'};
   transition: all 0.3s ease;
 `;
 
@@ -72,9 +71,9 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   display: block;
-  color: #d4af37;
+  color: #ffffff;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -92,7 +91,7 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
+    border-color: #ffffff;
     background: rgba(255, 255, 255, 0.08);
   }
 `;
@@ -109,12 +108,12 @@ const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #d4af37;
+    border-color: #ffffff;
     background: rgba(255, 255, 255, 0.08);
   }
 
   option {
-    background: #1a1a2e;
+    background: #5a3078;
     color: #fff;
   }
 `;
@@ -132,14 +131,14 @@ const Grid = styled.div`
 
 const RoomCard = styled(motion.div)`
   padding: 1.5rem;
-  background: ${props => props.$selected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.05)'};
-  border: 1px solid ${props => props.$selected ? '#d4af37' : 'rgba(255, 255, 255, 0.1)'};
+  background: ${props => props.$selected ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)'};
+  border: 1px solid ${props => props.$selected ? '#ffffff' : 'rgba(255, 255, 255, 0.1)'};
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: #d4af37;
+    border-color: #ffffff;
     transform: translateY(-5px);
   }
 `;
@@ -149,17 +148,17 @@ const AddonCard = styled(motion.div)`
   align-items: center;
   gap: 1rem;
   padding: 1.2rem;
-  background: ${props => props.$selected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.05)'};
-  border: 1px solid ${props => props.$selected ? '#d4af37' : 'rgba(255, 255, 255, 0.1)'};
+  background: ${props => props.$selected ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)'};
+  border: 1px solid ${props => props.$selected ? '#ffffff' : 'rgba(255, 255, 255, 0.1)'};
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
 
-  .icon { color: ${props => props.$selected ? '#d4af37' : 'rgba(255, 255, 255, 0.4)'}; font-size: 1.2rem; }
+  .icon { color: ${props => props.$selected ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'}; font-size: 1.2rem; }
   .info {
     flex: 1;
     .name { color: #fff; font-size: 0.95rem; font-weight: 500; }
-    .price { color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; }
+    .price { color: rgba(255, 255, 255, 0.85); font-size: 0.8rem; }
   }
 `;
 
@@ -181,20 +180,18 @@ const Button = styled(motion.button)`
   gap: 0.8rem;
 
   ${props => props.$primary ? `
-    background: #1E6F5C;
-    color: #ffffff;
+    background: #ffffff;
+    color: #5a3078;
     border: none;
-    box-shadow: 0 10px 30px rgba(30, 111, 92, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 
     &:hover {
-      background: #165e4d;
-      box-shadow: 0 15px 40px rgba(30, 111, 92, 0.4);
       transform: translateY(-2px);
     }
   ` : `
     background: transparent;
     color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   `}
 
   &:disabled {
@@ -212,25 +209,25 @@ const DatePickerStyles = styled.div`
   }
   
   .react-datepicker {
-    background-color: #0F1E2E;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #5a3078;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     font-family: inherit;
     color: #fff;
   }
 
   .react-datepicker__header {
-    background-color: #0F1E2E;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #5a3078;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .react-datepicker__current-month, .react-datepicker__day-name {
-    color: #d4af37;
+    color: #ffffff;
   }
 
   .react-datepicker__day {
     color: #fff;
     &:hover {
-      background-color: rgba(212, 175, 55, 0.2);
+      background-color: rgba(255, 255, 255, 0.25);
     }
   }
 
@@ -239,8 +236,8 @@ const DatePickerStyles = styled.div`
   }
 
   .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
-    background-color: #d4af37;
-    color: #0F1E2E;
+    background-color: #ffffff;
+    color: #5a3078;
   }
 `;
 
@@ -255,6 +252,13 @@ const QuickBooking = () => {
     const navigate = useNavigate();
     const { user, openLoginModal } = useAuth();
     const [step, setStep] = useState(1);
+    const [toasts, setToasts] = useState([]);
+
+    const showToast = (message, type = 'success') => {
+        const id = Date.now();
+        setToasts(prev => [...prev, { id, message, type }]);
+        setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
+    };
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
@@ -269,8 +273,11 @@ const QuickBooking = () => {
         guestPhone: '',
         idProofType: 'Aadhar Card',
         idProofNumber: '',
+        idProofFile: '',
         selectedAddons: []
     });
+
+    const [uploading, setUploading] = useState(false);
 
     const [availability, setAvailability] = useState({
         loading: false,
@@ -284,7 +291,8 @@ const QuickBooking = () => {
         const fetchRooms = async () => {
             try {
                 const data = await getRooms();
-                setRooms(data);
+                const activeRooms = data.filter(r => r.status !== 'inactive');
+                setRooms(activeRooms);
             } catch (err) {
                 console.error("Failed to fetch rooms:", err);
             } finally {
@@ -296,78 +304,54 @@ const QuickBooking = () => {
 
     const handleNext = async () => {
         if (step === 1) {
-            // Room Selection Step
-            // Validate at least one room is selected
-            if (formData.selectedRooms.length === 0) {
-                alert("Please select at least one room.");
-                return;
-            }
-
-            setAvailability(prev => ({ ...prev, loading: true }));
-            try {
-                // Fetch bookings for all selected rooms
-                const allBookedDates = new Set();
-
-                await Promise.all(formData.selectedRooms.map(async (roomNum) => {
-                    try {
-                        const bookings = await getRoomBookings(roomNum);
-                        bookings.forEach(booking => {
-                            let currentDate = parseISO(booking.start);
-                            const endDate = parseISO(booking.end);
-                            while (currentDate <= endDate) {
-                                allBookedDates.add(currentDate.toISOString().split('T')[0]);
-                                currentDate = addDays(currentDate, 1);
-                            }
-                        });
-                    } catch (e) {
-                        console.error(`Failed to fetch bookings for room ${roomNum}`, e);
-                    }
-                }));
-
-                setBookedDates(Array.from(allBookedDates).map(d => new Date(d)));
-                setStep(prev => prev + 1);
-            } catch (err) {
-                console.error("Error fetching room bookings:", err);
-                alert("Could not load room availability. Please try again.");
-            } finally {
-                setAvailability(prev => ({ ...prev, loading: false }));
-            }
-
-        } else if (step === 2) {
             // Date Selection Step
             if (!formData.checkIn || !formData.checkOut) {
-                alert("Please select check-in and check-out dates.");
+                showToast("Please select check-in and check-out dates.", "error");
                 return;
             }
 
-            // Verify availability (double check)
             setAvailability(prev => ({ ...prev, loading: true }));
             try {
-                const roomNumbers = formData.selectedRooms.join(',');
+                // Get all room numbers to check availability for all of them
+                const allRoomNumbers = rooms.map(r => r.room_number).join(',');
+                if (!allRoomNumbers) {
+                    showToast("No rooms found.", "error");
+                    setAvailability(prev => ({ ...prev, loading: false }));
+                    return;
+                }
+
                 const res = await checkRoomAvailability(
-                    roomNumbers,
+                    allRoomNumbers,
                     `${formData.checkIn}T${formData.checkInTime}:00Z`,
                     `${formData.checkOut}T${formData.checkOutTime}:00Z`
                 );
 
-                if (!res.is_available) {
-                    alert(`Selected dates are not available for the following rooms: ${res.conflicts.join(', ')}`);
-                    setAvailability({ loading: false, conflicts: res.conflicts || [], checked: true });
-                    return;
-                }
-
+                // Update conflicts in state
                 setAvailability({
                     loading: false,
-                    conflicts: [],
+                    conflicts: res.conflicts || [],
                     checked: true
                 });
-                setStep(prev => prev + 1);
 
+                // Clear any selected rooms that are no longer available under the newly checked dates
+                setFormData(prev => ({
+                    ...prev,
+                    selectedRooms: prev.selectedRooms.filter(roomNum => !(res.conflicts || []).includes(roomNum))
+                }));
+
+                setStep(prev => prev + 1);
             } catch (err) {
                 console.error("Availability check failed:", err);
                 setAvailability(prev => ({ ...prev, loading: false }));
-                alert("Could not verify availability. Please try again.");
+                showToast("Could not verify room availability. Please try again.", "error");
             }
+        } else if (step === 2) {
+            // Room Selection Step
+            if (formData.selectedRooms.length === 0) {
+                showToast("Please select at least one room.", "error");
+                return;
+            }
+            setStep(prev => prev + 1);
         } else {
             setStep(prev => prev + 1);
         }
@@ -414,6 +398,27 @@ const QuickBooking = () => {
         return total + addonsTotal;
     };
 
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const upData = new FormData();
+        upData.append('image', file);
+
+        try {
+            setUploading(true);
+            const response = await api.post('/upload/room-image/', upData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            setFormData(prev => ({ ...prev, idProofFile: response.data.url }));
+            showToast('ID Proof uploaded successfully!');
+        } catch (err) {
+            showToast('Upload failed: ' + (err.response?.data?.error || err.message), 'error');
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -424,6 +429,7 @@ const QuickBooking = () => {
             phone: user ? user.phone : formData.guestPhone,
             customerId: user ? user.customer_id : null,
             room_numbers: formData.selectedRooms,
+            id_proof_file: formData.idProofFile || 'manual_entry',
             extra_addons: formData.selectedAddons.map(id => {
                 const addon = addonsList.find(a => a.id === id);
                 return { id: addon.id, name: addon.name, price: addon.price };
@@ -431,7 +437,7 @@ const QuickBooking = () => {
         };
 
         if (!user && (!formData.guestName || !formData.guestPhone)) {
-            alert("Please fill in your name and phone number to continue.");
+            showToast("Please fill in your name and phone number to continue.", "error");
             return;
         }
 
@@ -467,42 +473,6 @@ const QuickBooking = () => {
                             animate={{ x: 0, opacity: 1 }}
                             exit={{ x: -20, opacity: 0 }}
                         >
-                            <Label>Select Your Rooms</Label>
-                            <Grid>
-                                {rooms.map(room => (
-                                    <RoomCard
-                                        key={room.room_number}
-                                        $selected={formData.selectedRooms.includes(room.room_number)}
-                                        onClick={() => toggleRoom(room.room_number)}
-                                    >
-                                        <div style={{ color: '#d4af37', fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem' }}>
-                                            {room.room_type} - {room.room_number}
-                                        </div>
-                                        <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem' }}>
-                                            ₹{parseFloat(room.price).toLocaleString()} / Night
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>
-                                            <FaUsers /> {room.bed_details?.capacity || 2} Pax
-                                        </div>
-                                    </RoomCard>
-                                ))}
-                            </Grid>
-                            <ButtonGroup>
-                                <div />
-                                <Button $primary onClick={handleNext} disabled={formData.selectedRooms.length === 0 || availability.loading}>
-                                    {availability.loading ? 'Loading Availability...' : 'Select Dates'} <FaArrowRight />
-                                </Button>
-                            </ButtonGroup>
-                        </motion.div>
-                    )}
-
-                    {step === 2 && (
-                        <motion.div
-                            key="step2"
-                            initial={{ x: 20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: -20, opacity: 0 }}
-                        >
                             <Grid>
                                 <FormGroup>
                                     <Label>Check-in Date</Label>
@@ -513,7 +483,6 @@ const QuickBooking = () => {
                                             selectsStart
                                             startDate={formData.checkIn ? new Date(formData.checkIn) : null}
                                             endDate={formData.checkOut ? new Date(formData.checkOut) : null}
-                                            excludeDates={bookedDates}
                                             minDate={startOfToday()}
                                             placeholderText="Select Check-In Date"
                                             customInput={<Input />}
@@ -540,7 +509,6 @@ const QuickBooking = () => {
                                             startDate={formData.checkIn ? new Date(formData.checkIn) : null}
                                             endDate={formData.checkOut ? new Date(formData.checkOut) : null}
                                             minDate={formData.checkIn ? addDays(new Date(formData.checkIn), 1) : startOfToday()}
-                                            excludeDates={bookedDates}
                                             placeholderText="Select Check-Out Date"
                                             customInput={<Input />}
                                             dateFormat="yyyy-MM-dd"
@@ -558,9 +526,66 @@ const QuickBooking = () => {
                                 </FormGroup>
                             </Grid>
                             <ButtonGroup>
-                                <Button onClick={handleBack}>Back</Button>
+                                <div />
                                 <Button $primary onClick={handleNext} disabled={!formData.checkIn || !formData.checkOut || availability.loading}>
-                                    {availability.loading ? 'Verifying...' : 'Add-ons'} <FaArrowRight />
+                                    {availability.loading ? 'Checking Availability...' : 'Select Rooms'} <FaArrowRight />
+                                </Button>
+                            </ButtonGroup>
+                        </motion.div>
+                    )}
+
+                    {step === 2 && (
+                        <motion.div
+                            key="step2"
+                            initial={{ x: 20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: -20, opacity: 0 }}
+                        >
+                            <Label>Select Your Rooms</Label>
+                            <Grid>
+                                {rooms.filter(room => !availability.conflicts.includes(room.room_number)).map(room => (
+                                    <RoomCard
+                                        key={room.room_number}
+                                        $selected={formData.selectedRooms.includes(room.room_number)}
+                                        onClick={() => toggleRoom(room.room_number)}
+                                    >
+                                        <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem' }}>
+                                            {room.room_type} - {room.room_number}
+                                        </div>
+                                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.9rem' }}>
+                                            ₹{parseFloat(room.price).toLocaleString()} / Night
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem' }}>
+                                            <FaUsers /> {room.bed_details?.capacity || 2} Pax
+                                        </div>
+                                    </RoomCard>
+                                ))}
+                            </Grid>
+                            {rooms.filter(room => !availability.conflicts.includes(room.room_number)).length === 0 && (
+                                <div style={{
+                                    textAlign: 'center',
+                                    color: '#ffffff',
+                                    padding: '3rem 1rem',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    borderRadius: '24px',
+                                    border: '1px dashed rgba(255, 255, 255, 0.2)',
+                                    marginBottom: '2rem'
+                                }}>
+                                    <FaExclamationTriangle style={{ fontSize: '3rem', marginBottom: '1rem', color: '#f59e0b' }} />
+                                    <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontFamily: 'Playfair Display' }}>No Rooms Available</h3>
+                                    <p style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                                        All rooms are fully booked for the selected dates. Please go back and choose different dates.
+                                    </p>
+                                </div>
+                            )}
+                            <ButtonGroup>
+                                <Button onClick={handleBack}>Back</Button>
+                                <Button 
+                                    $primary 
+                                    onClick={handleNext} 
+                                    disabled={formData.selectedRooms.length === 0 || rooms.filter(room => !availability.conflicts.includes(room.room_number)).length === 0}
+                                >
+                                    Add-ons <FaArrowRight />
                                 </Button>
                             </ButtonGroup>
                         </motion.div>
@@ -660,8 +685,34 @@ const QuickBooking = () => {
                                 </FormGroup>
                             </Grid>
 
-                            <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(212, 175, 55, 0.05)', borderRadius: '16px' }}>
-                                <div style={{ color: '#d4af37', fontWeight: 600 }}>Final Summary:</div>
+                            <FormGroup>
+                                <Label>Upload ID Proof (Image or PDF)</Label>
+                                <div style={{ position: 'relative' }}>
+                                    <Input
+                                        type="file"
+                                        accept="image/*,application/pdf"
+                                        onChange={handleFileUpload}
+                                        style={{ width: '100%', padding: '0.8rem 1.2rem' }}
+                                    />
+                                    <div style={{
+                                        position: 'absolute',
+                                        right: '1.2rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem'
+                                    }}>
+                                        {uploading ? <FaSpinner className="fa-spin" style={{ color: '#ffffff' }} /> : (formData.idProofFile ? <FaCheckCircle style={{ color: '#ffffff' }} /> : <FaUpload style={{ color: 'rgba(255, 255, 255, 0.6)' }} />)}
+                                    </div>
+                                </div>
+                                {formData.idProofFile && (
+                                    <span style={{ fontSize: '0.75rem', color: '#10b981', marginLeft: '0.5rem' }}>File uploaded successfully!</span>
+                                )}
+                            </FormGroup>
+
+                            <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(255, 255, 255, 0.15)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
+                                <div style={{ color: '#ffffff', fontWeight: 600 }}>Final Summary:</div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.8rem', color: '#fff' }}>
                                     <span>Selected Rooms:</span>
                                     <span>{formData.selectedRooms.join(', ')}</span>
@@ -670,7 +721,7 @@ const QuickBooking = () => {
                                     <span>Nights:</span>
                                     <span>{Math.max(1, Math.ceil((new Date(formData.checkOut) - new Date(formData.checkIn)) / (1000 * 60 * 60 * 24)))}</span>
                                 </div>
-                                <div style={{ color: '#d4af37', fontSize: '1.8rem', fontWeight: 700, marginTop: '1.5rem', textAlign: 'right' }}>
+                                <div style={{ color: '#ffffff', fontSize: '1.8rem', fontWeight: 700, marginTop: '1.5rem', textAlign: 'right' }}>
                                     Total: ₹{calculateTotalPrice().toLocaleString()}
                                 </div>
                             </div>
@@ -685,6 +736,48 @@ const QuickBooking = () => {
                     )}
                 </AnimatePresence>
             </MultiStepCard>
+
+            {/* Toast Notifications */}
+            <div style={{
+                position: 'fixed', bottom: '2rem', right: '2rem',
+                display: 'flex', flexDirection: 'column', gap: '0.75rem',
+                zIndex: 99999, pointerEvents: 'none'
+            }}>
+                {toasts.map(toast => (
+                    <div key={toast.id} style={{
+                        background: toast.type === 'error' ? 'rgba(239, 68, 68, 0.95)' : 'rgba(16, 185, 129, 0.95)',
+                        color: '#fff',
+                        padding: '1rem 1.5rem',
+                        borderRadius: '16px',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        animation: 'slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        pointerEvents: 'auto',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem'
+                    }}>
+                        {toast.type === 'error' ? <FaExclamationTriangle /> : <FaCheckCircle />}
+                        {toast.message}
+                    </div>
+                ))}
+            </div>
+            <style>{`
+                @keyframes slideInRight {
+                    from { transform: translateX(120%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                .fa-spin {
+                    animation: spin 1s linear infinite;
+                }
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </PageWrapper>
     );
 };

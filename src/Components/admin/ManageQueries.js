@@ -5,10 +5,11 @@ import { FaTrash, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import api from '../services/api';
 
 const Container = styled.div`
-  background: #0F1E2E;
+  background: #5a3078;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(193, 128, 210, 0.15);
 `;
 
 const QueryList = styled.div`
@@ -19,8 +20,8 @@ const QueryList = styled.div`
 `;
 
 const QueryCard = styled(motion.div)`
-  background: #0f151a; // Darker card
-  border: 1px solid ${props => props.$resolved ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid ${props => props.$resolved ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.2)'};
   border-radius: 20px;
   padding: 2rem;
   display: flex;
@@ -33,7 +34,7 @@ const Status = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8rem;
-  color: ${props => props.$resolved ? '#10b981' : '#d4af37'};
+  color: ${props => props.$resolved ? '#10b981' : '#ffffff'};
   margin-bottom: 0.5rem;
 `;
 
@@ -80,23 +81,23 @@ const ManageQueries = () => {
 
     return (
         <Container>
-            <div style={{ display: 'flex', gap: '1rem', padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '1rem', padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.15)', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>From:</span>
+                    <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)' }}>From:</span>
                     <input
                         type="date"
                         value={startDate}
                         onChange={e => setStartDate(e.target.value)}
-                        style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px' }}
+                        style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: '8px' }}
                     />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>To:</span>
+                    <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)' }}>To:</span>
                     <input
                         type="date"
                         value={endDate}
                         onChange={e => setEndDate(e.target.value)}
-                        style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px' }}
+                        style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: '8px' }}
                     />
                 </div>
             </div>
@@ -109,21 +110,21 @@ const ManageQueries = () => {
                                 {query.status.toUpperCase()}
                             </Status>
                             <h3 style={{ marginBottom: '0.5rem' }}>{query.name}</h3>
-                            <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+                            <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', marginBottom: '1rem' }}>
                                 {query.email} • {query.phone_number}
                             </div>
-                            <p style={{ color: 'rgba(255,255,255,0.8)', fontStyle: 'italic' }}>"{query.message}"</p>
+                            <p style={{ color: '#ffffff', fontStyle: 'italic' }}>"{query.message}"</p>
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                             <button
                                 onClick={() => handleToggleResolve(query.id, query.status)}
-                                style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: query.status === 'resolved' ? '#10b981' : '#fff', padding: '0.8rem', borderRadius: '12px', cursor: 'pointer' }}
+                                style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: query.status === 'resolved' ? '#10b981' : '#fff', padding: '0.8rem', borderRadius: '12px', cursor: 'pointer' }}
                             >
                                 <FaCheckCircle />
                             </button>
                             <button
                                 onClick={() => handleDelete(query.id)}
-                                style={{ background: 'rgba(255,77,77,0.1)', border: 'none', color: '#ff4d4d', padding: '0.8rem', borderRadius: '12px', cursor: 'pointer' }}
+                                style={{ background: 'rgba(255,77,77,0.15)', border: 'none', color: '#ff4d4d', padding: '0.8rem', borderRadius: '12px', cursor: 'pointer' }}
                             >
                                 <FaTrash />
                             </button>

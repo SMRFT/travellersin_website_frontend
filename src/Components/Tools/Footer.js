@@ -23,19 +23,9 @@ const shimmer = keyframes`
 /* ================= STYLED COMPONENTS ================= */
 
 const FooterWrapper = styled.footer`
-  background: #0F1E2E;
+  background: #431d59;
   position: relative;
   overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #C9A24D, transparent);
-  }
 `;
 
 const FooterTop = styled.div`
@@ -64,30 +54,47 @@ const FooterColumn = styled.div``;
 const BrandSection = styled.div``;
 
 const Logo = styled(Link)`
-  font-size: 2rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
   text-decoration: none;
-  font-family: 'Playfair Display', Georgia, serif;
-  letter-spacing: 1px;
-  background: linear-gradient(135deg, #fff 0%, #C9A24D 50%, #fff 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  display: inline-block;
   margin-bottom: 1.5rem;
+`;
+
+const LogoImage = styled.img`
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: #ffffff;
+  padding: 2px;
+  transition: transform 0.3s ease;
 
   &:hover {
-    animation: ${shimmer} 2s linear infinite;
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    height: 40px;
   }
 `;
 
+const LogoText = styled.span`
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'Playfair Display', Georgia, serif;
+  letter-spacing: 1px;
+  color: #ffffff;
+  transition: all 0.3s ease;
+`;
+
 const LogoAccent = styled.span`
-  -webkit-text-fill-color: #C9A24D;
+  color: #ffffff;
 `;
 
 const BrandDescription = styled.p`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.95);
   line-height: 1.8;
   font-size: 0.95rem;
   margin-bottom: 2rem;
@@ -116,14 +123,14 @@ const SocialIcon = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(201, 162, 77, 0.15);
-    border-color: rgba(201, 162, 77, 0.4);
-    color: #C9A24D;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
     transform: translateY(-3px);
   }
 `;
@@ -144,7 +151,7 @@ const ColumnTitle = styled.h4`
     left: 0;
     width: 30px;
     height: 2px;
-    background: linear-gradient(90deg, #C9A24D, transparent);
+    background: #ffffff;
 
     @media (max-width: 600px) {
       left: 50%;
@@ -163,7 +170,7 @@ const FooterLink = styled.li`
   margin-bottom: 0.8rem;
 
   a {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.9);
     text-decoration: none;
     font-size: 0.95rem;
     transition: all 0.3s ease;
@@ -172,7 +179,7 @@ const FooterLink = styled.li`
     gap: 0.5rem;
 
     &:hover {
-      color: #C9A24D;
+      color: #ffffff;
       transform: translateX(5px);
 
       @media (max-width: 600px) {
@@ -187,7 +194,7 @@ const ContactItem = styled.div`
   align-items: flex-start;
   gap: 1rem;
   margin-bottom: 1.2rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
 
   @media (max-width: 600px) {
@@ -196,7 +203,7 @@ const ContactItem = styled.div`
   }
 
   svg {
-    color: #C9A24D;
+    color: #ffffff;
     font-size: 1rem;
     margin-top: 4px;
     flex-shrink: 0;
@@ -212,7 +219,7 @@ const NewsletterSection = styled.div`
 `;
 
 const NewsletterText = styled.p`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
   margin-bottom: 1rem;
   line-height: 1.6;
@@ -243,26 +250,22 @@ const NewsletterInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: rgba(201, 162, 77, 0.5);
+    border-color: rgba(255, 255, 255, 0.5);
     background: rgba(255, 255, 255, 0.08);
   }
 `;
 
 const NewsletterButton = styled(motion.button)`
   padding: 0.9rem 1.5rem;
-  background: #1E6F5C;
+  background: #ffffff;
   border: none;
   border-radius: 10px;
-  color: #0f0f1a;
+  color: #431d59;
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
-
-  &:hover {
-    box-shadow: 0 5px 20px rgba(30, 111, 92, 0.3);
-  }
 `;
 
 const FooterMiddle = styled.div`
@@ -308,22 +311,22 @@ const AwardBadge = styled.div`
 const AwardIcon = styled.div`
   width: 35px;
   height: 35px;
-  background: linear-gradient(135deg, rgba(201, 162, 77, 0.2), rgba(201, 162, 77, 0.05));
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 1rem;
 `;
 
 const AwardText = styled.div`
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.85rem;
 
   span {
     display: block;
-    color: #C9A24D;
+    color: #ffffff;
     font-weight: 600;
     font-size: 0.9rem;
   }
@@ -356,13 +359,13 @@ const LegalLinks = styled.div`
   gap: 2rem;
 
   a {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
     font-size: 0.85rem;
     transition: color 0.3s ease;
 
     &:hover {
-      color: #C9A24D;
+      color: #ffffff;
     }
   }
 `;
@@ -372,16 +375,16 @@ const BackToTop = styled(motion.button)`
   right: 2rem;
   width: 50px;
   height: 50px;
-  background: #1E6F5C;
+  background: #ffffff;
   border: none;
   border-radius: 12px;
-  color: #0f0f1a;
+  color: #431d59;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 1.2rem;
-  box-shadow: 0 5px 25px rgba(30, 111, 92, 0.3);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
   z-index: 100;
 
   @media (max-width: 768px) {
@@ -403,8 +406,7 @@ const Footer = () => {
     { name: 'Home', path: '/' },
     { name: 'Rooms', path: '/rooms' },
     { name: 'Events', path: '/events' },
-    { name: 'Track Booking', path: '/track-booking' },
-    { name: 'Track Event', path: '/trackevent' },
+    { name: 'Track Stay & Event', path: '/track' },
     { name: 'Contact', path: '/contact' }
   ];
 
@@ -421,7 +423,8 @@ const Footer = () => {
         <FooterColumn>
           <BrandSection>
             <Logo to="/">
-              Travellers<LogoAccent>Inn</LogoAccent>
+              <LogoImage src="/TRAVELLERSINN_LOGO.jpeg" alt="Travellers Inn Logo" />
+              <LogoText>Travellers<LogoAccent>Inn</LogoAccent></LogoText>
             </Logo>
             <BrandDescription>
               A sanctuary of comfort in the heart of Salem. Experience luxury redefined
@@ -504,26 +507,7 @@ Salem, India - 636007
               <span>Salem 2024</span>
             </AwardText>
           </AwardBadge>
-          <AwardBadge>
-            <AwardIcon>✓</AwardIcon>
-            <AwardText>
-              Verified
-              <span>OYO Partner</span>
-            </AwardText>
-          </AwardBadge>
         </Awards>
-        <NewsletterSection>
-          <NewsletterForm onSubmit={(e) => e.preventDefault()}>
-            <NewsletterInput type="email" placeholder="Subscribe to newsletter" />
-            <NewsletterButton
-              type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Subscribe
-            </NewsletterButton>
-          </NewsletterForm>
-        </NewsletterSection>
       </FooterMiddle>
 
       <FooterBottom>

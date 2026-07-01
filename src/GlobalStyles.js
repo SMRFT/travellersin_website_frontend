@@ -11,7 +11,7 @@ export const GlobalStyle = createGlobalStyle`
 
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #d0d0d0;
+    background-color: #F3EEF1;
     color: #333333;
     line-height: 1.6;
   }
@@ -24,10 +24,10 @@ export const GlobalStyle = createGlobalStyle`
 
 export const theme = {
   colors: {
-    primary: '#0F1E2E', // Deep Navy Blue
-    secondary: '#C9A24D', // Warm Gold / Brass
-    accent: '#1E6F5C', // Deep Teal Green
-    background: '#d0d0d0', // Soft Off-White
+    primary: '#5a3078', // Orchid Purple
+    secondary: '#5a3078', // Orchid Purple
+    accent: '#5a3078', // Orchid Purple
+    background: '#F3EEF1', // Soft Off-White
     text: '#333333', // Charcoal Grey
     white: '#ffffff',
     danger: '#ef4444',

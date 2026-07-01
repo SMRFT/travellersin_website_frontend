@@ -16,18 +16,18 @@ const formatImageUrl = (url) => {
 };
 
 const Container = styled.div`
-  background: #0F1E2E;
+  background: #5a3078;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(193, 128, 210, 0.15);
 `;
 
 const TableWrapper = styled.div`
   overflow-x: auto;
   width: 100%;
   &::-webkit-scrollbar { height: 6px; }
-  &::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.2); border-radius: 3px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
 `;
 
 const Controls = styled.div`
@@ -38,9 +38,9 @@ const Controls = styled.div`
 
 const ActionButton = styled(motion.button)`
   padding: 0.8rem 1.5rem;
-  background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.1)' : '#1E6F5C'};
-  color: ${props => props.$variant === 'danger' ? '#ff4d4d' : '#ffffff'};
-  border: ${props => props.$variant === 'danger' ? '1px solid rgba(255, 77, 77, 0.2)' : 'none'};
+  background: ${props => props.$variant === 'danger' ? 'rgba(255, 77, 77, 0.15)' : '#ffffff'};
+  color: ${props => props.$variant === 'danger' ? '#ff4d4d' : '#431d59'};
+  border: ${props => props.$variant === 'danger' ? '1px solid rgba(255, 77, 77, 0.3)' : 'none'};
   border-radius: 12px;
   font-weight: 600;
   display: flex;
@@ -57,11 +57,11 @@ const RoomsTable = styled.table`
 
   th, td {
     padding: 1.2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   th {
-    background: #15202b; // Slightly lighter/different blue for header
+    background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     font-weight: 600;
     font-size: 0.9rem;
@@ -70,14 +70,14 @@ const RoomsTable = styled.table`
   }
 
   tr:hover {
-    background: rgba(212, 175, 55, 0.05);
+    background: rgba(255, 255, 255, 0.05);
   }
 `;
 
 const ModalOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
@@ -87,14 +87,15 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #161625;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #431d59;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 32px;
   width: 100%;
   max-width: 600px;
   padding: 3rem;
   max-height: 90vh;
   overflow-y: auto;
+  color: #ffffff;
 `;
 
 const Form = styled.form`
@@ -113,21 +114,21 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
 `;
 
 const Input = styled.input`
   padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   color: #fff;
   font-size: 0.95rem;
 
-  &:focus { outline: none; border-color: #d4af37; }
+  &:focus { outline: none; border-color: #ffffff; }
 
   option {
-    background-color: #1a1a2e;
+    background-color: #431d59;
     color: #fff;
   }
 `;
@@ -142,7 +143,7 @@ const ManageRooms = () => {
         room_type: 'Deluxe',
         price: '',
         size: '',
-        is_available: true,
+        status: 'active',
         amenities_str: '',
         about: '',
         bed_capacity: 2,
@@ -202,6 +203,7 @@ const ManageRooms = () => {
             setEditingRoom(room);
             setFormData({
                 ...room,
+                status: room.status || 'active',
                 amenities_str: room.amenities?.join(', ') || '',
                 images_str: room.images?.join(', ') || '',
                 bed_capacity: room.bed_details?.capacity || 2,
@@ -214,7 +216,7 @@ const ManageRooms = () => {
                 room_type: 'Deluxe',
                 price: '',
                 size: '',
-                is_available: true,
+                status: 'active',
                 amenities_str: '',
                 about: '',
                 bed_capacity: 2,
@@ -294,8 +296,8 @@ const ManageRooms = () => {
                                     {room.images?.[0] ? (
                                         <img src={formatImageUrl(room.images[0])} alt="Room" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '8px' }} />
                                     ) : (
-                                        <div style={{ width: '60px', height: '40px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <FaImage style={{ opacity: 0.3 }} />
+                                        <div style={{ width: '60px', height: '40px', background: 'rgba(255,255,255,0.15)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <FaImage style={{ opacity: 0.5 }} />
                                         </div>
                                     )}
                                 </td>
@@ -305,13 +307,13 @@ const ManageRooms = () => {
                                 <td>{room.size}</td>
                                 <td>{room.bed_details?.capacity || 2} Adults</td>
                                 <td>
-                                    <span style={{ color: room.is_available ? '#10b981' : '#ff4d4d' }}>
-                                        {room.is_available ? 'Available' : 'Occupied'}
+                                    <span style={{ color: room.status === 'active' ? '#10b981' : '#ff4d4d' }}>
+                                        {room.status === 'inactive' ? 'Inactive' : 'Active'}
                                     </span>
                                 </td>
                                 <td>
                                     <div style={{ display: 'flex', gap: '1rem' }}>
-                                        <button onClick={() => handleOpenModal(room)} style={{ background: 'none', border: 'none', color: '#d4af37', cursor: 'pointer' }}><FaEdit /></button>
+                                        <button onClick={() => handleOpenModal(room)} style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer' }}><FaEdit /></button>
                                         <button onClick={() => handleDelete(room.room_number)} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer' }}><FaTrash /></button>
                                     </div>
                                 </td>
@@ -338,10 +340,10 @@ const ManageRooms = () => {
                                 <FormGroup>
                                     <Label>Room Type</Label>
                                     <Input as="select" value={formData.room_type} onChange={e => setFormData({ ...formData, room_type: e.target.value })}>
-                                        <option value="Standard">Standard</option>
+                                        {/* <option value="Standard">Standard</option> */}
                                         <option value="Classic">Classic</option>
                                         <option value="Deluxe">Deluxe</option>
-                                        <option value="Suite">Suite</option>
+                                        {/* <option value="Suite">Suite</option> */}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
@@ -359,6 +361,13 @@ const ManageRooms = () => {
                                 <FormGroup>
                                     <Label>Bed Type</Label>
                                     <Input type="text" placeholder="King Bed, Twin Bed..." value={formData.bed_type} onChange={e => setFormData({ ...formData, bed_type: e.target.value })} />
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label>Status</Label>
+                                    <Input as="select" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </Input>
                                 </FormGroup>
                                 <FormGroup className="full">
                                     <Label>About Room</Label>
@@ -383,7 +392,7 @@ const ManageRooms = () => {
                                                 </button>
                                             </div>
                                         ))}
-                                        <label style={{ width: '80px', height: '80px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: uploading ? 'not-allowed' : 'pointer', border: '1px dashed rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', gap: '0.3rem' }}>
+                                        <label style={{ width: '80px', height: '80px', background: 'rgba(255,255,255,0.15)', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: uploading ? 'not-allowed' : 'pointer', border: '1px dashed rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.85)', fontSize: '0.7rem', gap: '0.3rem' }}>
                                             {uploading ? <FaSpinner className="fa-spin" /> : <FaUpload />}
                                             {uploading ? 'Uploading...' : 'Upload'}
                                             <input type="file" hidden accept="image/*" onChange={handleFileUpload} disabled={uploading} />

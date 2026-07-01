@@ -29,7 +29,7 @@ const HeroSection = styled.section`
   position: relative;
   padding: 4rem 2rem;
   text-align: center;
-  background: #0F1E2E;
+  background: #5a3078;
 
   @media (max-width: 768px) {
     padding: 3rem 1.5rem;
@@ -38,7 +38,7 @@ const HeroSection = styled.section`
 
 const PageLabel = styled(motion.span)`
   display: block;
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 3px;
@@ -54,7 +54,7 @@ const PageTitle = styled(motion.h1)`
   margin-bottom: 1rem;
   
   span {
-    color: #C9A24D;
+    color: #ffffff;
     background: none;
     -webkit-text-fill-color: initial;
     background-clip: border-box;
@@ -80,18 +80,18 @@ const FilterSection = styled.div`
 
 const FilterButton = styled.button`
   padding: 0.8rem 1.5rem;
-  background: ${props => props.$active ? '#C9A24D' : 'rgba(255, 255, 255, 0.1)'};
-  border: 1px solid ${props => props.$active ? 'transparent' : 'rgba(255, 255, 255, 0.2)'};
-  color: ${props => props.$active ? '#0f0f1a' : 'rgba(255, 255, 255, 0.8)'};
+  background: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.15)'};
+  border: 1px solid ${props => props.$active ? 'transparent' : 'rgba(255, 255, 255, 0.3)'};
+  color: ${props => props.$active ? '#5a3078' : 'rgba(255, 255, 255, 0.9)'};
   border-radius: 50px;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    background: ${props => props.$active ? '#C9A24D' : 'rgba(255, 255, 255, 0.2)'};
-    color: ${props => props.$active ? '#0f0f1a' : '#fff'};
+    background: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.25)'};
+    color: ${props => props.$active ? '#5a3078' : '#fff'};
   }
 `;
 
@@ -119,7 +119,7 @@ const StatItem = styled.div`
 const StatValue = styled.div`
   font-size: 1.8rem;
   font-weight: 700;
-  color: #C9A24D;
+  color: #5a3078;
   font-family: 'Playfair Display', Georgia, serif;
 `;
 
@@ -148,17 +148,15 @@ const RoomsGrid = styled.div`
 `;
 
 const RoomCard = styled(motion.div)`
-  background: #0F1E2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #5a3078;
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px rgba(193, 128, 210, 0.15);
   overflow: hidden;
   transition: all 0.4s ease;
 
   &:hover {
-    border-color: rgba(201, 162, 77, 0.2);
     transform: translateY(-8px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 40px rgba(193, 128, 210, 0.25);
   }
 `;
 
@@ -184,10 +182,10 @@ const RoomBadge = styled.div`
   top: 1rem;
   left: 1rem;
   padding: 0.5rem 1rem;
-  background: #C9A24D;
-  color: #0f0f1a;
+  background: #ffffff;
+  color: #5a3078;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
   border-radius: 50px;
@@ -216,7 +214,7 @@ const RoomRating = styled.div`
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  color: #C9A24D;
+  color: #ffffff;
   font-size: 0.9rem;
   font-weight: 600;
 `;
@@ -232,12 +230,11 @@ const SpecItem = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.85rem;
 
   svg {
-    color: #C9A24D;
+    color: #ffffff;
   }
 `;
 
@@ -250,11 +247,10 @@ const RoomAmenities = styled.div`
 
 const AmenityTag = styled.span`
   padding: 0.4rem 0.8rem;
-  background: rgba(201, 162, 77, 0.1);
-  border: 1px solid rgba(201, 162, 77, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 20px;
-  border-radius: 20px;
-  color: #ddd;
+  color: #ffffff;
   font-size: 0.75rem;
 `;
 
@@ -273,31 +269,29 @@ const RoomPrice = styled.div`
 const PriceAmount = styled.span`
   font-size: 1.8rem;
   font-weight: 700;
-  color: #d4af37;
+  color: #ffffff;
   font-family: 'Playfair Display', Georgia, serif;
 `;
 
 const PriceLabel = styled.span`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.85rem;
 `;
 
 const ViewButton = styled(Link)`
   padding: 0.9rem 2rem;
-  background: #1E6F5C;
-  color: #ffffff;
+  background: #ffffff;
+  color: #5a3078;
   text-decoration: none;
   border-radius: 50px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(30, 111, 92, 0.3);
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(30, 111, 92, 0.4);
   }
 `;
 
@@ -352,9 +346,10 @@ const Rooms = () => {
   const filteredRooms = useMemo(() => {
     if (!Array.isArray(rooms)) return [];
 
+    const activeRooms = rooms.filter(room => room.status !== 'inactive');
     const typed = filter === 'all'
-      ? rooms
-      : rooms.filter(room => room.room_type?.toLowerCase().includes(filter.toLowerCase()));
+      ? activeRooms
+      : activeRooms.filter(room => room.room_type?.toLowerCase().includes(filter.toLowerCase()));
 
     // De-duplicate by room_number, prioritizing rooms with images
     const uniqueMap = new Map();
@@ -397,9 +392,9 @@ const Rooms = () => {
           <FilterButton $active={filter === 'all'} onClick={() => setFilter('all')}>
             All Rooms
           </FilterButton>
-          <FilterButton $active={filter === 'standard'} onClick={() => setFilter('standard')}>
+          {/* <FilterButton $active={filter === 'standard'} onClick={() => setFilter('standard')}>
             Standard
-          </FilterButton>
+          </FilterButton> */}
           <FilterButton $active={filter === 'classic'} onClick={() => setFilter('classic')}>
             Classic
           </FilterButton>
@@ -432,7 +427,7 @@ const Rooms = () => {
 
       <RoomsSection>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: '#1E6F5C' }}>
+          <div style={{ textAlign: 'center', padding: '4rem', color: '#5a3078' }}>
             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
               <FaSnowflake style={{ fontSize: '3rem' }} />
             </motion.div>

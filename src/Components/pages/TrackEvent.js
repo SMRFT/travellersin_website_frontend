@@ -32,7 +32,7 @@ const Title = styled.h1`
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: #0F1E2E;
+  color: #1C0D24;
 `;
 
 const SearchCard = styled.div`
@@ -73,14 +73,14 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #C9A24D;
+    border-color: #5a3078;
     background: #fff;
   }
 `;
 
 const SubmitBtn = styled(motion.button)`
   padding: 1.2rem;
-  background: #1E6F5C;
+  background: #431d59;
   color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -115,14 +115,14 @@ const StatusBadge = styled.div`
         switch (props.$status) {
             case 'confirmed': return 'rgba(16, 185, 129, 0.1)';
             case 'cancelled': return 'rgba(239, 68, 68, 0.1)';
-            default: return 'rgba(201, 162, 77, 0.1)';
+            default: return 'rgba(193, 128, 210, 0.1)';
         }
     }};
   color: ${props => {
         switch (props.$status) {
             case 'confirmed': return '#10b981';
             case 'cancelled': return '#ef4444';
-            default: return '#C9A24D';
+            default: return '#5a3078';
         }
     }};
 `;
@@ -144,7 +144,7 @@ const DetailItem = styled.div`
 `;
 
 const DetailIcon = styled.div`
-  color: #C9A24D;
+  color: #5a3078;
   font-size: 1.2rem;
   margin-top: 0.2rem;
 `;
@@ -164,7 +164,7 @@ const DetailLabel = styled.span`
 const DetailValue = styled.span`
   font-size: 1.1rem;
   font-weight: 600;
-  color: #0F1E2E;
+  color: #1C0D24;
 `;
 
 const ConfirmationCard = styled.div`
@@ -186,7 +186,7 @@ const CardHeader = styled.div`
 `;
 
 const CardBrand = styled.div`
-  color: #d4af37;
+  color: #5a3078;
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
   font-weight: 700;
@@ -222,9 +222,9 @@ const ActionButtons = styled.div`
 const ActionButton = styled(motion.button)`
   flex: 1;
   padding: 0.8rem 1.5rem;
-  background: ${props => props.$primary ? '#1E6F5C' : '#ffffff'};
-  color: ${props => props.$primary ? '#ffffff' : '#1E6F5C'};
-  border: ${props => props.$primary ? 'none' : '1px solid #1E6F5C'};
+  background: ${props => props.$primary ? '#431d59' : '#ffffff'};
+  color: ${props => props.$primary ? '#ffffff' : '#431d59'};
+  border: ${props => props.$primary ? 'none' : '1px solid #431d59'};
   border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -237,7 +237,17 @@ const ActionButton = styled(motion.button)`
 
   &:hover {
     transform: translateY(-2px);
-    ${props => !props.$primary && 'background: rgba(201, 162, 77, 0.1);'}
+    ${props => !props.$primary && 'background: rgba(193, 128, 210, 0.1);'}
+  }
+`;
+
+const FormGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
   }
 `;
 
@@ -247,7 +257,6 @@ const TrackEvent = () => {
     const [phone, setPhone] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
-
     const [error, setError] = useState('');
     const location = useLocation();
 
@@ -336,7 +345,7 @@ const TrackEvent = () => {
 
                 <SearchCard>
                     <Form onSubmit={handleSearch}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+                        <FormGrid>
                             <InputGroup>
                                 <Label>Event Booking ID</Label>
                                 <Input
@@ -356,7 +365,7 @@ const TrackEvent = () => {
                                     onChange={e => setPhone(e.target.value)}
                                 />
                             </InputGroup>
-                        </div>
+                        </FormGrid>
                         <SubmitBtn
                             type="submit"
                             disabled={loading}
@@ -383,7 +392,7 @@ const TrackEvent = () => {
                         >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
                                 <div>
-                                    <h2 style={{ fontFamily: 'Playfair Display', fontSize: '1.8rem', marginBottom: '0.5rem', color: '#0F1E2E' }}>{result.event_type} Inquiry</h2>
+                                    <h2 style={{ fontFamily: 'Playfair Display', fontSize: '1.8rem', marginBottom: '0.5rem', color: '#1C0D24' }}>{result.event_type} Inquiry</h2>
                                     <p style={{ color: '#666' }}>ID: {result.booking_id}</p>
                                 </div>
                                 <StatusBadge $status={result.status}>{result.status}</StatusBadge>
@@ -397,7 +406,7 @@ const TrackEvent = () => {
                                     </CardHeader>
                                     <PrintableDetail><span>Booking ID</span><span>{result.booking_id}</span></PrintableDetail>
                                     <PrintableDetail><span>Event Type</span><span>{result.event_type}</span></PrintableDetail>
-                                    <PrintableDetail><span>Status</span><span style={{ color: '#d4af37' }}>{result.status.toUpperCase()}</span></PrintableDetail>
+                                    <PrintableDetail><span>Status</span><span style={{ color: '#5a3078', fontWeight: '600' }}>{result.status.toUpperCase()}</span></PrintableDetail>
                                     <PrintableDetail><span>Event Date</span><span>{new Date(result.event_date).toLocaleDateString()}</span></PrintableDetail>
                                     <PrintableDetail><span>Expected Guests</span><span>{result.number_of_guests}</span></PrintableDetail>
                                     <PrintableDetail><span>Guest Name</span><span>{result.name}</span></PrintableDetail>

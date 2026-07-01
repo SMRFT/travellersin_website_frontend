@@ -39,6 +39,7 @@ api.interceptors.response.use(
         window.location.href = '/';
       }
     }
+    console.error("API Error:", error.response ? error.response.status : "Network Error", error.config.url);
     return Promise.reject(error);
   }
 );
