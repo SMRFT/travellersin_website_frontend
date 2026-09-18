@@ -14,9 +14,42 @@ const API_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 
 const formatImageUrl = (url) => {
   if (!url) return '';
-  if (url.startsWith('http')) return url;
+  let s = typeof url === 'object' && url?.url ? url.url : String(url).trim();
+  if (!s) return '';
+
+  // Clean local dev hostnames
+  if (s.includes('127.0.0.1:1919') || s.includes('localhost:1919') || s.includes('localhost:3000') || s.includes('localhost:3001')) {
+    const match = s.match(/(?:\/_b_a_c_k_e_n_d\/travellerinwebsite)?\/media\/gridfs\/([^/]+)/);
+    if (match) {
+      s = match[1];
+    } else {
+      s = s.replace(/^https?:\/\/[^/]+/, '');
+    }
+  }
+
+  // Remote external URLs
+  if ((s.startsWith('http://') || s.startsWith('https://')) && !s.includes('127.0.0.1') && !s.includes('localhost')) {
+    return s;
+  }
+  if (s.startsWith('data:')) return s;
+
   const baseUrl = (API_BASE_URL || '').replace(/\/$/, '');
-  const path = url.startsWith('/') ? url : `/${url}`;
+
+  if (!s.includes('/')) {
+    return `${baseUrl}/media/gridfs/${s}/`;
+  }
+
+  if (s.startsWith('/_b_a_c_k_e_n_d/travellerinwebsite')) {
+    const rootBase = baseUrl.split('/_b_a_c_k_e_n_d')[0];
+    return `${rootBase}${s}`;
+  }
+
+  if (s.includes('media/gridfs/')) {
+    const fileId = s.split('media/gridfs/')[1].replace(/\//g, '');
+    return `${baseUrl}/media/gridfs/${fileId}/`;
+  }
+
+  const path = s.startsWith('/') ? s : `/${s}`;
   return `${baseUrl}${path}`;
 };
 
