@@ -1,0 +1,90 @@
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { ThemeProvider } from "styled-components";
+import { GlobalStyle, theme } from "./GlobalStyles";
+
+/* ===== Layout ===== */
+import Navbar from "./Components/Tools/Navbar";
+import Footer from "./Components/Tools/Footer";
+import ScrollToTop from "./Components/Tools/ScrollToTop";
+
+/* ===== Auth ===== */
+import { AuthProvider } from "./Components/auth/AuthContext";
+import LoginModal from "./Components/auth/LoginModal";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+/* ===== Pages ===== */
+import Home from "./Components/pages/Home";
+import Rooms from "./Components/pages/Rooms";
+import RoomDetails from "./Components/pages/RoomDetails";
+import Events from "./Components/pages/Events";
+import Booking from "./Components/pages/Booking";
+import Payment from "./Components/pages/Payment";
+import Confirmation from "./Components/pages/Confirmation";
+import Profile from "./Components/pages/Profile";
+import Contact from "./Components/pages/Contact";
+import AdminLogin from "./Components/pages/AdminLogin";
+import AdminSignup from "./Components/pages/AdminSignup";
+import AdminDashboard from "./Components/pages/AdminDashboard";
+import QuickBooking from "./Components/pages/QuickBooking";
+import TrackStayAndEvent from './Components/pages/TrackStayAndEvent';
+import Gallery from "./Components/pages/Gallery";
+
+
+const LayoutWrapper = ({ children }) => {
+  const { pathname } = useLocation();
+  const path = pathname.toLowerCase();
+  const isAdminPath = path.startsWith('/admin');
+
+  return (
+    <>
+      <ScrollToTop />
+      {!isAdminPath && <Navbar />}
+      
+      {/* Optional Global Login Modal */}
+      {!isAdminPath && <LoginModal />}
+
+      {children}
+
+      {!isAdminPath && <Footer />}
+    </>
+  );
+};
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+        <AuthProvider>
+          <Router>
+            <LayoutWrapper>
+              <Routes>
+                {/* Client Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/rooms" element={<Rooms />} />
+                <Route path="/rooms/:roomId" element={<RoomDetails />} />
+                <Route path="/booking/:roomId" element={<Booking />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/confirmation" element={<Confirmation />} />
+                <Route path="/track" element={<TrackStayAndEvent />} />
+                <Route path="/track-booking" element={<TrackStayAndEvent />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/signup" element={<AdminSignup />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/quick-booking" element={<QuickBooking />} />
+                <Route path="/gallery" element={<Gallery />} />
+                <Route path="/trackevent" element={<TrackStayAndEvent />} />
+              </Routes>
+            </LayoutWrapper>
+          </Router>
+        </AuthProvider>
+      </GoogleOAuthProvider>
+    </ThemeProvider>
+  );
+}
+
+export default App;

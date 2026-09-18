@@ -1,0 +1,850 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
+import { FaCalendarAlt, FaUserFriends, FaHotel, FaArrowRight, FaCheckCircle, FaIdCard, FaCoffee, FaWifi, FaPlus, FaClock, FaExclamationTriangle, FaUpload, FaSpinner } from 'react-icons/fa';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import { addDays, isWithinInterval, parseISO, startOfToday, format, differenceInCalendarDays } from 'date-fns';
+import { useAuth } from '../auth/AuthContext';
+import { getRoomById, checkRoomAvailability, getRoomBookings } from '../services/roomService';
+import api from '../services/api';
+
+const PageWrapper = styled.div`
+  background: #F3EEF1;
+  min-height: 100vh;
+  padding: 120px 2rem 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const BookingCard = styled(motion.div)`
+  background: #5a3078;
+  border-radius: 32px;
+  width: 100%;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(193, 128, 210, 0.15);
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const InfoSection = styled.div`
+  padding: 3rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+
+  @media (max-width: 900px) {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  @media (max-width: 600px) {
+    padding: 2rem;
+  }
+`;
+
+const FormSection = styled.div`
+  padding: 3rem;
+
+  @media (max-width: 600px) {
+    padding: 2rem;
+  }
+`;
+
+const Badge = styled.span`
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+`;
+
+const Title = styled.h2`
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+`;
+
+const RoomDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`;
+
+const DetailItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+
+  svg {
+    color: #ffffff;
+    font-size: 1.2rem;
+  }
+`;
+
+const PriceTag = styled.div`
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+  }
+
+  .amount {
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    margin-top: 0.5rem;
+    span {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-left: 0.5rem;
+    }
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const Label = styled.label`
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  padding-left: 0.5rem;
+`;
+
+const Input = styled.input`
+  padding: 1.1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  option {
+    background-color: #1a1a2e;
+    color: #fff;
+  }
+`;
+
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+`;
+
+const SubmitButton = styled(motion.button)`
+  margin-top: 1rem;
+  padding: 1.2rem;
+  background: #ffffff;
+  color: #5a3078;
+  border: none;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const AddonsSection = styled.div`
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const AddonGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const AddonCard = styled.div`
+  padding: 1rem;
+  background: ${props => props.$active ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)'};
+  border: 1px solid ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.1)'};
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  svg {
+    color: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'};
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    .name { color: #fff; font-size: 0.85rem; font-weight: 500; }
+    .price { color: rgba(255, 255, 255, 0.85); font-size: 0.75rem; }
+  }
+`;
+
+const AvailabilityBanner = styled(motion.div)`
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.9rem;
+  background: ${props => props.$available ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
+  color: ${props => props.$available ? '#10b981' : '#ef4444'};
+  border: 1px solid ${props => props.$available ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+`;
+
+const DatePickerStyles = styled.div`
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+  .react-datepicker__input-container {
+    width: 100%;
+  }
+  
+  .react-datepicker {
+    background-color: #5a3078;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-family: inherit;
+    color: #fff;
+  }
+
+  .react-datepicker__header {
+    background-color: #5a3078;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .react-datepicker__current-month, .react-datepicker__day-name {
+    color: #ffffff;
+  }
+
+  .react-datepicker__day {
+    color: #fff;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  .react-datepicker__day--disabled {
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
+    background-color: #ffffff;
+    color: #5a3078;
+  }
+`;
+
+const addonsList = [
+  { id: 'breakfast', name: 'Breakfast', price: 200, icon: <FaCoffee />, perGuest: true },
+  // { id: 'wifi', name: 'Premium WiFi', price: 200, icon: <FaWifi />, perGuest: false },
+  { id: 'extraperson', name: 'Extra Person', price: 500, icon: <FaPlus />, perGuest: false },
+  { id: 'latecheckout(2 hours)', name: 'Late Checkout (2 Hours)', price: 500, icon: <FaClock />, perGuest: false },
+];
+
+const Booking = () => {
+  const { roomId } = useParams();
+  const navigate = useNavigate();
+  const { user, openLoginModal } = useAuth();
+  const [toasts, setToasts] = useState([]);
+
+  const showToast = (message, type = 'success') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
+  };
+
+  const [formData, setFormData] = useState({
+    checkIn: '',
+    checkInTime: '12:00',
+    checkOut: '',
+    checkOutTime: '10:00',
+    guests: 1,
+    idProofType: 'Aadhar Card',
+    idProofNumber: '',
+    numberOfRooms: 1,
+    guestName: user?.name || '',
+    guestPhone: user?.phone || '',
+    guestEmail: user?.email || '',
+    selectedAddons: [],
+    idProofFile: ''
+  });
+
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        guestName: user.name || '',
+        guestPhone: user.phone || '',
+        guestEmail: user.email || ''
+      }));
+    }
+  }, [user]);
+
+  const [room, setRoom] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [availability, setAvailability] = useState({ checked: false, available: true, loading: false });
+  const [totalPrice, setTotalPrice] = useState(0);
+
+  useEffect(() => {
+    const fetchRoom = async () => {
+      try {
+        setLoading(true);
+        const data = await getRoomById(roomId);
+        setRoom(data);
+      } catch (err) {
+        console.error("Failed to fetch room:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRoom();
+  }, [roomId]);
+
+  const [bookedDates, setBookedDates] = useState([]);
+
+  useEffect(() => {
+    if (room?.room_number) {
+      const fetchBookings = async () => {
+        try {
+          const bookings = await getRoomBookings(room.room_number);
+          const dates = [];
+          bookings.forEach(booking => {
+            let currentDate = parseISO(booking.start);
+            const endDate = parseISO(booking.end);
+            // block the entire range
+            while (currentDate <= endDate) {
+              dates.push(new Date(currentDate));
+              currentDate = addDays(currentDate, 1);
+            }
+          });
+          setBookedDates(dates);
+        } catch (err) {
+          console.error("Failed to fetch bookings:", err);
+        }
+      };
+      fetchBookings();
+    }
+  }, [room]);
+
+  useEffect(() => {
+    if (!room) return;
+
+    let base = room.price * (formData.numberOfRooms || 1);
+
+    // Calculate Stay Duration
+    let nights = 1;
+    if (formData.checkIn && formData.checkOut) {
+      const start = parseISO(formData.checkIn);
+      const end = parseISO(formData.checkOut);
+      nights = Math.max(1, differenceInCalendarDays(end, start));
+    }
+
+    base *= nights;
+
+    // Calculate Addons
+    const addonsTotal = formData.selectedAddons.reduce((acc, addonId) => {
+      const addon = addonsList.find(a => a.id === addonId);
+      if (addon.perGuest) {
+        return acc + (addon.price * formData.guests * nights);
+      }
+      return acc + addon.price;
+    }, 0);
+
+    setTotalPrice(base + addonsTotal);
+  }, [formData, room]);
+
+  useEffect(() => {
+    if (formData.checkIn && formData.checkOut && room) {
+      const timer = setTimeout(async () => {
+        setAvailability(prev => ({ ...prev, loading: true }));
+        try {
+          const res = await checkRoomAvailability(
+            room.room_number,
+            `${formData.checkIn}T${formData.checkInTime || '12:00'}`,
+            `${formData.checkOut}T${formData.checkOutTime || '10:00'}`
+          );
+          setAvailability({ checked: true, available: res.is_available, loading: false });
+        } catch (err) {
+          console.error("Availability check failed:", err);
+          setAvailability({ checked: false, available: true, loading: false });
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [formData.checkIn, formData.checkOut, formData.checkInTime, formData.checkOutTime, room]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const toggleAddon = (id) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedAddons: prev.selectedAddons.includes(id)
+        ? prev.selectedAddons.filter(a => a !== id)
+        : [...prev.selectedAddons, id]
+    }));
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const upData = new FormData();
+    upData.append('image', file);
+
+    try {
+      setUploading(true);
+      const response = await api.post('/upload/room-image/', upData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setFormData(prev => ({ ...prev, idProofFile: response.data.url }));
+      showToast('ID Proof uploaded successfully!');
+    } catch (err) {
+      showToast('Upload failed: ' + (err.response?.data?.error || err.message), 'error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!room) return;
+
+    const finalBookingDetails = {
+      ...formData,
+      fullName: formData.guestName,
+      email: formData.guestEmail,
+      phone: formData.guestPhone,
+      customerId: user ? user.customer_id : null,
+      room_numbers: [room.room_number || roomId],
+      id_proof_file: formData.idProofFile || 'manual_entry',
+      idProofNumber: formData.idProofNumber,
+      idProofType: formData.idProofType,
+    };
+
+    if (!room.room_number && !roomId) {
+      showToast("Error: Room Number is missing. Please try refreshing the page.", "error");
+      return;
+    }
+
+    // Pass data to Payment page
+    navigate('/payment', {
+      state: {
+        bookingDetails: {
+          ...finalBookingDetails,
+          extra_addons: formData.selectedAddons.map(id => {
+            const addon = addonsList.find(a => a.id === id);
+            return { id: addon.id, name: addon.name, price: addon.price };
+          })
+        },
+        roomId: room.room_number,
+        totalAmount: totalPrice
+      }
+    });
+  };
+
+  if (loading) {
+    return (
+      <PageWrapper>
+        <div style={{ color: '#fff', fontSize: '1.5rem', fontFamily: 'Playfair Display' }}>
+          Loading your luxury space...
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  if (!room) {
+    return (
+      <PageWrapper>
+        <div style={{ color: '#fff', textAlign: 'center' }}>
+          <h2 style={{ fontFamily: 'Playfair Display', marginBottom: '1rem' }}>Room Not Found</h2>
+          <SubmitButton onClick={() => navigate('/rooms')}>Back to Rooms</SubmitButton>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  return (
+    <PageWrapper>
+      <BookingCard
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <InfoSection>
+          <Badge>Reservation</Badge>
+          <Title>Secure Your Luxury Escape</Title>
+
+          <RoomDetails>
+            <DetailItem>
+              <FaHotel />
+              <span>{room.room_type} - Room {room.room_number}</span>
+            </DetailItem>
+            <DetailItem>
+              <FaUserFriends />
+              <span>Up to {room.bed_details?.capacity || formData.guests * 2} Guests</span>
+            </DetailItem>
+            <DetailItem>
+              <FaCheckCircle />
+              <span>{room.amenities?.slice(0, 3).join(', ') || 'Complimentary Breakfast Included'}</span>
+            </DetailItem>
+          </RoomDetails>
+
+          <PriceTag>
+            <div className="label">Total Price</div>
+            <div className="amount">₹{totalPrice.toLocaleString()}<span>/ stay</span></div>
+          </PriceTag>
+        </InfoSection>
+
+        <FormSection>
+          <Form onSubmit={handleSubmit}>
+            {availability.checked && (
+              <AvailabilityBanner $available={availability.available}>
+                {availability.available ? (
+                  <>
+                    <FaCheckCircle />
+                    <span>Room is available for your dates!</span>
+                  </>
+                ) : (
+                  <>
+                    <FaExclamationTriangle />
+                    <span>Room is already booked for these dates.</span>
+                  </>
+                )}
+              </AvailabilityBanner>
+            )}
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+            >
+              <FormGroup>
+                <Label>Full Name</Label>
+                <Input
+                  type="text"
+                  name="guestName"
+                  value={formData.guestName}
+                  onChange={handleChange}
+                  placeholder="Enter your full name"
+                  required
+                />
+              </FormGroup>
+              <Grid>
+                <FormGroup>
+                  <Label>Phone Number</Label>
+                  <Input
+                    type="tel"
+                    name="guestPhone"
+                    value={formData.guestPhone}
+                    onChange={handleChange}
+                    placeholder="Phone number"
+                    required
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Label>Email (Optional)</Label>
+                  <Input
+                    type="email"
+                    name="guestEmail"
+                    value={formData.guestEmail}
+                    onChange={handleChange}
+                    placeholder="Email address"
+                  />
+                </FormGroup>
+              </Grid>
+              <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0.5rem 0' }} />
+            </motion.div>
+
+            <Grid>
+              <FormGroup>
+                <Label>Check-In Date</Label>
+                <DatePickerStyles>
+                  <DatePicker
+                    selected={formData.checkIn ? new Date(formData.checkIn) : null}
+                    onChange={(date) => setFormData(prev => ({ ...prev, checkIn: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                    selectsStart
+                    startDate={formData.checkIn ? new Date(formData.checkIn) : null}
+                    endDate={formData.checkOut ? new Date(formData.checkOut) : null}
+                    excludeDates={bookedDates}
+                    minDate={startOfToday()}
+                    placeholderText="Select Check-In Date"
+                    customInput={<Input />}
+                    dateFormat="yyyy-MM-dd"
+                    required
+                  />
+                </DatePickerStyles>
+              </FormGroup>
+              <FormGroup>
+                <Label>Check-In Time</Label>
+                <Input
+                  type="time"
+                  name="checkInTime"
+                  value={formData.checkInTime}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+            </Grid>
+
+            <Grid>
+              <FormGroup>
+                <Label>Check-Out Date</Label>
+                <DatePickerStyles>
+                  <DatePicker
+                    selected={formData.checkOut ? new Date(formData.checkOut) : null}
+                    onChange={(date) => setFormData(prev => ({ ...prev, checkOut: date ? format(date, 'yyyy-MM-dd') : '' }))}
+                    selectsEnd
+                    startDate={formData.checkIn ? new Date(formData.checkIn) : null}
+                    endDate={formData.checkOut ? new Date(formData.checkOut) : null}
+                    minDate={formData.checkIn ? addDays(new Date(formData.checkIn), 1) : startOfToday()}
+                    excludeDates={bookedDates}
+                    placeholderText="Select Check-Out Date"
+                    customInput={<Input />}
+                    dateFormat="yyyy-MM-dd"
+                    required
+                  />
+                </DatePickerStyles>
+              </FormGroup>
+              <FormGroup>
+                <Label>Check-Out Time</Label>
+                <Input
+                  type="time"
+                  name="checkOutTime"
+                  value={formData.checkOutTime}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+            </Grid>
+
+            <Grid>
+              <FormGroup>
+                <Label>Number of Guests</Label>
+                <Input
+                  type="number"
+                  name="guests"
+                  min="1"
+                  max="4"
+                  value={formData.guests}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label>Number of Rooms</Label>
+                <Input
+                  type="number"
+                  name="numberOfRooms"
+                  min="1"
+                  max="2"
+                  value={formData.numberOfRooms}
+                  onChange={handleChange}
+                  required
+                />
+              </FormGroup>
+            </Grid>
+
+            <FormGroup>
+              <Label>ID Proof Type</Label>
+              <Input
+                as="select"
+                name="idProofType"
+                value={formData.idProofType}
+                onChange={handleChange}
+                style={{ appearance: 'none' }}
+              >
+                <option value="Aadhar Card">Aadhar Card</option>
+                <option value="PAN Card">PAN Card</option>
+                <option value="Passport">Passport</option>
+                <option value="Driving License">Driving License</option>
+                <option value="Voter ID">Voter ID</option>
+                <option value="Government ID">Government ID</option>
+              </Input>
+            </FormGroup>
+
+            <FormGroup>
+              <Label>ID Proof Number</Label>
+              <div style={{ position: 'relative' }}>
+                <Input
+                  type="text"
+                  name="idProofNumber"
+                  placeholder="Enter your ID number"
+                  value={formData.idProofNumber}
+                  onChange={handleChange}
+                  // required
+                  style={{ width: '100%' }}
+                />
+                <FaIdCard style={{
+                  position: 'absolute',
+                  right: '1.5rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'rgba(255, 255, 255, 0.6)'
+                }} />
+              </div>
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Upload ID Proof (Image or PDF)</Label>
+              <div style={{ position: 'relative' }}>
+                <Input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={handleFileUpload}
+                  style={{ width: '100%', padding: '0.8rem 1.5rem' }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  right: '1.5rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  {uploading ? <FaSpinner className="fa-spin" style={{ color: '#ffffff' }} /> : (formData.idProofFile ? <FaCheckCircle style={{ color: '#ffffff' }} /> : <FaUpload style={{ color: 'rgba(255, 255, 255, 0.6)' }} />)}
+                </div>
+              </div>
+              {formData.idProofFile && (
+                <span style={{ fontSize: '0.75rem', color: '#10b981', marginLeft: '0.5rem' }}>File uploaded successfully!</span>
+              )}
+            </FormGroup>
+
+            <AddonsSection>
+              <Label>Enhance Your Stay (Optional)</Label>
+              <AddonGrid>
+                {addonsList.map(addon => (
+                  <AddonCard
+                    key={addon.id}
+                    $active={formData.selectedAddons.includes(addon.id)}
+                    onClick={() => toggleAddon(addon.id)}
+                  >
+                    {addon.icon}
+                    <div className="info">
+                      <span className="name">{addon.name}</span>
+                      <span className="price">₹{addon.price} {addon.perGuest ? '/ guest' : ''}</span>
+                    </div>
+                  </AddonCard>
+                ))}
+              </AddonGrid>
+            </AddonsSection>
+
+            <SubmitButton
+              type="submit"
+              disabled={availability.loading || (availability.checked && !availability.available)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{ opacity: (availability.loading || (availability.checked && !availability.available)) ? 0.5 : 1 }}
+            >
+              {availability.loading ? 'Checking Availability...' : 'Confirm Details'} <FaArrowRight />
+            </SubmitButton>
+          </Form>
+        </FormSection>
+      </BookingCard>
+
+      {/* Toast Notifications */}
+      <div style={{
+        position: 'fixed', bottom: '2rem', right: '2rem',
+        display: 'flex', flexDirection: 'column', gap: '0.75rem',
+        zIndex: 99999, pointerEvents: 'none'
+      }}>
+        {toasts.map(toast => (
+          <div key={toast.id} style={{
+            background: toast.type === 'error' ? 'rgba(239, 68, 68, 0.95)' : 'rgba(16, 185, 129, 0.95)',
+            color: '#fff',
+            padding: '1rem 1.5rem',
+            borderRadius: '16px',
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            animation: 'slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            pointerEvents: 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem'
+          }}>
+            {toast.type === 'error' ? <FaExclamationTriangle /> : <FaCheckCircle />}
+            {toast.message}
+          </div>
+        ))}
+      </div>
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(120%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .fa-spin {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </PageWrapper>
+  );
+};
+
+export default Booking;

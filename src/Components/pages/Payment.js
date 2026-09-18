@@ -1,0 +1,478 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled, { css } from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaCreditCard, FaMoneyBillWave, FaShieldAlt, FaArrowLeft, FaCheck } from 'react-icons/fa';
+import { createBooking, createRazorpayOrder, verifyPayment, confirmCashBooking } from '../services/bookingService';
+import { differenceInCalendarDays, parseISO } from 'date-fns';
+
+const PageWrapper = styled.div`
+  background: #F3EEF1;
+  min-height: 100vh;
+  padding: 120px 2rem 4rem;
+  display: flex;
+  justify-content: center;
+`;
+
+const Container = styled(motion.div)`
+  width: 100%;
+  max-width: 600px;
+`;
+
+const PaymentCard = styled.div`
+  background: #5a3078;
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 15px 40px rgba(193, 128, 210, 0.15);
+`;
+
+const Title = styled.h2`
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const SummaryBox = styled.div`
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+`;
+
+const SummaryLine = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+
+  &:last-child {
+    margin-bottom: 0;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+`;
+
+const MethodGrid = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+
+  > div {
+    flex: 1;
+    min-width: 150px;
+    max-width: 300px;
+  }
+`;
+
+const MethodCard = styled.div`
+  padding: 1.5rem;
+  background: ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.1)'};
+  border: 1px solid ${props => props.$active ? '#ffffff' : 'rgba(255, 255, 255, 0.2)'};
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  position: relative;
+
+  svg {
+    font-size: 2rem;
+    color: ${props => props.$active ? '#5a3078' : '#ffffff'};
+  }
+
+  span {
+    color: ${props => props.$active ? '#5a3078' : '#ffffff'};
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  ${props => props.$active && css`
+    &::after {
+      content: '';
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 18px;
+      height: 18px;
+      background: #5a3078;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(193, 128, 210, 0.3);
+    }
+  `}
+
+  &:hover {
+    border-color: #ffffff;
+    transform: translateY(-2px);
+  }
+`;
+
+const PayButton = styled(motion.button)`
+  width: 100%;
+  padding: 1.2rem;
+  background: #ffffff;
+  color: #5a3078;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+
+  &:hover {
+    /* No color change on hover, keeping it clean white/purple */
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+const SecurityInfo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+`;
+
+const ErrorMsg = styled.div`
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+`;
+
+const Payment = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { bookingDetails, roomId, totalAmount } = location.state || {};
+
+  const nights = bookingDetails?.checkIn && bookingDetails?.checkOut
+    ? Math.max(1, differenceInCalendarDays(parseISO(bookingDetails.checkOut), parseISO(bookingDetails.checkIn)))
+    : 1;
+
+  const [method, setMethod] = useState('online'); // Default to online payment since cash is disabled for customer bookings
+  const [paymentOption, setPaymentOption] = useState('full'); // 'full' or 'advance'
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const advanceAmount = totalAmount * 0.15;
+  const amountToPay = method === 'online' 
+    ? (paymentOption === 'full' ? totalAmount : advanceAmount)
+    : 0; // cash implies paying 0 upfront
+
+
+  useEffect(() => {
+    // Load Razorpay Script dynamically
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handleBooking = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const subtotal = parseFloat(totalAmount) || 0;
+      const taxableAmount = subtotal > 0 ? parseFloat((subtotal / 1.05).toFixed(2)) : 0;
+      const totalTax = subtotal > 0 ? parseFloat((subtotal - taxableAmount).toFixed(2)) : 0;
+      const cgstAmount = parseFloat((totalTax / 2).toFixed(2));
+      const sgstAmount = parseFloat((totalTax / 2).toFixed(2));
+      const grossTotal = subtotal;
+      const unroundedPayable = grossTotal;
+      const roundedPayable = Math.round(unroundedPayable);
+      const roundOff = parseFloat((roundedPayable - unroundedPayable).toFixed(2));
+
+      const bookingData = {
+        room_numbers: Array.isArray(bookingDetails.room_numbers) && bookingDetails.room_numbers.length > 0
+          ? bookingDetails.room_numbers.map(String).filter(r => r && r !== "undefined" && r !== "null")
+          : [String(bookingDetails.roomId || roomId)],
+        customer_id: bookingDetails.customerId,
+        guest_name: bookingDetails.fullName,
+        guest_phone: bookingDetails.phone,
+        guest_email: bookingDetails.email,
+        number_of_guests: bookingDetails.guests,
+        check_in: `${bookingDetails.checkIn}T${bookingDetails.checkInTime || '12:00'}`,
+        check_out: `${bookingDetails.checkOut}T${bookingDetails.checkOutTime || '10:00'}`,
+        payment_details: {
+          amount: roundedPayable,
+          status: method === 'online' ? 'paid' : 'pending'
+        },
+        id_proof_type: bookingDetails.idProofType,
+        id_proof_number: bookingDetails.idProofNumber,
+        id_proof_file: bookingDetails.id_proof_file || "manual_entry",
+        company_details: bookingDetails.company_details || {},
+        guest_address: bookingDetails.address || bookingDetails.guest_address || "",
+        extra_addons: bookingDetails.extra_addons || [],
+        bill_type: "Net Rate",
+        round_off: roundOff,
+        tax_details: {
+          bill_type: "Net Rate",
+          subtotal: subtotal,
+          taxable_amount: taxableAmount,
+          cgst_rate: 2.5,
+          cgst_amount: cgstAmount,
+          sgst_rate: 2.5,
+          sgst_amount: sgstAmount,
+          total_tax: totalTax,
+          round_off: roundOff,
+          gross_total: grossTotal
+        }
+      };
+
+      if (method === 'online') {
+        // 1. Initialize Razorpay Options DIRECTLY (Frontend Approach)
+        const options = {
+          key: process.env.REACT_APP_RAZORPAY_KEY || "rzp_test_YooSlpOnNDsCoN",
+          amount: amountToPay * 100, // Amount in paise
+          currency: "INR",
+          name: "TravellersInn",
+          description: `Booking for Room ${roomId}`,
+          // order_id: null, // No Order ID created on backend
+          handler: async function (response) {
+            console.log("Payment Success! Details:", response);
+
+            try {
+              // 2. Create Booking NOW (after payment success)
+              const booking = await createBooking(bookingData);
+
+              // 3. Verify/Link Payment (Just record it)
+              await verifyPayment({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id || "N/A",
+                razorpay_signature: response.razorpay_signature || "SKIPPED",
+                booking_id: booking.booking_id,
+                amount_paid: amountToPay
+              });
+
+              navigate('/confirmation', {
+                state: {
+                  bookingId: booking.booking_id,
+                  success: true,
+                  method: 'online',
+                  room_numbers: bookingData.room_numbers,
+                  check_in: bookingData.check_in,
+                  check_out: bookingData.check_out,
+                  checkInTime: bookingDetails.checkInTime || '12:00 PM',
+                  checkOutTime: bookingDetails.checkOutTime || '10:00 AM'
+                }
+              });
+            } catch (err) {
+              console.error("Booking Creation / Verification error:", err);
+              let serverMsg = "";
+              if (err.response?.data) {
+                if (typeof err.response.data === "string") {
+                  serverMsg = ` (${err.response.data})`;
+                } else if (err.response.data.error) {
+                  serverMsg = ` (${err.response.data.error})`;
+                } else if (err.response.data.non_field_errors) {
+                  serverMsg = ` (${Array.isArray(err.response.data.non_field_errors) ? err.response.data.non_field_errors.join(", ") : err.response.data.non_field_errors})`;
+                } else if (err.response.data.room_details) {
+                  serverMsg = ` (${err.response.data.room_details})`;
+                } else {
+                  serverMsg = ` (${JSON.stringify(err.response.data)})`;
+                }
+              }
+              setError(`Payment successful but booking creation failed${serverMsg}. Please contact support with Payment ID: ${response.razorpay_payment_id}`);
+            }
+          },
+          prefill: {
+            name: bookingDetails.fullName,
+            email: bookingDetails.email,
+            contact: bookingDetails.phone,
+          },
+          theme: {
+            color: "#5a3078",
+          },
+          modal: {
+            ondismiss: function () {
+              setLoading(false);
+            }
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+        // Loading stays true until either success handler or ondismiss
+      } else {
+        // Cash Flow - Create booking immediately
+        const booking = await createBooking(bookingData);
+        await confirmCashBooking(booking.booking_id);
+
+        navigate('/confirmation', {
+          state: {
+            bookingId: booking.booking_id,
+            success: true,
+            method: 'cash',
+            room_numbers: bookingData.room_numbers,
+            check_in: bookingData.check_in,
+            check_out: bookingData.check_out,
+            checkInTime: bookingDetails.checkInTime || '12:00 PM',
+            checkOutTime: bookingDetails.checkOutTime || '10:00 AM'
+          }
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err?.response?.data?.error || "Failed to initiate booking. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  if (!bookingDetails) {
+    return (
+      <PageWrapper>
+        <Container>
+          <ErrorMsg>Session expired. Please start the booking process again.</ErrorMsg>
+          <PayButton onClick={() => navigate('/rooms')}>Back to Rooms</PayButton>
+        </Container>
+      </PageWrapper>
+    );
+  }
+
+  return (
+    <PageWrapper>
+      <Container
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <PaymentCard>
+          <Title><FaCreditCard /> Payment Method</Title>
+
+          {error && <ErrorMsg>{error}</ErrorMsg>}
+
+          <SummaryBox>
+            <SummaryLine>
+              <span>Room Type</span>
+              <span>Premium Suite</span>
+            </SummaryLine>
+            <SummaryLine>
+              <span>Duration</span>
+              <span>{nights} Night{nights > 1 ? 's' : ''}</span>
+            </SummaryLine>
+            <SummaryLine>
+              <span>Guests</span>
+              <span>{bookingDetails.guests} person(s)</span>
+            </SummaryLine>
+            <SummaryLine>
+              <span>Total Amount</span>
+              <span>₹{totalAmount.toLocaleString()}</span>
+            </SummaryLine>
+            {method === 'online' && paymentOption === 'advance' && (
+              <SummaryLine style={{ borderTop: 'none', marginTop: 0, paddingTop: 0, fontWeight: 'normal', fontSize: '0.95rem' }}>
+                <span>Advance to Pay Now (15%)</span>
+                <span style={{ color: '#ffffff' }}>₹{amountToPay.toLocaleString()}</span>
+              </SummaryLine>
+            )}
+          </SummaryBox>
+
+          <MethodGrid>
+            <MethodCard
+              $active={method === 'online'}
+              onClick={() => setMethod('online')}
+            >
+              <FaCreditCard />
+              <span>Online Payment</span>
+            </MethodCard> 
+            {/* <MethodCard
+              $active={method === 'cash'}
+              onClick={() => setMethod('cash')}
+            >
+              <FaMoneyBillWave />
+              <span>Pay at Hotel</span>
+            </MethodCard> */}
+          </MethodGrid>
+
+          {method === 'online' && (
+            <div style={{ marginBottom: '2.5rem', display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+              <MethodCard 
+                $active={paymentOption === 'full'} 
+                onClick={() => setPaymentOption('full')}
+                style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <FaCheck style={{ opacity: paymentOption === 'full' ? 1 : 0 }} />
+                  <span>Pay Full Amount</span>
+                </div>
+                <span style={{ color: '#ffffff', fontWeight: 'bold' }}>₹{totalAmount.toLocaleString()}</span>
+              </MethodCard>
+              
+              <MethodCard 
+                $active={paymentOption === 'advance'} 
+                onClick={() => setPaymentOption('advance')}
+                style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <FaCheck style={{ opacity: paymentOption === 'advance' ? 1 : 0 }} />
+                  <span>Pay 15% Advance</span>
+                </div>
+                <span style={{ color: '#ffffff', fontWeight: 'bold' }}>₹{advanceAmount.toLocaleString()}</span>
+              </MethodCard>
+            </div>
+          )}
+
+          <PayButton
+            disabled={loading}
+            onClick={handleBooking}
+            whileHover={{ scale: method === 'online' ? 1.02 : 1 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            {loading ? 'Processing...' : (
+              method === 'online' ? 'Pay Now with Razorpay' : 'Confirm Cash Booking'
+            )}
+          </PayButton>
+
+          <SecurityInfo>
+            <FaShieldAlt />
+            <span>Secure 256-bit SSL Encrypted Payment</span>
+          </SecurityInfo>
+
+          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+            <button
+              onClick={() => navigate(-1)}
+              style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}
+            >
+              <FaArrowLeft /> Edit Details
+            </button>
+          </div>
+        </PaymentCard>
+      </Container>
+    </PageWrapper>
+  );
+};
+
+export default Payment;
