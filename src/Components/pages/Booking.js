@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FaCalendarAlt, FaUserFriends, FaHotel, FaArrowRight, FaCheckCircle, FaIdCard, FaCoffee, FaWifi, FaPlus, FaClock, FaExclamationTriangle, FaUpload, FaSpinner } from 'react-icons/fa';
+import { FaCalendarAlt, FaUserFriends, FaHotel, FaArrowRight, FaCheckCircle, FaIdCard, FaBed, FaWifi, FaPlus, FaClock, FaExclamationTriangle, FaUpload, FaSpinner } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays, isWithinInterval, parseISO, startOfToday, format, differenceInCalendarDays } from 'date-fns';
@@ -291,10 +291,10 @@ const DatePickerStyles = styled.div`
 `;
 
 const addonsList = [
-  { id: 'breakfast', name: 'Breakfast', price: 200, icon: <FaCoffee />, perGuest: true },
-  // { id: 'wifi', name: 'Premium WiFi', price: 200, icon: <FaWifi />, perGuest: false },
-  { id: 'extraperson', name: 'Extra Person', price: 500, icon: <FaPlus />, perGuest: false },
-  { id: 'latecheckout(2 hours)', name: 'Late Checkout (2 Hours)', price: 500, icon: <FaClock />, perGuest: false },
+  { id: 'wifi', name: 'Premium WiFi', price: 200, icon: <FaWifi />, perGuest: false },
+  { id: 'extrabed_300', name: 'Extra Bed (₹300)', price: 300, icon: <FaBed />, perGuest: false },
+  { id: 'extrabed_500', name: 'Extra Bed (₹500)', price: 500, icon: <FaBed />, perGuest: false },
+  { id: 'latecheckout', name: 'Late Checkout (Per Hr)', price: 250, icon: <FaClock />, perGuest: false },
 ];
 
 const Booking = () => {
@@ -309,11 +309,20 @@ const Booking = () => {
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
   };
 
+  const getCurrentTimeHHMM = () => {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    return `${h}:${m}`;
+  };
+
+  const initialTime = getCurrentTimeHHMM();
+
   const [formData, setFormData] = useState({
     checkIn: '',
-    checkInTime: '12:00',
+    checkInTime: initialTime,
     checkOut: '',
-    checkOutTime: '10:00',
+    checkOutTime: initialTime,
     guests: 1,
     idProofType: 'Aadhar Card',
     idProofNumber: '',
@@ -402,6 +411,7 @@ const Booking = () => {
     // Calculate Addons
     const addonsTotal = formData.selectedAddons.reduce((acc, addonId) => {
       const addon = addonsList.find(a => a.id === addonId);
+      if (!addon) return acc;
       if (addon.perGuest) {
         return acc + (addon.price * formData.guests * nights);
       }
@@ -416,10 +426,13 @@ const Booking = () => {
       const timer = setTimeout(async () => {
         setAvailability(prev => ({ ...prev, loading: true }));
         try {
+          const nowTime = getCurrentTimeHHMM();
+          const inTime = formData.checkInTime || nowTime;
+          const outTime = formData.checkOutTime || inTime;
           const res = await checkRoomAvailability(
             room.room_number,
-            `${formData.checkIn}T${formData.checkInTime || '12:00'}`,
-            `${formData.checkOut}T${formData.checkOutTime || '10:00'}`
+            `${formData.checkIn}T${inTime}`,
+            `${formData.checkOut}T${outTime}`
           );
           setAvailability({ checked: true, available: res.is_available, loading: false });
         } catch (err) {
@@ -432,16 +445,33 @@ const Booking = () => {
   }, [formData.checkIn, formData.checkOut, formData.checkInTime, formData.checkOutTime, room]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "checkInTime") {
+      setFormData(prev => ({
+        ...prev,
+        checkInTime: value,
+        checkOutTime: (!prev.checkOutTime || prev.checkOutTime === prev.checkInTime) ? value : prev.checkOutTime
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const toggleAddon = (id) => {
-    setFormData(prev => ({
-      ...prev,
-      selectedAddons: prev.selectedAddons.includes(id)
-        ? prev.selectedAddons.filter(a => a !== id)
-        : [...prev.selectedAddons, id]
-    }));
+    setFormData(prev => {
+      let updated = [...prev.selectedAddons];
+      if (updated.includes(id)) {
+        updated = updated.filter(a => a !== id);
+      } else {
+        if (id === 'extrabed_300') {
+          updated = updated.filter(a => a !== 'extrabed_500');
+        } else if (id === 'extrabed_500') {
+          updated = updated.filter(a => a !== 'extrabed_300');
+        }
+        updated.push(id);
+      }
+      return { ...prev, selectedAddons: updated };
+    });
   };
 
   const handleFileUpload = async (e) => {
@@ -494,8 +524,8 @@ const Booking = () => {
           ...finalBookingDetails,
           extra_addons: formData.selectedAddons.map(id => {
             const addon = addonsList.find(a => a.id === id);
-            return { id: addon.id, name: addon.name, price: addon.price };
-          })
+            return addon ? { id: addon.id, name: addon.name, price: addon.price, rate: addon.price, count: 1 } : null;
+          }).filter(Boolean)
         },
         roomId: room.room_number,
         totalAmount: totalPrice
@@ -546,7 +576,7 @@ const Booking = () => {
             </DetailItem>
             <DetailItem>
               <FaCheckCircle />
-              <span>{room.amenities?.slice(0, 3).join(', ') || 'Complimentary Breakfast Included'}</span>
+              <span>{room.amenities?.slice(0, 3).join(', ') || 'High-Speed WiFi & Premium Amenities'}</span>
             </DetailItem>
           </RoomDetails>
 

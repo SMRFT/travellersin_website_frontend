@@ -687,8 +687,12 @@ const Profile = () => {
   }, [user]);
 
   const handleCancelBooking = async (bookingId) => {
-    const reason = window.prompt("Please enter the reason for cancellation:");
+    const reason = window.prompt("Please enter the reason for cancellation (Mandatory):");
     if (reason === null) return;
+    if (!reason || !reason.trim()) {
+      alert("Cancellation reason is mandatory.");
+      return;
+    }
 
     if (!window.confirm("Are you sure you want to cancel this booking?")) return;
     try {

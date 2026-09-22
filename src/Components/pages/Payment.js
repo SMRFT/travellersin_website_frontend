@@ -216,6 +216,10 @@ const Payment = () => {
       const roundedPayable = Math.round(unroundedPayable);
       const roundOff = parseFloat((roundedPayable - unroundedPayable).toFixed(2));
 
+      const nowHHMM = new Date().toTimeString().slice(0, 5);
+      const chosenInTime = bookingDetails.checkInTime || nowHHMM;
+      const chosenOutTime = bookingDetails.checkOutTime || chosenInTime;
+
       const bookingData = {
         room_numbers: Array.isArray(bookingDetails.room_numbers) && bookingDetails.room_numbers.length > 0
           ? bookingDetails.room_numbers.map(String).filter(r => r && r !== "undefined" && r !== "null")
@@ -225,8 +229,8 @@ const Payment = () => {
         guest_phone: bookingDetails.phone,
         guest_email: bookingDetails.email,
         number_of_guests: bookingDetails.guests,
-        check_in: `${bookingDetails.checkIn}T${bookingDetails.checkInTime || '12:00'}`,
-        check_out: `${bookingDetails.checkOut}T${bookingDetails.checkOutTime || '10:00'}`,
+        check_in: `${bookingDetails.checkIn}T${chosenInTime}`,
+        check_out: `${bookingDetails.checkOut}T${chosenOutTime}`,
         payment_details: {
           amount: roundedPayable,
           status: method === 'online' ? 'paid' : 'pending'
@@ -286,45 +290,41 @@ const Payment = () => {
                   room_numbers: bookingData.room_numbers,
                   check_in: bookingData.check_in,
                   check_out: bookingData.check_out,
-                  checkInTime: bookingDetails.checkInTime || '12:00 PM',
-                  checkOutTime: bookingDetails.checkOutTime || '10:00 AM'
+                  checkInTime: chosenInTime,
+                  checkOutTime: chosenOutTime
                 }
               });
             } catch (err) {
               console.error("Booking Creation / Verification error:", err);
               let serverMsg = "";
-              if (err.response?.data) {
+              if (err.response && err.response.data) {
                 if (typeof err.response.data === "string") {
-                  serverMsg = ` (${err.response.data})`;
+                  serverMsg = err.response.data;
                 } else if (err.response.data.error) {
-                  serverMsg = ` (${err.response.data.error})`;
-                } else if (err.response.data.non_field_errors) {
-                  serverMsg = ` (${Array.isArray(err.response.data.non_field_errors) ? err.response.data.non_field_errors.join(", ") : err.response.data.non_field_errors})`;
-                } else if (err.response.data.room_details) {
-                  serverMsg = ` (${err.response.data.room_details})`;
+                  serverMsg = err.response.data.error;
                 } else {
-                  serverMsg = ` (${JSON.stringify(err.response.data)})`;
+                  serverMsg = JSON.stringify(err.response.data);
                 }
               }
-              setError(`Payment successful but booking creation failed${serverMsg}. Please contact support with Payment ID: ${response.razorpay_payment_id}`);
+              setError(serverMsg || "Payment successful, but failed to record booking. Please contact front desk with your Razorpay Payment ID: " + response.razorpay_payment_id);
+              setLoading(false);
             }
           },
           prefill: {
             name: bookingDetails.fullName,
             email: bookingDetails.email,
-            contact: bookingDetails.phone,
+            contact: bookingDetails.phone
           },
           theme: {
-            color: "#5a3078",
-          },
-          modal: {
-            ondismiss: function () {
-              setLoading(false);
-            }
+            color: "#682B83"
           }
         };
 
         const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          setError(response.error.description || "Payment failed. Please try again.");
+          setLoading(false);
+        });
         rzp.open();
         // Loading stays true until either success handler or ondismiss
       } else {
@@ -340,8 +340,8 @@ const Payment = () => {
             room_numbers: bookingData.room_numbers,
             check_in: bookingData.check_in,
             check_out: bookingData.check_out,
-            checkInTime: bookingDetails.checkInTime || '12:00 PM',
-            checkOutTime: bookingDetails.checkOutTime || '10:00 AM'
+            checkInTime: chosenInTime,
+            checkOutTime: chosenOutTime
           }
         });
       }

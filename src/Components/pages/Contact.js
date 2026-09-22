@@ -604,8 +604,7 @@ const Contact = () => {
                 <ContactLabel>Working Hours</ContactLabel>
                 <ContactText>
                   Reception: 24/7<br />
-                  Check-in: 12:00 PM<br />
-                  Check-out: 11:00 AM
+                  Check-in & Check-out: 24-Hour Cycle (From Check-in Time)
                 </ContactText>
               </ContactDetails>
             </ContactItem>

@@ -199,8 +199,12 @@ const TrackBooking = () => {
     };
 
     const handleCancel = async () => {
-        const reason = window.prompt("Please enter the reason for cancellation:");
+        const reason = window.prompt("Please enter the reason for cancellation (Mandatory):");
         if (reason === null) return; // User cancelled the prompt
+        if (!reason || !reason.trim()) {
+            alert("Cancellation reason is mandatory.");
+            return;
+        }
 
         if (!window.confirm("Are you sure you want to cancel this booking? This action cannot be undone.")) return;
 

@@ -242,10 +242,10 @@ const DatePickerStyles = styled.div`
 `;
 
 const addonsList = [
-    { id: 'breakfast', name: 'Breakfast', price: 500, icon: <FaCoffee />, perGuest: true },
     { id: 'wifi', name: 'Premium WiFi', price: 200, icon: <FaWifi />, perGuest: false },
-    { id: 'extrabed', name: 'Extra Bed', price: 1000, icon: <FaPlus />, perGuest: false },
-    { id: 'latecheckout', name: 'Late Checkout', price: 500, icon: <FaClock />, perGuest: false },
+    { id: 'extrabed_300', name: 'Extra Bed (₹300)', price: 300, icon: <FaBed />, perGuest: false },
+    { id: 'extrabed_500', name: 'Extra Bed (₹500)', price: 500, icon: <FaBed />, perGuest: false },
+    { id: 'latecheckout', name: 'Late Checkout (Per Hr)', price: 250, icon: <FaClock />, perGuest: false },
 ];
 
 const QuickBooking = () => {
@@ -261,11 +261,20 @@ const QuickBooking = () => {
     };
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
+    const getCurrentTimeHHMM = () => {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        return `${h}:${m}`;
+    };
+
+    const initialTime = getCurrentTimeHHMM();
+
     const [formData, setFormData] = useState({
         checkIn: '',
         checkOut: '',
-        checkInTime: '12:00',
-        checkOutTime: '10:00',
+        checkInTime: initialTime,
+        checkOutTime: initialTime,
         selectedRooms: [],
         guests: 1,
         guestName: '',
@@ -320,10 +329,14 @@ const QuickBooking = () => {
                     return;
                 }
 
+                const nowTime = getCurrentTimeHHMM();
+                const inTime = formData.checkInTime || nowTime;
+                const outTime = formData.checkOutTime || inTime;
+
                 const res = await checkRoomAvailability(
                     allRoomNumbers,
-                    `${formData.checkIn}T${formData.checkInTime || '12:00'}`,
-                    `${formData.checkOut}T${formData.checkOutTime || '10:00'}`
+                    `${formData.checkIn}T${inTime}`,
+                    `${formData.checkOut}T${outTime}`
                 );
 
                 // Update conflicts in state
@@ -368,12 +381,20 @@ const QuickBooking = () => {
     };
 
     const toggleAddon = (id) => {
-        setFormData(prev => ({
-            ...prev,
-            selectedAddons: prev.selectedAddons.includes(id)
-                ? prev.selectedAddons.filter(a => a !== id)
-                : [...prev.selectedAddons, id]
-        }));
+        setFormData(prev => {
+            let updated = [...prev.selectedAddons];
+            if (updated.includes(id)) {
+                updated = updated.filter(a => a !== id);
+            } else {
+                if (id === 'extrabed_300') {
+                    updated = updated.filter(a => a !== 'extrabed_500');
+                } else if (id === 'extrabed_500') {
+                    updated = updated.filter(a => a !== 'extrabed_300');
+                }
+                updated.push(id);
+            }
+            return { ...prev, selectedAddons: updated };
+        });
     };
 
     const calculateTotalPrice = () => {
@@ -389,10 +410,11 @@ const QuickBooking = () => {
         // Addons
         const addonsTotal = formData.selectedAddons.reduce((acc, addonId) => {
             const addon = addonsList.find(a => a.id === addonId);
+            if (!addon) return acc;
             if (addon.perGuest) {
                 return acc + (addon.price * formData.guests * nights);
             }
-            return acc + (addon.price * nights); // Apply per night if applicable
+            return acc + addon.price;
         }, 0);
 
         return total + addonsTotal;
@@ -432,8 +454,8 @@ const QuickBooking = () => {
             id_proof_file: formData.idProofFile || 'manual_entry',
             extra_addons: formData.selectedAddons.map(id => {
                 const addon = addonsList.find(a => a.id === id);
-                return { id: addon.id, name: addon.name, price: addon.price };
-            })
+                return addon ? { id: addon.id, name: addon.name, price: addon.price, rate: addon.price, count: 1 } : null;
+            }).filter(Boolean)
         };
 
         if (!user && (!formData.guestName || !formData.guestPhone)) {
@@ -496,7 +518,14 @@ const QuickBooking = () => {
                                     <Input
                                         type="time"
                                         value={formData.checkInTime}
-                                        onChange={e => setFormData({ ...formData, checkInTime: e.target.value })}
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                checkInTime: val,
+                                                checkOutTime: (!prev.checkOutTime || prev.checkOutTime === prev.checkInTime) ? val : prev.checkOutTime
+                                            }));
+                                        }}
                                     />
                                 </FormGroup>
                                 <FormGroup>

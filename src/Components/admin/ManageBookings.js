@@ -596,7 +596,13 @@ const ManageBookings = () => {
                 </div>
                 <div class="details">
                     <div class="row"><div class="label">Booking ID:</div><div class="value">${booking.booking_id}</div></div>
-                    <div class="row"><div class="label">Status:</div><div class="value">${booking.booking_status.toUpperCase()}</div></div>
+                    <div class="row"><div class="label">Status:</div><div class="value" style="color: ${String(booking.booking_status).toLowerCase().includes('cancel') ? '#DC2626; font-weight: bold;' : 'inherit;'}">${booking.booking_status.toUpperCase()}</div></div>
+                    ${String(booking.booking_status).toLowerCase().includes('cancel') ? `
+                        <div class="row"><div class="label">Cancellation Reason:</div><div class="value" style="color: #DC2626;">${booking.cancellation_reason || 'Cancelled by Admin'}</div></div>
+                        ${booking.payment_details?.refund_amount ? `<div class="row"><div class="label">Refund Amount:</div><div class="value">₹${booking.payment_details.refund_amount}</div></div>` : ''}
+                        ${booking.payment_details?.fine_amount ? `<div class="row"><div class="label">Cancellation Fee:</div><div class="value">₹${booking.payment_details.fine_amount}</div></div>` : ''}
+                        <div class="row"><div class="label">Refund Status:</div><div class="value">${booking.payment_details?.status || 'Pending'}</div></div>
+                    ` : ''}
                     <div class="row"><div class="label">Guest Name:</div><div class="value">${booking.guest_name}</div></div>
                     <div class="row"><div class="label">Phone:</div><div class="value">${booking.guest_phone || 'N/A'}</div></div>
                     <div class="row"><div class="label">Email:</div><div class="value">${booking.guest_email || 'N/A'}</div></div>
@@ -606,7 +612,7 @@ const ManageBookings = () => {
                     <div class="row"><div class="label">Rooms:</div><div class="value">${booking.room_numbers}</div></div>
                     <div class="row"><div class="label">Total Amount:</div><div class="value">₹${booking.payment_details?.amount || 0}</div></div>
                     <div class="row"><div class="label">Discount:</div><div class="value">₹${booking.discount_amount || 0}</div></div>
-                    <div class="row"><div class="label">Paid Amount:</div><div class="value">₹${booking.payment_details?.amount_paid || 0}</div></div>
+                    <div class="row"><div class="label">Paid Amount:</div><div class="value">₹${booking.payment_details?.amount_paid || (booking.payment_details?.amount || 0)}</div></div>
                     <div class="row"><div class="label">Remaining:</div><div class="value">₹${((booking.payment_details?.amount || 0) - (booking.discount_amount || 0)) - (booking.payment_details?.amount_paid || 0)}</div></div>
                 </div>
             </body>
@@ -906,9 +912,9 @@ const ManageBookings = () => {
                                 guest_name: '', guest_phone: '', guest_email: '',
                                 number_of_guests: 1, id_proof_type: 'Aadhar Card', id_proof_file: '',
                                 room_numbers: [],
-                                // Set default times to 12:00 and 10:00
-                                check_in: new Date().toISOString().split('T')[0] + 'T12:00',
-                                check_out: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0] + 'T10:00',
+                                // Set default 24-hour cycle from current time
+                                check_in: new Date().toISOString().split('T')[0] + 'T' + new Date().toTimeString().slice(0, 5),
+                                check_out: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0] + 'T' + new Date().toTimeString().slice(0, 5),
                                 amount: '', amount_paid: '', discount_amount: '', guest_address: ''
                             });
                             setCreateModal(true);

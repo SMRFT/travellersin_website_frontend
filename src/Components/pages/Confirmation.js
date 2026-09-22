@@ -379,8 +379,10 @@ const Confirmation = () => {
         transition={{ duration: 0.5 }}
       >
         <PrintHeader>
-          <h1>TravellersInn</h1>
-          <p>Booking Receipt & Confirmation</p>
+          <h1>TRAVELLER'S INN</h1>
+          <p style={{ margin: "2px 0 0", color: "#4B5563" }}>60/37, Saradha College Road, SALEM - 636007, Tamilnadu India</p>
+          <p style={{ margin: "2px 0 0", color: "#4B5563" }}>Phone: 9884347488 , 7695939196 | TIN: 33766480010 | <strong>GSTIN: 33AAMFT2081Q1ZM</strong></p>
+          <p style={{ margin: "4px 0 0", fontWeight: 700, color: "#5a3078" }}>Booking Receipt & Confirmation</p>
         </PrintHeader>
 
         <div className="no-print">
@@ -421,7 +423,7 @@ const Confirmation = () => {
                   day: 'numeric'
                 })}
                 <span style={{ color: 'rgba(255,255,255,0.85)', marginLeft: '0.5rem' }}>
-                  ({location.state?.checkInTime || '12:00 PM'})
+                  ({location.state?.checkInTime || (location.state.check_in.includes('T') ? location.state.check_in.split('T')[1].slice(0, 5) : '24-Hour Slot')})
                 </span>
               </span>
             </DetailLine>
@@ -437,7 +439,7 @@ const Confirmation = () => {
                   day: 'numeric'
                 })}
                 <span style={{ color: 'rgba(255,255,255,0.85)', marginLeft: '0.5rem' }}>
-                  ({location.state?.checkOutTime || '10:00 AM'})
+                  ({location.state?.checkOutTime || (location.state.check_out.includes('T') ? location.state.check_out.split('T')[1].slice(0, 5) : '24-Hour Slot')})
                 </span>
               </span>
             </DetailLine>
